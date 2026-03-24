@@ -30,22 +30,28 @@ O sistema utiliza uma arquitetura **Serverless (BaaS)**, garantindo escalabilida
 ## 📂 3. Estrutura de Pastas
 ```text
 /projeto-la-rose
-├── /public
-│   ├── manifest.json       # Configuração para instalar como App (PWA)
-│   ├── sw.js               # Service Worker (Cachê e Offline)
-│   └── /assets
-│       └── icons/          # Ícones do App (192x192, 512x512)
-├── /src
-│   ├── /css
-│   │   └── style.css       # Tailwind CSS e Estilos Customizados
-│   ├── /js
-│   │   ├── firebase-config.js # Conexão, Auth e Persistência Offline
-│   │   ├── auth.js         # Lógica de Login e Seletor de Operador
-│   │   ├── app.js          # Lógica de Lançamento, Busca e Smart-Draft
-│   │   ├── admin.js        # Algoritmo de Soma, BI e Trava de Lote
-│   │   └── data.js         # Master List (JSON com os 50+ produtos)
-│   ├── index.html          # Tela de Login e Seleção de Operador
-│   ├── lancamento.html     # Painel do Funcionário (Operacional)
-│   └── dashboard.html      # Painel do Admin (BI e Consolidação)
+├── firebase.json           # Configurações do Hosting (gerado pelo Firebase CLI)
+├── .firebaserc             # Identificação do projeto no Firebase
 ├── firestore.rules         # Regras de Segurança (RBAC)
-└── README.md               # Documentação Técnica
+├── firestore.indexes.json  # Índices para as buscas rápidas e filtros
+│
+├── /public                 # <-- TUDO que vai para o ar fica aqui
+│   ├── index.html          # Login e Seleção de Operador
+│   ├── lancamento.html     # Painel do Funcionário (PWA)
+│   ├── dashboard.html      # Painel do Admin (Márcio)
+│   ├── manifest.json       # Configurações de instalação Mobile
+│   ├── sw.js               # Service Worker (O "motor" do Offline)
+│   │
+│   ├── /assets             # Logos e Ícones da La Rose
+│   │
+│   ├── /css
+│   │   └── style.css       # Tailwind e Estilos
+│   │
+│   └── /js                 # Lógica do Sistema
+│       ├── firebase-config.js # Persistência Offline e Conexão
+│       ├── auth.js         # Controle de acesso
+│       ├── app.js          # Lógica Operacional (Rascunho/Busca/Manual)
+│       ├── admin.js        # BI, Soma de Lotes e Checklist
+│       └── data.js         # Master List (Seus 50+ produtos)
+│
+└── .gitignore              # Para não subir lixo para o seu GitHub
