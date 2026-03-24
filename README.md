@@ -29,29 +29,26 @@ O sistema utiliza uma arquitetura **Serverless (BaaS)**, garantindo escalabilida
 
 ## 📂 3. Estrutura de Pastas
 ```text
-/projeto-la-rose
-├── firebase.json           # Configurações do Hosting (gerado pelo Firebase CLI)
-├── .firebaserc             # Identificação do projeto no Firebase
-├── firestore.rules         # Regras de Segurança (RBAC)
-├── firestore.indexes.json  # Índices para as buscas rápidas e filtros
-│
-├── /public                 # <-- TUDO que vai para o ar fica aqui
-│   ├── index.html          # Login e Seleção de Operador
-│   ├── lancamento.html     # Painel do Funcionário (PWA)
-│   ├── dashboard.html      # Painel do Admin (Márcio)
-│   ├── manifest.json       # Configurações de instalação Mobile
-│   ├── sw.js               # Service Worker (O "motor" do Offline)
-│   │
-│   ├── /assets             # Logos e Ícones da La Rose
-│   │
-│   ├── /css
-│   │   └── style.css       # Tailwind e Estilos
-│   │
-│   └── /js                 # Lógica do Sistema
-│       ├── firebase-config.js # Persistência Offline e Conexão
-│       ├── auth.js         # Controle de acesso
-│       ├── app.js          # Lógica Operacional (Rascunho/Busca/Manual)
-│       ├── admin.js        # BI, Soma de Lotes e Checklist
-│       └── data.js         # Master List (Seus 50+ produtos)
-│
-└── .gitignore              # Para não subir lixo para o seu GitHub
+la-rose-smart-waste/
+├── firebase.json           # Configurações de deploy do Firebase
+├── firestore.rules         # Regras de segurança (Quem pode ler/gravar)
+├── firestore.indexes.json  # Índices para buscas rápidas
+├── .gitignore              # Arquivos que o Git deve ignorar
+└── /public                 # <-- PASTA PÚBLICA (Tudo aqui vai para a web)
+    ├── index.html          # Splash Screen e Seleção de Loja/Admin
+    ├── lancamento.html     # Painel do Operador (Lindomar, Amanda, etc)
+    ├── dashboard.html      # Seu Painel Admin (Soma de lotes e PDF)
+    ├── manifest.json       # Configuração para instalar como App (PWA)
+    ├── sw.js               # Service Worker (Motor do modo Offline)
+    │
+    ├── /assets             # Logos e ícones da La Rose
+    │
+    ├── /css
+    │   └── style.css       # Estilos (Tailwind ou CSS customizado)
+    │
+    └── /js                 # Lógica do Sistema
+        ├── firebase-config.js # Conexão com Firebase e Persistência Offline
+        ├── data.js         # Master List de Produtos e Config de Lojas
+        ├── auth.js         # Controle de acesso e UID do Márcio
+        ├── app.js          # Lógica de Lançamento e Rascunho
+        └── admin.js        # Algoritmo de Soma e Fechamento de Lote          # Para não subir lixo para o seu GitHub
