@@ -31,12 +31,21 @@ O sistema utiliza uma arquitetura **Serverless (BaaS)**, garantindo escalabilida
 ```text
 /projeto-la-rose
 ├── /public
-│   ├── /assets/icons       # Assets visuais do PWA
-│   ├── manifest.json       # Configurações de instalação mobile
-│   └── service-worker.js   # Controle de cache e modo offline
+│   ├── manifest.json       # Configuração para instalar como App (PWA)
+│   ├── sw.js               # Service Worker (Cachê e Offline)
+│   └── /assets
+│       └── icons/          # Ícones do App (192x192, 512x512)
 ├── /src
 │   ├── /css
-│   │   └── tailwind.css    # Design System e utilitários
+│   │   └── style.css       # Tailwind CSS e Estilos Customizados
 │   ├── /js
-│   │   ├── firebase.js     # Configuração SDK e App Check
-│   │   ├── app
+│   │   ├── firebase-config.js # Conexão, Auth e Persistência Offline
+│   │   ├── auth.js         # Lógica de Login e Seletor de Operador
+│   │   ├── app.js          # Lógica de Lançamento, Busca e Smart-Draft
+│   │   ├── admin.js        # Algoritmo de Soma, BI e Trava de Lote
+│   │   └── data.js         # Master List (JSON com os 50+ produtos)
+│   ├── index.html          # Tela de Login e Seleção de Operador
+│   ├── lancamento.html     # Painel do Funcionário (Operacional)
+│   └── dashboard.html      # Painel do Admin (BI e Consolidação)
+├── firestore.rules         # Regras de Segurança (RBAC)
+└── README.md               # Documentação Técnica
