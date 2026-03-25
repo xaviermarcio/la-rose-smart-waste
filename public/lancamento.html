@@ -2,21 +2,91 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lançamento - La Rose</title>
-    <link rel="stylesheet" href="css/style.css?v=13.0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/style.css?v=13.2">
     <meta name="theme-color" content="#f1f5f9">
 </head>
-<body id="app-page" style="opacity:0; transition:0.5s;">
-    
+
+<body id="app-page" class="page-fade">
+
+    <!-- Modal Sair -->
     <div id="modal-sair" class="modal-overlay hidden">
-        <div class="modal-estruturado fade-in-up" style="max-width: 340px; padding: 30px; text-align: center;">
-            <div style="font-size: 48px; margin-bottom: 15px;">⚠️</div>
-            <h3 style="color:var(--verde-dark); font-size: 24px; margin-bottom:12px; font-weight: 900; letter-spacing: -1px;">Deseja sair?</h3>
-            <p style="font-size:15px; color:var(--texto-suave); margin-bottom:35px; line-height: 1.5;">O lote atual que você está preenchendo será apagado permanentemente.</p>
-            <div style="display:flex; flex-direction: column; gap:12px;">
+        <div class="modal-centered pop-in">
+            <div class="modal-icon">⚠️</div>
+            <h3>Deseja sair?</h3>
+            <p class="modal-msg">O lote atual que você está preenchendo será apagado permanentemente.</p>
+            <div class="modal-actions">
                 <button onclick="window.confirmarSaida(true)" class="btn-entrar btn-rosa">SIM, QUERO SAIR</button>
-                <button onclick="window.confirmarSaida(false)" class="btn-manual-helper" style="margin-top:0;">CANCELAR E VOLTAR</button>
+                <button onclick="window.confirmarSaida(false)" class="cancel-link">CANCELAR E VOLTAR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Duplicado -->
+    <div id="modal-duplicado" class="modal-overlay hidden">
+        <div class="modal-centered pop-in">
+            <div class="modal-icon modal-info">ℹ️</div>
+            <h3>Produto já adicionado!</h3>
+            <p class="modal-msg" id="msg-duplicado"></p>
+            <div class="modal-actions">
+                <button id="btn-confirmar-dup" class="btn-entrar">SIM, SOMAR</button>
+                <button onclick="fecharModalDuplicado()" class="cancel-link">CANCELAR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Peso Alto -->
+    <div id="modal-peso-alto" class="modal-overlay hidden">
+        <div class="modal-centered pop-in">
+            <div class="modal-icon modal-warning">⚠️</div>
+            <h3>Peso elevado!</h3>
+            <p class="modal-msg" id="msg-peso-alto"></p>
+            <div class="modal-actions">
+                <button id="btn-confirmar-peso" class="btn-entrar">SIM, CONFIRMAR</button>
+                <button onclick="fecharModalPesoAlto()" class="cancel-link">CANCELAR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Envio -->
+    <div id="modal-envio" class="modal-overlay hidden">
+        <div class="modal-centered pop-in">
+            <div class="modal-icon modal-success">📤</div>
+            <h3>Confirmar Envio?</h3>
+            <p class="modal-msg" id="msg-envio"></p>
+            <div class="modal-actions">
+                <button id="btn-confirmar-envio" class="btn-entrar">SIM, ENVIAR LOTE</button>
+                <button onclick="fecharModalEnvio()" class="cancel-link">CANCELAR E VOLTAR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Sucesso -->
+    <div id="modal-sucesso" class="modal-overlay hidden">
+        <div class="modal-centered pop-in">
+            <div class="modal-icon modal-success">✅</div>
+            <h3>Lote Enviado!</h3>
+            <p class="modal-msg">Lote enviado com sucesso para a Gestão!</p>
+            <div class="modal-actions">
+                <button onclick="fecharModalSucesso()" class="btn-entrar">OK, ENTENDI</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Erro -->
+    <div id="modal-erro" class="modal-overlay hidden">
+        <div class="modal-centered pop-in">
+            <div class="modal-icon modal-error">⚠️</div>
+            <h3>Atenção</h3>
+            <p class="modal-msg" id="msg-erro"></p>
+            <div class="modal-actions">
+                <button onclick="fecharModalErro()" class="btn-entrar btn-rosa">ENTENDI</button>
             </div>
         </div>
     </div>
@@ -30,38 +100,85 @@
             <button onclick="window.abrirModalSair()" class="btn-outline">SAIR</button>
         </header>
 
-        <main class="glass-card overlay fade-in-up">
-            <div style="margin-bottom: 25px;">
-                <label>1. Buscar Produto</label>
-                <div style="position: relative;">
-                    <input type="text" id="busca-produto" placeholder="Digite nome ou código..." class="input-premium">
-                    <div id="sugestoes" class="hidden" style="position:absolute; width:100%; top:calc(100% + 8px); max-height:250px; overflow-y:auto; z-index:50; border-radius: var(--radius-md);"></div>
-                </div>
-            </div>
-            
-            <button onclick="window.ativarModoManual()" class="btn-manual-helper">Não encontrou? Digite aqui</button>
+        <main class="glass-card overlay fade-in-up lancamento-main">
+            <div class="campo-bloco">
+                <label class="campo-label">1. Buscar Produto</label>
 
-            <div style="margin-top: 40px;">
-                <label>2. Peso Bruto / Quantidade</label>
-                <div style="position:relative; margin-top:8px;">
-                    <input type="text" id="peso-input" placeholder="0,000" class="input-peso" inputmode="decimal">
-                    <span id="label-unidade" style="position:absolute; right:30px; top:50%; transform:translateY(-50%); font-weight:900; color:var(--texto-suave); font-size: 20px;">KG</span>
+                <div class="campo-busca-wrapper">
+                    <input type="text" id="busca-produto" placeholder="Digite nome ou código..." class="input-premium">
+
+                    <div id="sugestoes" class="hidden sugestoes-box"></div>
                 </div>
             </div>
-            <button id="btn-adicionar" class="btn-entrar" style="margin-top:35px;">ADICIONAR AO LOTE</button>
+
+            <button id="btn-manual-toggle" onclick="window.ativarModoManual()" class="btn-manual-helper">
+                Não encontrou? Digite aqui
+            </button>
+
+            <div id="manual-area" class="manual-area hidden fade-in-up">
+                <input type="text" id="manual-name" class="input-premium" placeholder="Nome do produto">
+
+                <div class="unit-toggle">
+                    <button class="unit-btn active" id="manual-kg" onclick="setManualUnit('KG')">⚖️ KG</button>
+                    <button class="unit-btn" id="manual-un" onclick="setManualUnit('UN')"># UN</button>
+                </div>
+
+                <button onclick="confirmarManual()" class="btn-entrar btn-confirmar-produto">
+                    CONFIRMAR PRODUTO
+                </button>
+            </div>
+
+            <div id="unit-toggle-catalog" class="hidden fade-in-up campo-toggle-unidade">
+                <label class="campo-label campo-label-sm">Tipo de medida</label>
+                <div class="unit-toggle">
+                    <button class="unit-btn active" id="cat-kg" onclick="setCatUnit('KG')">⚖️ KG</button>
+                    <button class="unit-btn" id="cat-un" onclick="setCatUnit('UN')"># UN</button>
+                </div>
+            </div>
+
+            <div class="campo-peso-bloco">
+                <label id="label-peso-titulo" class="campo-label">2. Peso</label>
+
+                <div class="peso-wrapper">
+                    <input type="text" id="peso-input" placeholder="0,000" class="input-peso" inputmode="decimal">
+                    <span id="label-unidade" class="label-unidade-peso">KG</span>
+                </div>
+            </div>
+
+            <button id="btn-adicionar" class="btn-entrar btn-adicionar-lote">
+                ➕ ADICIONAR AO LOTE
+            </button>
         </main>
 
-        <div id="lista-conferencia" style="padding:25px; width: 100%; margin: 0 auto 140px;"></div>
+        <div id="lista-conferencia" class="lista-conferencia-box"></div>
 
         <footer class="footer-action">
             <div>
-                <span style="display:block; color:var(--texto-suave); font-weight:800; font-size:11px; text-transform: uppercase; letter-spacing: 1px;">TOTAL DO LOTE</span>
-                <span id="total-itens" style="font-size:36px; font-weight:900; color: var(--verde-dark); letter-spacing: -2px; line-height: 1;">0</span>
+                <span class="footer-total-label">TOTAL DO LOTE</span>
+                <span id="total-itens" class="footer-total-numero">0</span>
             </div>
-            <button id="btn-finalizar-lote" class="btn-entrar" style="width: auto; padding: 20px 40px; border-radius: 100px;">FINALIZAR</button>
+
+            <button id="btn-finalizar-lote" class="btn-entrar btn-finalizar-lote">
+                📤 FINALIZAR
+            </button>
         </footer>
     </div>
 
-    <script type="module" src="js/app.js?v=12.3"></script>
+    <!-- MODAL GLOBAL -->
+    <div id="modal-global" class="modal-overlay hidden">
+        <div class="modal-centered pop-in">
+            <div class="modal-icon">⚠️</div>
+            <h3 id="modalTitulo">Título</h3>
+            <p class="modal-msg" id="modalMensagem"></p>
+
+            <div class="modal-actions">
+                <button id="modalConfirmar" class="btn-entrar">OK</button>
+                <button id="modalCancelar" class="cancel-link">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/modal.js?v=13.2"></script>
+<script type="module" src="js/app.js?v=13.2"></script>
 </body>
 </html>

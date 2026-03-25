@@ -2,32 +2,74 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestão La Rose - Smart Waste</title>
-    <link rel="stylesheet" href="css/style.css?v=13.0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/style.css?v=13.2">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <meta name="theme-color" content="#f1f5f9">
 </head>
-<body id="admin-page" style="opacity: 0; transition: 0.5s;">
 
+<body id="admin-page" class="page-fade">
+
+    <!-- Modal Detalhes -->
     <div id="modal-detalhes" class="modal-overlay hidden">
         <div class="modal-estruturado pop-in">
             <div class="modal-cabecalho">
                 <div>
-                    <h3 style="color:var(--verde-dark); font-size: 16px; font-weight: 900;">Resumo do Lote</h3>
-                    <p style="font-size: 11px; color: var(--texto-suave); font-weight: 600; margin-top: 2px;" id="detalhe-data-op">00/00/0000 • Operador</p>
+                    <h3 class="titulo-modal-lote">Resumo do Lote</h3>
+                    <p id="detalhe-data-op"></p>
                 </div>
                 <div id="detalhe-loja" class="badge-loja">LOJA</div>
             </div>
+
             <div class="modal-corpo">
                 <table class="tabela-detalhes">
-                    <thead><tr><th>Produto</th><th style="text-align: right;">Qtd/Peso</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Produto</th>
+                            <th class="text-right">Qtd/Peso</th>
+                        </tr>
+                    </thead>
                     <tbody id="lista-itens-detalhe"></tbody>
                 </table>
             </div>
+
             <div class="modal-rodape">
-                <button onclick="window.fecharModalDetalhes()" class="btn-outline" style="flex: 1;">FECHAR</button>
-                <button id="btn-acao-lancamento" class="btn-entrar" style="flex: 2; padding: 14px;">✅ DAR BAIXA</button>
+                <button onclick="window.fecharModalDetalhes()" class="btn-outline">FECHAR</button>
+                <button id="btn-acao-lancamento" class="btn-entrar">✅ DAR BAIXA</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Somar -->
+    <div id="modal-somar" class="modal-overlay hidden">
+        <div class="modal-centered pop-in">
+            <div class="modal-icon modal-success">📊</div>
+            <h3>Somar Lotes?</h3>
+            <p class="modal-msg" id="msg-somar"></p>
+
+            <div class="modal-actions">
+                <button id="btn-confirmar-somar" class="btn-entrar">SOMAR LOTES</button>
+                <button onclick="document.getElementById('modal-somar').classList.add('hidden')" class="cancel-link">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Sair -->
+    <div id="modal-sair-admin" class="modal-overlay hidden">
+        <div class="modal-centered pop-in">
+            <div class="modal-icon">⚠️</div>
+            <h3>Deseja sair?</h3>
+            <p class="modal-msg">Você será desconectado do painel administrativo.</p>
+
+            <div class="modal-actions">
+                <button id="btn-confirmar-sair-admin" class="btn-entrar btn-rosa">SIM, QUERO SAIR</button>
+                <button onclick="document.getElementById('modal-sair-admin').classList.add('hidden')" class="cancel-link">CANCELAR</button>
             </div>
         </div>
     </div>
@@ -35,39 +77,67 @@
     <div class="app-container">
         <header class="header-app">
             <div>
-                <div class="badge-loja" style="border: none;">👑 PAINEL ADMIN</div>
+                <div class="badge-loja">👑 PAINEL ADMIN</div>
                 <h1 class="nome-operador">Painel La Rose</h1>
             </div>
             <button id="btn-logout" class="btn-outline">SAIR</button>
         </header>
 
-        <main class="fade-in-up" style="position: relative; z-index: 20; padding-bottom: 100px;">
-            <div class="glass-card overlay" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
-                <div style="display: flex; flex-direction: column; justify-content: center; padding: 10px;">
-                    <small style="font-weight: 800; color: var(--texto-suave); font-size: 10px; text-transform: uppercase;" id="titulo-resumo">Pendentes</small>
-                    <h2 id="resumo-total" style="font-size: 38px; color: var(--verde-dark); font-weight: 900; letter-spacing: -2px; margin-top: 5px;">0</h2>
+        <main class="fade-in-up admin-main">
+
+            <!-- RESUMO -->
+            <div class="glass-card overlay resumo-admin-card">
+                <div class="resumo-admin-info">
+                    <small id="titulo-resumo" class="resumo-admin-label">Pendentes</small>
+                    <h2 id="resumo-total" class="resumo-admin-total">0</h2>
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 8px;">
-                    <button id="btn-excel" class="btn-entrar" style="padding: 12px; font-size: 11px; border-radius: 12px; background: #16a34a; color: white;">📊 EXCEL</button>
-                    <button onclick="window.gerarRelatorioPDF()" class="btn-entrar btn-rosa" style="padding: 12px; font-size: 11px; border-radius: 12px; color: white;">📄 PDF</button>
+
+                <div class="resumo-admin-acoes">
+                    <button id="btn-excel" class="btn-entrar">📊 EXCEL</button>
+                    <button onclick="window.gerarRelatorioPDF()" class="btn-entrar btn-rosa">📄 PDF</button>
                 </div>
             </div>
 
+            <!-- FILTRO -->
+            <div class="filtro-data-box">
+                <div class="filtro-data-linha">
+                    <input type="date" id="filtroData" class="input-premium">
+                    <button onclick="filtrarPorData()" class="btn-entrar btn-filtrar-data">
+                        FILTRAR POR DATA
+                    </button>
+                </div>
+            </div>
+
+            <!-- TABS -->
             <div class="tabs-container">
                 <button id="tab-pendentes" class="tab-btn active" onclick="window.mudarAba('pendentes')">⏳ PENDENTES</button>
+                <button id="tab-consolidados" class="tab-btn" onclick="window.mudarAba('consolidados')">📊 SOMADOS</button>
                 <button id="tab-lancados" class="tab-btn" onclick="window.mudarAba('lancados')">✅ LANÇADOS</button>
             </div>
 
-            <div style="width: 92%; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 15px 20px; border-radius: 16px; border: 1px solid var(--borda-fina);" class="glass-card">
-                <h3 style="font-size: 13px; font-weight: 900; color: var(--verde-dark); text-transform: uppercase;">Lotes</h3>
-                <label style="font-size: 11px; font-weight: 800; display: flex; align-items: center; gap: 8px; cursor: pointer; margin: 0; color: var(--texto-principal);">
-                    <input type="checkbox" id="selecionar-todos" checked class="checkbox-premium"> Sel. Todos
-                </label>
-            </div>
+            <!-- SELEÇÃO -->
+            <div id="selection-bar" class="selection-bar-admin"></div>
 
-            <div id="lista-admin" style="display: flex; flex-direction: column; gap: 10px; width: 92%; margin: 0 auto;"></div>
+            <!-- LISTA -->
+            <div id="lista-admin" class="lista-admin-box"></div>
         </main>
     </div>
-    <script type="module" src="js/app.js?v=12.3"></script>
+
+    <!-- MODAL GLOBAL -->
+    <div id="modal-global" class="modal-overlay hidden">
+        <div class="modal-centered pop-in">
+            <div class="modal-icon">⚠️</div>
+            <h3 id="modalTitulo">Título</h3>
+            <p class="modal-msg" id="modalMensagem"></p>
+
+            <div class="modal-actions">
+                <button id="modalConfirmar" class="btn-entrar">OK</button>
+                <button id="modalCancelar" class="cancel-link">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+   <script src="js/modal.js?v=13.2"></script>
+<script type="module" src="js/app.js?v=13.2"></script>
 </body>
 </html>
