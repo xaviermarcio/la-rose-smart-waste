@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>La Rose - Smart Waste</title>
+    <link rel="stylesheet" href="css/style.css?v=13.0">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#090E17">
+</head>
+<body id="index-page">
+    <div class="app-container">
+        <div id="splash-screen" style="position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.4s ease; background: var(--fundo-app);">
+            <img src="assets/images/logo.png" style="width: 260px; filter: drop-shadow(0 0 30px rgba(0, 230, 118, 0.4));" alt="La Rose">
+            <div class="loader" style="width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--verde-vibrante); border-radius: 50%; margin-top: 30px; animation: spin 0.8s linear infinite;"></div>
+        </div>
+
+        <main id="login-page" style="height:100vh; display:flex; align-items:center; opacity:0; transition: 0.8s; padding: 20px;">
+            <div class="glass-card" style="width: 100%;">
+                <h2 style="font-weight:900; margin-bottom:5px;">Acesso La Rose</h2>
+                <p style="color:var(--texto-suave); font-size:10px; text-transform:uppercase; letter-spacing:3px; margin-bottom:30px;">Smart Waste v13.0</p>
+
+                <div id="seletor-perfil">
+                    <button onclick="window.definirPerfil('operacional')" class="btn-entrar" style="margin-bottom: 15px;">ACESSO EQUIPE</button>
+                    <button onclick="window.definirPerfil('admin')" class="btn-outline" style="width: 100%;">ACESSO GESTÃO (ADMIN)</button>
+                </div>
+
+                <div id="campos-auth" class="hidden fade-in-up">
+                    <input type="email" id="email" placeholder="E-mail" class="input-premium" style="margin-bottom: 15px;">
+                    <input type="password" id="senha" placeholder="Senha" class="input-premium" style="margin-bottom: 25px;">
+                    <button id="btn-fazer-login" class="btn-entrar">ENTRAR NO SISTEMA</button>
+                    <button onclick="window.location.reload()" class="btn-manual-helper" style="border: none;">VOLTAR</button>
+                </div>
+
+                <div id="config-operacional" class="hidden fade-in-up">
+                    <div id="etapa-loja">
+                        <p style="font-size:11px; font-weight:800; color:var(--texto-suave); margin-bottom:15px; text-transform:uppercase;">Selecione a Unidade</p>
+                        <div class="grid-cards" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                            <div class="flash-card" onclick="window.selecionarLoja('entre_lagos')">
+                                <div class="avatar-circle">EL</div>
+                                <p>Entre Lagos</p>
+                            </div>
+                            <div class="flash-card" onclick="window.selecionarLoja('itapoa_parque')">
+                                <div class="avatar-circle">IP</div>
+                                <p>Itapoã Parque</p>
+                            </div>
+                        </div>
+                        <button onclick="window.resetar()" class="btn-manual-helper" style="margin-top:40px; border:none; color:var(--rosa-la-rose);">🚪 SAIR DO SISTEMA</button>
+                    </div>
+
+                    <div id="etapa-operador" class="hidden">
+                        <p style="font-size:11px; font-weight:800; color:var(--texto-suave); margin-bottom:15px; text-transform:uppercase;">Quem está operando?</p>
+                        <div id="container-operadores" class="grid-cards" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;"></div>
+                        <button onclick="window.voltarParaLoja()" class="btn-manual-helper" style="margin-top:20px; border:none;">ALTERAR UNIDADE</button>
+                    </div>
+                    
+                    <button id="btn-iniciar" onclick="window.location.href='lancamento.html'" class="btn-entrar hidden fade-in-up" style="margin-top:30px;">INICIAR TURNO</button>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
+    <script type="module" src="js/app.js?v=12.3"></script>
+</body>
+</html>

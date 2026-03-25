@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gestão La Rose - Smart Waste</title>
+    <link rel="stylesheet" href="css/style.css?v=13.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <meta name="theme-color" content="#f1f5f9">
+</head>
+<body id="admin-page" style="opacity: 0; transition: 0.5s;">
+
+    <div id="modal-detalhes" class="modal-overlay hidden">
+        <div class="modal-estruturado pop-in">
+            <div class="modal-cabecalho">
+                <div>
+                    <h3 style="color:var(--verde-dark); font-size: 16px; font-weight: 900;">Resumo do Lote</h3>
+                    <p style="font-size: 11px; color: var(--texto-suave); font-weight: 600; margin-top: 2px;" id="detalhe-data-op">00/00/0000 • Operador</p>
+                </div>
+                <div id="detalhe-loja" class="badge-loja">LOJA</div>
+            </div>
+            <div class="modal-corpo">
+                <table class="tabela-detalhes">
+                    <thead><tr><th>Produto</th><th style="text-align: right;">Qtd/Peso</th></tr></thead>
+                    <tbody id="lista-itens-detalhe"></tbody>
+                </table>
+            </div>
+            <div class="modal-rodape">
+                <button onclick="window.fecharModalDetalhes()" class="btn-outline" style="flex: 1;">FECHAR</button>
+                <button id="btn-acao-lancamento" class="btn-entrar" style="flex: 2; padding: 14px;">✅ DAR BAIXA</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <header class="header-app">
+            <div>
+                <div class="badge-loja" style="border: none;">👑 PAINEL ADMIN</div>
+                <h1 class="nome-operador">Painel La Rose</h1>
+            </div>
+            <button id="btn-logout" class="btn-outline">SAIR</button>
+        </header>
+
+        <main class="fade-in-up" style="position: relative; z-index: 20; padding-bottom: 100px;">
+            <div class="glass-card overlay" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+                <div style="display: flex; flex-direction: column; justify-content: center; padding: 10px;">
+                    <small style="font-weight: 800; color: var(--texto-suave); font-size: 10px; text-transform: uppercase;" id="titulo-resumo">Pendentes</small>
+                    <h2 id="resumo-total" style="font-size: 38px; color: var(--verde-dark); font-weight: 900; letter-spacing: -2px; margin-top: 5px;">0</h2>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <button id="btn-excel" class="btn-entrar" style="padding: 12px; font-size: 11px; border-radius: 12px; background: #16a34a; color: white;">📊 EXCEL</button>
+                    <button onclick="window.gerarRelatorioPDF()" class="btn-entrar btn-rosa" style="padding: 12px; font-size: 11px; border-radius: 12px; color: white;">📄 PDF</button>
+                </div>
+            </div>
+
+            <div class="tabs-container">
+                <button id="tab-pendentes" class="tab-btn active" onclick="window.mudarAba('pendentes')">⏳ PENDENTES</button>
+                <button id="tab-lancados" class="tab-btn" onclick="window.mudarAba('lancados')">✅ LANÇADOS</button>
+            </div>
+
+            <div style="width: 92%; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 15px 20px; border-radius: 16px; border: 1px solid var(--borda-fina);" class="glass-card">
+                <h3 style="font-size: 13px; font-weight: 900; color: var(--verde-dark); text-transform: uppercase;">Lotes</h3>
+                <label style="font-size: 11px; font-weight: 800; display: flex; align-items: center; gap: 8px; cursor: pointer; margin: 0; color: var(--texto-principal);">
+                    <input type="checkbox" id="selecionar-todos" checked class="checkbox-premium"> Sel. Todos
+                </label>
+            </div>
+
+            <div id="lista-admin" style="display: flex; flex-direction: column; gap: 10px; width: 92%; margin: 0 auto;"></div>
+        </main>
+    </div>
+    <script type="module" src="js/app.js?v=12.3"></script>
+</body>
+</html>

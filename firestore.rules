@@ -1,0 +1,20 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Regra para a coleção de quebras (Lançamentos de Banana, Tomate, etc.)
+    match /quebras/{document} {
+      // Qualquer funcionário logado (Lindomar, Amanda, etc) pode enviar dados
+      allow create: if request.auth != null;
+      
+      // TRAVA DE SEGURANÇA: Apenas você (Márcio) pode ler, editar ou apagar os relatórios
+      allow read, update, delete: if request.auth.token.email == "xaviermarcio80@gmail.com";
+    }
+
+    // Bloqueia qualquer outro acesso não especificado por padrão
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
