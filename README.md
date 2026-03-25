@@ -30,25 +30,18 @@ O sistema utiliza uma arquitetura **Serverless (BaaS)**, garantindo escalabilida
 ## 📂 3. Estrutura de Pastas
 ```text
 la-rose-smart-waste/
-├── firebase.json           # Configurações de deploy do Firebase
-├── firestore.rules         # Regras de segurança (Quem pode ler/gravar)
-├── firestore.indexes.json  # Índices para buscas rápidas
-├── .gitignore              # Arquivos que o Git deve ignorar
-└── /public                 # <-- PASTA PÚBLICA (Tudo aqui vai para a web)
-    ├── index.html          # Splash Screen e Seleção de Loja/Admin
-    ├── lancamento.html     # Painel do Operador (Lindomar, Amanda, etc)
-    ├── dashboard.html      # Seu Painel Admin (Soma de lotes e PDF)
-    ├── manifest.json       # Configuração para instalar como App (PWA)
-    ├── sw.js               # Service Worker (Motor do modo Offline)
-    │
-    ├── /assets             # Logos e ícones da La Rose
-    │
-    ├── /css
-    │   └── style.css       # Estilos (Tailwind ou CSS customizado)
-    │
-    └── /js                 # Lógica do Sistema
-        ├── firebase-config.js # Conexão com Firebase e Persistência Offline
-        ├── data.js         # Master List de Produtos e Config de Lojas
-        ├── auth.js         # Controle de acesso e UID do Márcio
-        ├── app.js          # Lógica de Lançamento e Rascunho
-        └── admin.js        # Algoritmo de Soma e Fechamento de Lote          # Para não subir lixo para o seu GitHub
+public/
+├── assets/
+│   ├── images/logo.png  ← use a logo.png
+│   ├── icon-192.png     ← crie você
+│   └── icon-512.png     ← crie você
+├── css/style.css
+├── js/
+│   ├── app.js
+│   ├── data.js
+│   └── firebase-config.js
+├── index.html
+├── dashboard.html
+├── lancamento.html       ← mantenha o seu atual
+├── manifest.json
+└── sw.js
