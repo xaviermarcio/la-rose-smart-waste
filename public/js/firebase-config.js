@@ -20,13 +20,13 @@ import {
 
 // SUAS CHAVES REAIS DA LA ROSE
 const firebaseConfig = {
-    apiKey: "AIzaSyCFC5vl9pzAy9h-k5T5QpSMUGQYdjYTJjY",
-    authDomain: "la-rose-smart-waste.firebaseapp.com",
-    projectId: "la-rose-smart-waste",
-    storageBucket: "la-rose-smart-waste.firebasestorage.app",
-    messagingSenderId: "363477370389",
-    appId: "1:363477370389:web:997b36628ce27c5285301c",
-    measurementId: "G-48Z4GQBQZ6"
+    apiKey: "",
+    authDomain: "",
+    projectId: "",
+    storageBucket: "l",
+    messagingSenderId: "3",
+    appId: "",
+    measurementId: ""
 };
 
 // Inicialização
