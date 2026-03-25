@@ -83,10 +83,19 @@
     <div class="app-container">
         <header class="header-app">
             <div>
-                <div class="badge-loja">👑 PAINEL ADMIN</div>
+                <div class="badge-loja">👤PAINEL ADMIN</div>
                 <h1 class="nome-operador">Painel La Rose</h1>
             </div>
-            <button id="btn-logout" class="btn-outline">SAIR</button>
+
+            <div style="display:flex; gap:10px;">
+                <button onclick="window.location.reload()" class="btn-outline">
+                    ↻
+                </button>
+
+                <button id="btn-logout" class="btn-outline">
+                    SAIR
+                </button>
+            </div>
         </header>
 
         <main class="fade-in-up admin-main">
