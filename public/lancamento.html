@@ -100,12 +100,21 @@
 
     <div class="app-container">
         <header class="header-app">
-            <div>
-                <div class="badge-loja">📍 <span id="display-loja">LOJA</span></div>
-                <h1 class="nome-operador" id="display-operador">Operador</h1>
-            </div>
-            <button onclick="window.abrirModalSair()" class="btn-outline">SAIR</button>
-        </header>
+    <div>
+        <div class="badge-loja">📍 <span id="display-loja">LOJA</span></div>
+        <h1 class="nome-operador" id="display-operador">Operador</h1>
+    </div>
+
+    <div style="display:flex; gap:10px;">
+        <button onclick="window.location.reload()" class="btn-outline">
+            🔄
+        </button>
+
+        <button onclick="window.abrirModalSair()" class="btn-outline" style="position:absolute; top:15px; right:15px; padding:8px 12px;">
+            SAIR
+        </button>
+    </div>
+</header>
 
         <main class="glass-card overlay fade-in-up lancamento-main">
             <div class="campo-bloco">
