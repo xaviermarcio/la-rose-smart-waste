@@ -5,9 +5,11 @@
   "start_url": "/index.html",
   "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "browser"],
   "orientation": "portrait-primary",
   "background_color": "#090E17",
   "theme_color": "#090E17",
+  "categories": ["business", "productivity"],
   "icons": [
     {
       "src": "assets/icons/icon-192.png",

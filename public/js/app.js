@@ -211,8 +211,8 @@ setTimeout(() => {
         splash.classList.add('hidden');
         const loginPage = el('login-page');
         if (loginPage) loginPage.style.opacity = '1';
-    }, 500);
-}, 2000);
+    }, 600);
+}, 3200);
 
 // ==========================================
 // 5. LÓGICA DE LOGIN
@@ -1442,5 +1442,26 @@ if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js')
             .then((reg) => console.log('✅ Service Worker registrado:', reg.scope))
             .catch((err) => console.error('❌ Erro ao registrar SW:', err));
+    });
+}
+
+// ===== SERVICE WORKER UPDATE =====
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').then(reg => {
+
+        reg.onupdatefound = () => {
+            const newWorker = reg.installing;
+
+            newWorker.onstatechange = () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    showGlobalModal({
+                        titulo: 'Atualização disponível',
+                        mensagem: 'Nova versão do sistema disponível. Atualize a página.',
+                        onConfirm: () => window.location.reload()
+                    });
+                }
+            };
+        };
+
     });
 }

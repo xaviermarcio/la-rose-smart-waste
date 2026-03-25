@@ -8,10 +8,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
 
-    <link rel="stylesheet" href="css/style.css?v=13.2">
+    <!-- 🚀 PERFORMANCE -->
+    <link rel="preload" href="css/style.css?v=13.2" as="style">
+    <link rel="preload" href="js/app.js?v=13.2" as="script">
+
    <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#090E17">
+   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+   <meta name="theme-color" content="#090E17">
     
 </head>
 
@@ -36,7 +41,7 @@
             <div class="glass-card login-card">
 
                 <h2 class="titulo-login">Acesso La Rose</h2>
-                <p class="subtitulo-login">Smart Waste v13.0</p>
+                <p class="subtitulo-login">Smart Waste </p>
 
                 <!-- PERFIL -->
                 <div id="seletor-perfil">
@@ -85,7 +90,7 @@
                         </div>
 
                         <button onclick="window.resetar()" class="btn-manual-helper btn-sem-borda btn-sair-sistema">
-                            🚪 SAIR DO SISTEMA
+                            ❌ SAIR DO SISTEMA
                         </button>
                     </div>
 
@@ -103,7 +108,7 @@
                     </div>
 
                     <button id="btn-iniciar" onclick="window.location.href='lancamento.html'" class="btn-entrar hidden fade-in-up mt-30">
-                        INICIAR TURNO
+                        INICIAR 
                     </button>
 
                 </div>
