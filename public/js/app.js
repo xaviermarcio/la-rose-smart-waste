@@ -32,6 +32,7 @@ const AppState = {
     selectedConsolidadoId: null,
     filtroRapidoAtivo: null,
     resumoVisivel: true,
+    rankingLojaFiltro: 'todas',
 };
 
 // Manter compatibilidade com window.*
@@ -299,7 +300,7 @@ setTimeout(() => {
         const loginPage = el('login-page');
         if (loginPage) loginPage.style.opacity = '1';
     }, 500);
-}, 2500);
+}, 2000);
 
 // ==========================================
 // 5. LÓGICA DE LOGIN
@@ -331,7 +332,7 @@ if (btnLogin) {
                     el('campos-auth')?.classList.add('hidden');
                     el('config-operacional')?.classList.remove('hidden');
                     hideTransitionLoader();
-                }, 2000);
+                }, 500);
             }
         } catch (e) {
             showGlobalModal({
@@ -1049,11 +1050,13 @@ if (document.body.id === 'admin-page') {
     }
 
     // === Rankings ===
-    function calcularRanking(lotes, unidade, top = 5) {
+    function calcularRanking(lotes, unidade, top = 5, lojaFiltro = 'todas') {
         const mapa = {};
 
         lotes.forEach(lote => {
             if (!lote.itens) return;
+            if (lojaFiltro !== 'todas' && lote.loja !== lojaFiltro) return;
+
             lote.itens.forEach(item => {
                 if (item.unidade === unidade || (unidade === 'KG' && item.unidade !== 'UN')) {
                     const key = item.nome;
@@ -1069,6 +1072,32 @@ if (document.body.id === 'admin-page') {
             .sort((a, b) => b.total - a.total)
             .slice(0, top);
     }
+
+    // Store filter for rankings
+    window.setRankingLoja = (loja) => {
+        vibrar();
+        AppState.rankingLojaFiltro = loja;
+
+        document.querySelectorAll('.ranking-store-tab').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.ranking-store-tab').forEach(b => {
+            const text = b.textContent.toLowerCase();
+            if (
+                (loja === 'todas' && text.includes('todas')) ||
+                (loja === 'entre_lagos' && text.includes('entre lagos')) ||
+                (loja === 'itapoa_parque' && text.includes('itapo'))
+            ) {
+                b.classList.add('active');
+            }
+        });
+
+        const label = el('ranking-loja-label');
+        if (label) {
+            const names = { todas: 'Todas as lojas', entre_lagos: '🏬 Entre Lagos', itapoa_parque: '🏬 Itapoã Parque' };
+            label.textContent = names[loja] || 'Todas as lojas';
+        }
+
+        renderDashboard();
+    };
 
     function renderRanking(containerId, ranking, unidade) {
         const container = el(containerId);
@@ -1091,15 +1120,32 @@ if (document.body.id === 'admin-page') {
         }).join('');
     }
 
-    // === PDF Ranking ===
+    // === PDF Ranking (por loja) ===
     window.gerarPdfRanking = (unidade) => {
         const lotesFiltrados = aplicarFiltroData(window.todosOsLotes.filter(b => b.status_lancado));
-        const ranking = calcularRanking(lotesFiltrados, unidade, 10);
+        const lojaFiltro = AppState.rankingLojaFiltro || 'todas';
 
-        if (ranking.length === 0) {
+        const lojas = lojaFiltro === 'todas'
+            ? ['entre_lagos', 'itapoa_parque']
+            : [lojaFiltro];
+
+        const nomeLojas = { entre_lagos: 'Entre Lagos', itapoa_parque: 'Itapoã Parque' };
+
+        let temDados = false;
+        const rankingsPorLoja = {};
+        lojas.forEach(loja => {
+            const r = calcularRanking(lotesFiltrados, unidade, 10, loja);
+            if (r.length > 0) temDados = true;
+            rankingsPorLoja[loja] = r;
+        });
+
+        if (!temDados) {
             showGlobalModal({ titulo: 'Aviso', mensagem: 'Nenhum dado para exportar!' });
             return;
         }
+
+        const dataStr = new Date().toLocaleDateString('pt-BR');
+        const horaStr = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
         const win = window.open('', '', 'height=700,width=900');
         let html = `
@@ -1108,26 +1154,51 @@ if (document.body.id === 'admin-page') {
                 <title>Ranking Perdas ${unidade} - La Rose</title>
                 <style>
                     body { font-family:sans-serif; padding:40px; color:#0f172a; }
-                    table { width:100%; border-collapse:collapse; margin-top:20px; }
+                    table { width:100%; border-collapse:collapse; margin-top:15px; margin-bottom:30px; }
                     th, td { border:1px solid #e2e8f0; padding:12px; text-align:left; }
                     th { background:#022c22; color:white; text-transform:uppercase; font-size:12px; }
                     h2 { color:#022c22; margin-bottom:5px; }
+                    h3 { color:#10b981; margin-top:30px; padding:10px 0; border-bottom:2px solid #10b981; }
                     .pos { font-weight:900; color:#10b981; }
                     .valor { font-weight:900; color:#e11d48; }
+                    .loja-badge { display:inline-block; padding:4px 12px; border-radius:6px; font-size:11px; font-weight:800; margin-left:8px; }
+                    .separador { border:none; border-top:3px solid #e2e8f0; margin:35px 0; }
+                    @media print { .separador { page-break-before: auto; } }
                 </style>
             </head>
             <body>
-                <h2>🏆 Ranking de Perdas em ${unidade} - Hortifruti La Rose</h2>
-                <p style="color:gray; margin-bottom:30px;">Gerado em ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</p>
-                <table>
-                    <tr><th>#</th><th>Produto</th><th>Total</th></tr>
+                <h2>🏆 Ranking de Perdas em ${unidade}</h2>
+                <p style="font-size:18px; font-weight:700; color:#022c22; margin-bottom:4px;">Hortifruti La Rose</p>
+                <p style="color:gray; margin-bottom:10px;">Gerado em ${dataStr} às ${horaStr}</p>
+                <p style="color:#64748b; font-size:13px; margin-bottom:20px;">
+                    ${lojaFiltro === 'todas' ? 'Relatório comparativo entre lojas' : 'Loja: ' + nomeLojas[lojaFiltro]}
+                </p>
         `;
 
-        ranking.forEach((item, idx) => {
-            html += `<tr><td class="pos">${idx + 1}°</td><td>${item.nome}</td><td class="valor">${formatPeso(item.total, unidade)}</td></tr>`;
+        lojas.forEach((loja, lojaIdx) => {
+            const ranking = rankingsPorLoja[loja];
+            if (lojaIdx > 0) html += '<hr class="separador">';
+
+            html += `<h3>🏬 ${nomeLojas[loja]}</h3>`;
+
+            if (ranking.length === 0) {
+                html += '<p style="color:#64748b; padding:20px 0;">Sem dados para esta loja.</p>';
+                return;
+            }
+
+            html += `
+                <table>
+                    <tr><th>#</th><th>Produto</th><th>Total</th></tr>
+            `;
+
+            ranking.forEach((item, idx) => {
+                html += `<tr><td class="pos">${idx + 1}°</td><td>${item.nome}</td><td class="valor">${formatPeso(item.total, unidade)}</td></tr>`;
+            });
+
+            html += `</table>`;
         });
 
-        html += `</table></body></html>`;
+        html += `</body></html>`;
         win.document.write(html);
         win.document.close();
         win.print();
@@ -1162,10 +1233,11 @@ if (document.body.id === 'admin-page') {
         if (metricaKG) metricaKG.innerText = metricas.totalKG.toFixed(3).replace('.', ',');
         if (metricaUN) metricaUN.innerText = Math.floor(metricas.totalUN);
 
-        // Rankings (baseados nos lotes lançados)
+        // Rankings (baseados nos lotes lançados, filtrados por loja)
         const lotesLancados = aplicarFiltroData(completed);
-        const rankingKG = calcularRanking(lotesLancados, 'KG', 5);
-        const rankingUN = calcularRanking(lotesLancados, 'UN', 5);
+        const lojaFiltro = AppState.rankingLojaFiltro || 'todas';
+        const rankingKG = calcularRanking(lotesLancados, 'KG', 5, lojaFiltro);
+        const rankingUN = calcularRanking(lotesLancados, 'UN', 5, lojaFiltro);
         renderRanking('ranking-kg', rankingKG, 'KG');
         renderRanking('ranking-un', rankingUN, 'UN');
 
@@ -1632,6 +1704,18 @@ if (document.body.id === 'admin-page') {
         const dados = window.obterDadosConsolidados();
         if (!dados) return;
 
+        const nomeLojas = { 'ENTRE LAGOS': 'Entre Lagos', 'ITAPOA PARQUE': 'Itapoã Parque' };
+        const dataStr = new Date().toLocaleDateString('pt-BR');
+        const horaStr = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+        // Agrupar por loja
+        const porLoja = {};
+        dados.forEach(c => {
+            const loja = c.Loja || 'SEM LOJA';
+            if (!porLoja[loja]) porLoja[loja] = [];
+            porLoja[loja].push(c);
+        });
+
         const win = window.open('', '', 'height=700,width=900');
 
         let html = `
@@ -1640,33 +1724,52 @@ if (document.body.id === 'admin-page') {
                     <title>Relatório La Rose</title>
                     <style>
                         body { font-family:sans-serif; padding:40px; color:#0f172a; }
-                        table { width:100%; border-collapse:collapse; margin-top:20px; }
+                        table { width:100%; border-collapse:collapse; margin-top:15px; margin-bottom:30px; }
                         th, td { border:1px solid #e2e8f0; padding:12px; text-align:left; }
                         th { background:#022c22; color:white; text-transform:uppercase; font-size:12px; }
                         h2 { color:#022c22; margin-bottom:5px; }
+                        h3 { color:#10b981; margin-top:30px; padding:10px 0; border-bottom:2px solid #10b981; }
+                        .separador { border:none; border-top:3px solid #e2e8f0; margin:35px 0; }
+                        .valor { font-weight:900; color:#e11d48; }
+                        .resumo-box { background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:15px 20px; margin:15px 0; }
+                        .resumo-item { display:flex; justify-content:space-between; padding:6px 0; }
+                        @media print { h3 { page-break-before: auto; } }
                     </style>
                 </head>
                 <body>
-                    <h2>Relatório Consolidado - Hortifruti La Rose</h2>
-                    <p style="color:gray; margin-bottom:30px;">Gerado em ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}. Soma total agrupada por produto.</p>
-                    <table>
-                        <tr>
-                            <th>Produto</th>
-                            <th>Quantidade / Peso</th>
-                        </tr>
+                    <h2>📋 Relatório Consolidado de Quebras</h2>
+                    <p style="font-size:18px; font-weight:700; color:#022c22; margin-bottom:4px;">Hortifruti La Rose</p>
+                    <p style="color:gray; margin-bottom:5px;">Gerado em ${dataStr} às ${horaStr}</p>
+                    <p style="color:#64748b; font-size:13px; margin-bottom:20px;">Soma total agrupada por produto e separada por loja</p>
         `;
 
-        dados.forEach(c => {
+        const lojaKeys = Object.keys(porLoja);
+        lojaKeys.forEach((loja, idx) => {
+            if (idx > 0) html += '<hr class="separador">';
+            const nomeLoja = nomeLojas[loja] || loja;
+
+            html += `<h3>🏬 ${nomeLoja}</h3>`;
             html += `
-                <tr>
-                    <td>${c.Produto}</td>
-                    <td><b style="color:#e11d48;">${c.Peso_Total}</b></td>
-                </tr>
+                <table>
+                    <tr>
+                        <th>Produto</th>
+                        <th>Quantidade / Peso</th>
+                    </tr>
             `;
+
+            porLoja[loja].forEach(c => {
+                html += `
+                    <tr>
+                        <td>${c.Produto}</td>
+                        <td class="valor">${c.Peso_Total}</td>
+                    </tr>
+                `;
+            });
+
+            html += `</table>`;
         });
 
         html += `
-                    </table>
                 </body>
             </html>
         `;

@@ -1123,6 +1123,56 @@ body#index-page .flash-card.selected {
     margin: 0 auto 15px;
 }
 
+/* Tabs de loja para rankings */
+.ranking-store-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+    background: var(--branco-puro);
+    border: 1px solid var(--borda-fina);
+    border-radius: var(--radius-md);
+    padding: 5px;
+    box-shadow: var(--sombra-card);
+}
+
+.ranking-store-tab {
+    flex: 1;
+    padding: 10px 8px;
+    border-radius: var(--radius-sm);
+    border: none;
+    font-size: 10px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    background: transparent;
+    color: var(--texto-suave);
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.ranking-store-tab:active {
+    transform: scale(0.96);
+}
+
+.ranking-store-tab.active {
+    background: var(--verde-vibrante);
+    color: var(--cor-btn-texto);
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.25);
+}
+
+.ranking-loja-label {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--verde-vibrante);
+    text-align: center;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
 .ranking-card {
     background: var(--branco-puro);
     border: 1px solid var(--borda-fina);
@@ -1677,7 +1727,7 @@ body#index-page .flash-card.selected {
 }
 
 .splash-logo {
-    width: 280px;
+    width: 260px;
     filter: drop-shadow(0 0 30px rgba(0, 230, 118, 0.4));
     animation: fadeInUp 0.8s var(--ease-out-expo) forwards;
 }
@@ -1742,7 +1792,7 @@ body#index-page .flash-card.selected {
 
 /* Logo no login card */
 .login-logo {
-    width: 120px;
+    width: 60px;
     margin-bottom: 20px;
     filter: drop-shadow(0 0 16px rgba(0, 230, 118, 0.3));
 }

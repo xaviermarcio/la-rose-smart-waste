@@ -113,6 +113,19 @@
                 </div>
             </div>
 
+
+             <!-- FILTRO POR DATA (range) -->
+            <div class="filtro-data-box">
+                <div class="filtro-data-linha">
+                    <input type="date" id="filtroDataInicio" class="input-premium" title="Data início">
+                    <span class="filtro-data-separador">até</span>
+                    <input type="date" id="filtroDataFim" class="input-premium" title="Data fim">
+                    <button onclick="window.filtrarPorData()" class="btn-entrar btn-filtrar-data tap-feedback">
+                        FILTRAR
+                    </button>
+                </div>
+            </div>
+
             <!-- BOTÃO OCULTAR/MOSTRAR RESUMO -->
             <button id="btn-toggle-resumo" class="btn-toggle-resumo tap-feedback" onclick="window.toggleResumo()">
                 👁️ Ocultar Resumo
@@ -142,8 +155,17 @@
                     <button class="btn-filtro-rapido btn-limpar tap-feedback" onclick="window.filtroRapido('limpar')">✕ Limpar</button>
                 </div>
 
-                <!-- RANKINGS -->
+                <!-- RANKINGS POR LOJA -->
                 <div id="ranking-container" class="ranking-container">
+                    <!-- Filtro de loja para rankings -->
+                    <div class="ranking-store-tabs">
+                        <button class="ranking-store-tab active tap-feedback" onclick="window.setRankingLoja('todas')">📊 Todas</button>
+                        <button class="ranking-store-tab tap-feedback" onclick="window.setRankingLoja('entre_lagos')">🏬 Entre Lagos</button>
+                        <button class="ranking-store-tab tap-feedback" onclick="window.setRankingLoja('itapoa_parque')">🏬 Itapoã Parque</button>
+                    </div>
+
+                    <div id="ranking-loja-label" class="ranking-loja-label">Todas as lojas</div>
+
                     <!-- Ranking KG -->
                     <div class="ranking-card">
                         <div class="ranking-header">
@@ -164,7 +186,7 @@
                 </div>
             </div>
 
-            <!-- FILTRO POR DATA (range) -->
+            <!-- FILTRO POR DATA (range) 
             <div class="filtro-data-box">
                 <div class="filtro-data-linha">
                     <input type="date" id="filtroDataInicio" class="input-premium" title="Data início">
@@ -174,7 +196,7 @@
                         FILTRAR
                     </button>
                 </div>
-            </div>
+            </div>-->
 
             <!-- TABS -->
             <div class="tabs-container">
