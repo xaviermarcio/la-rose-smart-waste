@@ -10,14 +10,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
 
-     <!-- 🚀 PERFORMANCE -->
-    <link rel="preload" href="css/style.css?v=13.2" as="style">
-    <link rel="preload" href="js/app.js?v=13.2" as="script">
-    <link rel="stylesheet" href="css/style.css?v=13.2">
+    <!-- 🚀 PERFORMANCE -->
+    <link rel="preload" href="css/style.css?v=14.0" as="style">
+    <link rel="preload" href="js/app.js?v=14.0" as="script">
+    <link rel="stylesheet" href="css/style.css?v=14.0">
 
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-    <meta name="theme-color" content="#090E17">
+    <meta name="theme-color" content="#10b981">
 </head>
 
 <body id="admin-page" class="page-fade">
@@ -46,8 +46,8 @@
             </div>
 
             <div class="modal-rodape">
-                <button onclick="window.fecharModalDetalhes()" class="btn-outline">FECHAR</button>
-                <button id="btn-acao-lancamento" class="btn-entrar">✅ DAR BAIXA</button>
+                <button onclick="window.fecharModalDetalhes()" class="btn-outline tap-feedback">FECHAR</button>
+                <button id="btn-acao-lancamento" class="btn-entrar tap-feedback">✅ DAR BAIXA</button>
             </div>
         </div>
     </div>
@@ -60,7 +60,7 @@
             <p class="modal-msg" id="msg-somar"></p>
 
             <div class="modal-actions">
-                <button id="btn-confirmar-somar" class="btn-entrar">SOMAR LOTES</button>
+                <button id="btn-confirmar-somar" class="btn-entrar tap-feedback">SOMAR LOTES</button>
                 <button onclick="document.getElementById('modal-somar').classList.add('hidden')" class="cancel-link">Cancelar</button>
             </div>
         </div>
@@ -74,31 +74,31 @@
             <p class="modal-msg">Você será desconectado do painel administrativo.</p>
 
             <div class="modal-actions">
-                <button id="btn-confirmar-sair-admin" class="btn-entrar btn-rosa">SIM, QUERO SAIR</button>
+                <button id="btn-confirmar-sair-admin" class="btn-entrar btn-rosa tap-feedback">SIM, QUERO SAIR</button>
                 <button onclick="document.getElementById('modal-sair-admin').classList.add('hidden')" class="cancel-link">CANCELAR</button>
             </div>
         </div>
     </div>
 
     <div class="app-container">
+        <!-- Header padronizado (mesmo estilo do lançamento) -->
         <header class="header-app">
             <div>
-                <div class="badge-loja">👤PAINEL ADMIN</div>
+                <div class="badge-loja">👤 PAINEL ADMIN</div>
                 <h1 class="nome-operador">Painel La Rose</h1>
             </div>
 
-            <div style="display:flex; gap:10px;">
-                <button onclick="window.location.reload()" class="btn-outline">
-                   🔄
+            <div class="header-actions">
+                <button onclick="window.location.reload()" class="btn-icon tap-feedback" title="Recarregar">
+                    🔄
                 </button>
-
-                <button id="btn-logout" class="btn-outline">
+                <button id="btn-logout" class="btn-outline btn-sair-header tap-feedback">
                     SAIR
                 </button>
             </div>
         </header>
 
-        <main class="fade-in-up admin-main">
+        <main class="fade-in-up admin-main" id="admin-main">
 
             <!-- RESUMO -->
             <div class="glass-card overlay resumo-admin-card">
@@ -108,26 +108,79 @@
                 </div>
 
                 <div class="resumo-admin-acoes">
-                    <button id="btn-excel" class="btn-entrar">📊 EXCEL</button>
-                    <button onclick="window.gerarRelatorioPDF()" class="btn-entrar btn-rosa">📄 PDF</button>
+                    <button id="btn-excel" class="btn-entrar tap-feedback">📊 EXCEL</button>
+                    <button onclick="window.gerarRelatorioPDF()" class="btn-entrar btn-rosa tap-feedback">📄 PDF</button>
                 </div>
             </div>
 
-            <!-- FILTRO -->
+            <!-- BOTÃO OCULTAR/MOSTRAR RESUMO -->
+            <button id="btn-toggle-resumo" class="btn-toggle-resumo tap-feedback" onclick="window.toggleResumo()">
+                👁️ Ocultar Resumo
+            </button>
+
+            <!-- SEÇÃO DE RESUMO (pode ser ocultada) -->
+            <div id="secao-resumo">
+                <!-- MÉTRICAS -->
+                <div id="metricas-container" class="metricas-container">
+                    <div class="metrica-card">
+                        <div class="metrica-icone">⚖️</div>
+                        <div id="metrica-kg" class="metrica-valor">0</div>
+                        <div class="metrica-label">Total KG</div>
+                    </div>
+                    <div class="metrica-card">
+                        <div class="metrica-icone">#️⃣</div>
+                        <div id="metrica-un" class="metrica-valor">0</div>
+                        <div class="metrica-label">Total UN</div>
+                    </div>
+                </div>
+
+                <!-- FILTROS RÁPIDOS -->
+                <div id="filtros-rapidos" class="filtros-rapidos">
+                    <button class="btn-filtro-rapido tap-feedback" onclick="window.filtroRapido('hoje')">Hoje</button>
+                    <button class="btn-filtro-rapido tap-feedback" onclick="window.filtroRapido('7dias')">7 dias</button>
+                    <button class="btn-filtro-rapido tap-feedback" onclick="window.filtroRapido('30dias')">30 dias</button>
+                    <button class="btn-filtro-rapido btn-limpar tap-feedback" onclick="window.filtroRapido('limpar')">✕ Limpar</button>
+                </div>
+
+                <!-- RANKINGS -->
+                <div id="ranking-container" class="ranking-container">
+                    <!-- Ranking KG -->
+                    <div class="ranking-card">
+                        <div class="ranking-header">
+                            <span class="ranking-titulo">🏆 Top Perdas KG</span>
+                            <button class="btn-pdf-ranking tap-feedback" onclick="window.gerarPdfRanking('KG')">📄 PDF</button>
+                        </div>
+                        <div id="ranking-kg"></div>
+                    </div>
+
+                    <!-- Ranking UN -->
+                    <div class="ranking-card">
+                        <div class="ranking-header">
+                            <span class="ranking-titulo">🏆 Top Perdas UN</span>
+                            <button class="btn-pdf-ranking tap-feedback" onclick="window.gerarPdfRanking('UN')">📄 PDF</button>
+                        </div>
+                        <div id="ranking-un"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FILTRO POR DATA (range) -->
             <div class="filtro-data-box">
                 <div class="filtro-data-linha">
-                    <input type="date" id="filtroData" class="input-premium">
-                    <button onclick="filtrarPorData()" class="btn-entrar btn-filtrar-data">
-                        FILTRAR POR DATA
+                    <input type="date" id="filtroDataInicio" class="input-premium" title="Data início">
+                    <span class="filtro-data-separador">até</span>
+                    <input type="date" id="filtroDataFim" class="input-premium" title="Data fim">
+                    <button onclick="window.filtrarPorData()" class="btn-entrar btn-filtrar-data tap-feedback">
+                        FILTRAR
                     </button>
                 </div>
             </div>
 
             <!-- TABS -->
             <div class="tabs-container">
-                <button id="tab-pendentes" class="tab-btn active" onclick="window.mudarAba('pendentes')">⏳ PENDENTES</button>
-                <button id="tab-consolidados" class="tab-btn" onclick="window.mudarAba('consolidados')">📊 SOMADOS</button>
-                <button id="tab-lancados" class="tab-btn" onclick="window.mudarAba('lancados')">✅ LANÇADOS</button>
+                <button id="tab-pendentes" class="tab-btn active tap-feedback" onclick="window.mudarAba('pendentes')">⏳ PENDENTES</button>
+                <button id="tab-consolidados" class="tab-btn tap-feedback" onclick="window.mudarAba('consolidados')">📊 SOMADOS</button>
+                <button id="tab-lancados" class="tab-btn tap-feedback" onclick="window.mudarAba('lancados')">✅ LANÇADOS</button>
             </div>
 
             <!-- SELEÇÃO -->
@@ -146,13 +199,14 @@
             <p class="modal-msg" id="modalMensagem"></p>
 
             <div class="modal-actions">
-                <button id="modalConfirmar" class="btn-entrar">OK</button>
+                <button id="modalConfirmar" class="btn-entrar tap-feedback">OK</button>
                 <button id="modalCancelar" class="cancel-link">Cancelar</button>
             </div>
         </div>
     </div>
 
-   <script src="js/modal.js?v=13.2"></script>
-<script type="module" src="js/app.js?v=13.2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="js/modal.js?v=14.0"></script>
+    <script type="module" src="js/app.js?v=14.0"></script>
 </body>
 </html>

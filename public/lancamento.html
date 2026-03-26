@@ -11,13 +11,13 @@
     <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
 
     <!-- 🚀 PERFORMANCE -->
-    <link rel="preload" href="css/style.css?v=13.2" as="style">
-    <link rel="preload" href="js/app.js?v=13.2" as="script">
-    <link rel="stylesheet" href="css/style.css?v=13.2">
+    <link rel="preload" href="css/style.css?v=14.0" as="style">
+    <link rel="preload" href="js/app.js?v=14.0" as="script">
+    <link rel="stylesheet" href="css/style.css?v=14.0">
 
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-    <meta name="theme-color" content="#090E17">
+    <meta name="theme-color" content="#10b981">
 </head>
 
 <body id="app-page" class="page-fade">
@@ -29,7 +29,7 @@
             <h3>Deseja sair?</h3>
             <p class="modal-msg">O lote atual que você está preenchendo será apagado permanentemente.</p>
             <div class="modal-actions">
-                <button onclick="window.confirmarSaida(true)" class="btn-entrar btn-rosa">SIM, QUERO SAIR</button>
+                <button onclick="window.confirmarSaida(true)" class="btn-entrar btn-rosa tap-feedback">SIM, QUERO SAIR</button>
                 <button onclick="window.confirmarSaida(false)" class="cancel-link">CANCELAR E VOLTAR</button>
             </div>
         </div>
@@ -42,7 +42,7 @@
             <h3>Produto já adicionado!</h3>
             <p class="modal-msg" id="msg-duplicado"></p>
             <div class="modal-actions">
-                <button id="btn-confirmar-dup" class="btn-entrar">SIM, SOMAR</button>
+                <button id="btn-confirmar-dup" class="btn-entrar tap-feedback">SIM, SOMAR</button>
                 <button onclick="fecharModalDuplicado()" class="cancel-link">CANCELAR</button>
             </div>
         </div>
@@ -55,7 +55,7 @@
             <h3>Peso elevado!</h3>
             <p class="modal-msg" id="msg-peso-alto"></p>
             <div class="modal-actions">
-                <button id="btn-confirmar-peso" class="btn-entrar">SIM, CONFIRMAR</button>
+                <button id="btn-confirmar-peso" class="btn-entrar tap-feedback">SIM, CONFIRMAR</button>
                 <button onclick="fecharModalPesoAlto()" class="cancel-link">CANCELAR</button>
             </div>
         </div>
@@ -68,7 +68,7 @@
             <h3>Confirmar Envio?</h3>
             <p class="modal-msg" id="msg-envio"></p>
             <div class="modal-actions">
-                <button id="btn-confirmar-envio" class="btn-entrar">SIM, ENVIAR LOTE</button>
+                <button id="btn-confirmar-envio" class="btn-entrar tap-feedback">SIM, ENVIAR LOTE</button>
                 <button onclick="fecharModalEnvio()" class="cancel-link">CANCELAR E VOLTAR</button>
             </div>
         </div>
@@ -81,7 +81,7 @@
             <h3>Lote Enviado!</h3>
             <p class="modal-msg">Lote enviado com sucesso para a Gestão!</p>
             <div class="modal-actions">
-                <button onclick="fecharModalSucesso()" class="btn-entrar">OK, ENTENDI</button>
+                <button onclick="fecharModalSucesso()" class="btn-entrar tap-feedback">OK, ENTENDI</button>
             </div>
         </div>
     </div>
@@ -93,41 +93,41 @@
             <h3>Atenção</h3>
             <p class="modal-msg" id="msg-erro"></p>
             <div class="modal-actions">
-                <button onclick="fecharModalErro()" class="btn-entrar btn-rosa">ENTENDI</button>
+                <button onclick="fecharModalErro()" class="btn-entrar btn-rosa tap-feedback">ENTENDI</button>
             </div>
         </div>
     </div>
 
     <div class="app-container">
+        <!-- Header padronizado (sem estilos inline) -->
         <header class="header-app">
-    <div>
-        <div class="badge-loja">📍 <span id="display-loja">LOJA</span></div>
-        <h1 class="nome-operador" id="display-operador">Operador</h1>
-    </div>
+            <div>
+                <div class="badge-loja">📍 <span id="display-loja">LOJA</span></div>
+                <h1 class="nome-operador" id="display-operador">Operador</h1>
+            </div>
 
-    <div style="display:flex; gap:10px;">
-        <button onclick="window.location.reload()" class="btn-outline">
-            🔄
-        </button>
-
-        <button onclick="window.abrirModalSair()" class="btn-outline" >
-            SAIR
-        </button>
-    </div>
-</header>
+            <div class="header-actions">
+                <button onclick="window.location.reload()" class="btn-icon tap-feedback" title="Recarregar">
+                    🔄
+                </button>
+                <button onclick="window.abrirModalSair()" class="btn-outline btn-sair-header tap-feedback">
+                    SAIR
+                </button>
+            </div>
+        </header>
 
         <main class="glass-card overlay fade-in-up lancamento-main">
             <div class="campo-bloco">
                 <label class="campo-label">1. Buscar Produto</label>
 
                 <div class="campo-busca-wrapper">
-                    <input type="text" id="busca-produto" placeholder="Digite nome ou código..." class="input-premium">
+                    <input type="text" id="busca-produto" placeholder="Digite nome ou código..." class="input-premium" autocomplete="off">
 
                     <div id="sugestoes" class="hidden sugestoes-box"></div>
                 </div>
             </div>
 
-            <button id="btn-manual-toggle" onclick="window.ativarModoManual()" class="btn-manual-helper">
+            <button id="btn-manual-toggle" onclick="window.ativarModoManual()" class="btn-manual-helper tap-feedback">
                 Não encontrou? Digite aqui
             </button>
 
@@ -135,11 +135,11 @@
                 <input type="text" id="manual-name" class="input-premium" placeholder="Nome do produto">
 
                 <div class="unit-toggle">
-                    <button class="unit-btn active" id="manual-kg" onclick="setManualUnit('KG')">⚖️ KG</button>
-                    <button class="unit-btn" id="manual-un" onclick="setManualUnit('UN')"># UN</button>
+                    <button class="unit-btn active tap-feedback" id="manual-kg" onclick="setManualUnit('KG')">⚖️ KG</button>
+                    <button class="unit-btn tap-feedback" id="manual-un" onclick="setManualUnit('UN')"># UN</button>
                 </div>
 
-                <button onclick="confirmarManual()" class="btn-entrar btn-confirmar-produto">
+                <button onclick="confirmarManual()" class="btn-entrar btn-confirmar-produto tap-feedback">
                     CONFIRMAR PRODUTO
                 </button>
             </div>
@@ -147,8 +147,8 @@
             <div id="unit-toggle-catalog" class="hidden fade-in-up campo-toggle-unidade">
                 <label class="campo-label campo-label-sm">Tipo de medida</label>
                 <div class="unit-toggle">
-                    <button class="unit-btn active" id="cat-kg" onclick="setCatUnit('KG')">⚖️ KG</button>
-                    <button class="unit-btn" id="cat-un" onclick="setCatUnit('UN')"># UN</button>
+                    <button class="unit-btn active tap-feedback" id="cat-kg" onclick="setCatUnit('KG')">⚖️ KG</button>
+                    <button class="unit-btn tap-feedback" id="cat-un" onclick="setCatUnit('UN')"># UN</button>
                 </div>
             </div>
 
@@ -161,20 +161,21 @@
                 </div>
             </div>
 
-            <button id="btn-adicionar" class="btn-entrar btn-adicionar-lote">
+            <button id="btn-adicionar" class="btn-entrar btn-adicionar-lote tap-feedback">
                 ➕ ADICIONAR AO LOTE
             </button>
         </main>
 
         <div id="lista-conferencia" class="lista-conferencia-box"></div>
 
+        <!-- Footer premium padronizado -->
         <footer class="footer-action">
             <div>
                 <span class="footer-total-label">TOTAL DO LOTE</span>
                 <span id="total-itens" class="footer-total-numero">0</span>
             </div>
 
-            <button id="btn-finalizar-lote" class="btn-entrar btn-finalizar-lote">
+            <button id="btn-finalizar-lote" class="btn-entrar btn-finalizar-lote tap-feedback">
                 📤 FINALIZAR
             </button>
         </footer>
@@ -188,13 +189,13 @@
             <p class="modal-msg" id="modalMensagem"></p>
 
             <div class="modal-actions">
-                <button id="modalConfirmar" class="btn-entrar">OK</button>
+                <button id="modalConfirmar" class="btn-entrar tap-feedback">OK</button>
                 <button id="modalCancelar" class="cancel-link">Cancelar</button>
             </div>
         </div>
     </div>
 
-    <script src="js/modal.js?v=13.2"></script>
-<script type="module" src="js/app.js?v=13.2"></script>
+    <script src="js/modal.js?v=14.0"></script>
+    <script type="module" src="js/app.js?v=14.0"></script>
 </body>
 </html>

@@ -10,12 +10,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
 
-    
-
-     <!-- 🚀 PERFORMANCE -->
-    <link rel="preload" href="css/style.css?v=13.2" as="style">
-    <link rel="preload" href="js/app.js?v=13.2" as="script">
-    <link rel="stylesheet" href="css/style.css?v=13.2">
+    <!-- 🚀 PERFORMANCE -->
+    <link rel="preload" href="css/style.css?v=14.0" as="style">
+    <link rel="preload" href="js/app.js?v=14.0" as="script">
+    <link rel="stylesheet" href="css/style.css?v=14.0">
 
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
@@ -25,7 +23,7 @@
 <body id="index-page">
     <div class="app-container">
 
-        <!-- SPLASH -->
+        <!-- SPLASH (mais rápido: 2s) -->
         <div id="splash-screen" class="splash-screen">
             <img src="assets/images/logo.png" class="splash-logo" alt="La Rose">
 
@@ -41,23 +39,24 @@
         <!-- LOGIN -->
         <main id="login-page" class="login-page">
             <div class="glass-card login-card">
-                 <!-- BOTÃO REFRESH -->
-                <button onclick="window.location.reload()" 
-                    class="btn-outline" 
-                    style="position:absolute; top:15px; right:15px; padding:8px 12px;">
-                    🔄
-                </button>
+                <!-- BOTÃO REFRESH -->
+                <div class="login-refresh">
+                    <button onclick="window.location.reload()" class="btn-icon tap-feedback" title="Recarregar">
+                        🔄
+                    </button>
+                </div>
 
+                <img src="assets/images/logo.png" class="login-logo" alt="La Rose">
                 <h2 class="titulo-login">Acesso La Rose</h2>
-                <p class="subtitulo-login">Smart Waste </p>
+                <p class="subtitulo-login">Smart Waste</p>
 
                 <!-- PERFIL -->
                 <div id="seletor-perfil">
-                    <button onclick="window.definirPerfil('operacional')" class="btn-entrar mb-15">
+                    <button onclick="window.definirPerfil('operacional')" class="btn-entrar mb-15 tap-feedback">
                         👥 ACESSO EQUIPE
                     </button>
 
-                    <button onclick="window.definirPerfil('admin')" class="btn-outline w-full">
+                    <button onclick="window.definirPerfil('admin')" class="btn-outline w-full tap-feedback">
                         👤 ACESSO GESTÃO (ADMIN)
                     </button>
                 </div>
@@ -67,11 +66,11 @@
                     <input type="email" id="email" placeholder="E-mail" class="input-premium mb-15">
                     <input type="password" id="senha" placeholder="Senha" class="input-premium mb-25">
 
-                    <button id="btn-fazer-login" class="btn-entrar">
+                    <button id="btn-fazer-login" class="btn-entrar tap-feedback">
                         ENTRAR NO SISTEMA
                     </button>
 
-                    <button onclick="window.location.reload()" class="btn-manual-helper btn-sem-borda">
+                    <button onclick="window.location.reload()" class="btn-manual-helper btn-sem-borda tap-feedback">
                         VOLTAR
                     </button>
                 </div>
@@ -79,44 +78,45 @@
                 <!-- OPERACIONAL -->
                 <div id="config-operacional" class="hidden fade-in-up">
 
-                    <!-- LOJA -->
-                    <div id="etapa-loja">
+                    <!-- LOJA (etapa com transição) -->
+                    <div id="etapa-loja" class="etapa-transicao">
                         <p class="section-label">
                             📍 Selecione a Unidade
                         </p>
 
                         <div class="grid-cards unidades-grid">
-                            <div class="flash-card" onclick="window.selecionarLoja('entre_lagos')">
+                            <div class="flash-card tap-feedback" onclick="window.selecionarLoja('entre_lagos')">
                                 <div class="avatar-circle">EL</div>
                                 <p>Entre Lagos</p>
                             </div>
 
-                            <div class="flash-card" onclick="window.selecionarLoja('itapoa_parque')">
+                            <div class="flash-card tap-feedback" onclick="window.selecionarLoja('itapoa_parque')">
                                 <div class="avatar-circle">IP</div>
                                 <p>Itapoã Parque</p>
                             </div>
                         </div>
 
-                        <button onclick="window.resetar()" class="btn-manual-helper btn-sem-borda btn-sair-sistema">
+                        <button onclick="window.resetar()" class="btn-manual-helper btn-sem-borda btn-sair-sistema tap-feedback">
                             ❌ SAIR DO SISTEMA
                         </button>
                     </div>
 
-                    <!-- OPERADOR -->
-                    <div id="etapa-operador" class="hidden">
+                    <!-- OPERADOR (etapa com transição) -->
+                    <div id="etapa-operador" class="hidden etapa-transicao">
                         <p class="section-label">
                             👥 Quem está operando?
                         </p>
 
                         <div id="container-operadores" class="grid-cards operadores-grid"></div>
 
-                        <button onclick="window.voltarParaLoja()" class="btn-manual-helper btn-sem-borda mt-20">
+                        <button onclick="window.voltarParaLoja()" class="btn-manual-helper btn-sem-borda mt-20 tap-feedback">
                             ALTERAR UNIDADE
                         </button>
                     </div>
 
-                    <button id="btn-iniciar" onclick="window.location.href='lancamento.html'" class="btn-entrar hidden fade-in-up mt-30">
-                        INICIAR 
+                    <!-- BOTÃO INICIAR (com animação) -->
+                    <button id="btn-iniciar" onclick="window.location.href='lancamento.html'" class="btn-entrar hidden btn-appear mt-30 tap-feedback">
+                        INICIAR
                     </button>
 
                 </div>
@@ -132,18 +132,13 @@
             <p class="modal-msg" id="modalMensagem"></p>
 
             <div class="modal-actions">
-                <button id="modalConfirmar" class="btn-entrar">OK</button>
+                <button id="modalConfirmar" class="btn-entrar tap-feedback">OK</button>
                 <button id="modalCancelar" class="cancel-link">Cancelar</button>
             </div>
         </div>
     </div>
 
-    <style>
-        @keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
-        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
-    </style>
-
-    <script src="js/modal.js?v=13.2"></script>
-<script type="module" src="js/app.js?v=13.2"></script>
+    <script src="js/modal.js?v=14.0"></script>
+    <script type="module" src="js/app.js?v=14.0"></script>
 </body>
 </html>

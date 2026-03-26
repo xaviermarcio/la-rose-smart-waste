@@ -19,6 +19,22 @@ import { CONFIG_SISTEMA } from './data.js';
 // ==========================================
 // 1. ESTADO GLOBAL DO SISTEMA
 // ==========================================
+const AppState = {
+    operadorAtivo: '',
+    produtoSelecionado: null,
+    loteAtual: [],
+    todosOsLotes: [],
+    abaAtual: 'pendentes',
+    consolidados: [],
+    modoSelecao: false,
+    selecaoLotes: [],
+    selectedBatchId: null,
+    selectedConsolidadoId: null,
+    filtroRapidoAtivo: null,
+    resumoVisivel: true,
+};
+
+// Manter compatibilidade com window.*
 window.operadorAtivo = '';
 window.produtoSelecionado = null;
 window.loteAtual = [];
@@ -40,6 +56,24 @@ function el(id) {
 function limparHtmlMensagem(texto = '') {
     return texto.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '');
 }
+
+function vibrar(ms = 30) {
+    if (navigator.vibrate) navigator.vibrate(ms);
+}
+
+function showTransitionLoader() {
+    const card = document.querySelector('.login-card');
+    if (!card || card.querySelector('.transition-loader')) return;
+    const loader = document.createElement('div');
+    loader.className = 'transition-loader';
+    loader.innerHTML = '<div class="transition-spinner"></div><span class="transition-loader-text">Carregando...</span>';
+    card.appendChild(loader);
+}
+
+function hideTransitionLoader() {
+    document.querySelectorAll('.transition-loader').forEach(el => el.remove());
+}
+
 
 function showGlobalModal({
     titulo = 'Atenção',
@@ -113,22 +147,50 @@ function formatPeso(peso, unidade) {
 // 3. FUNÇÕES GLOBAIS DE INTERFACE & NAVEGAÇÃO
 // ==========================================
 window.definirPerfil = (tipo) => {
-    el('seletor-perfil')?.classList.add('hidden');
-    el('campos-auth')?.classList.remove('hidden');
+    vibrar();
+    showTransitionLoader();
 
-    const mail = el('email');
-    if (mail) {
-        mail.value = (tipo === 'admin')
-            ? CONFIG_SISTEMA.adminEmail
-            : 'hortifrutilarose@gmail.com';
-    }
+    setTimeout(() => {
+        el('seletor-perfil')?.classList.add('hidden');
+        el('campos-auth')?.classList.remove('hidden');
+
+        const mail = el('email');
+        if (mail) {
+            mail.value = (tipo === 'admin')
+                ? CONFIG_SISTEMA.adminEmail
+                : 'hortifrutilarose@gmail.com';
+        }
+
+        hideTransitionLoader();
+    }, 450);
 };
 
+// Transição suave entre etapas
 window.selecionarLoja = (lojaId) => {
     localStorage.setItem('loja_ativa', lojaId);
-    el('etapa-loja')?.classList.add('hidden');
-    el('etapa-operador')?.classList.remove('hidden');
-    window.renderizarOperadores(lojaId);
+    vibrar();
+    showTransitionLoader();
+
+    const etapaLoja = el('etapa-loja');
+    const etapaOperador = el('etapa-operador');
+
+    if (etapaLoja) {
+        etapaLoja.classList.add('etapa-saindo');
+        setTimeout(() => {
+            etapaLoja.classList.add('hidden');
+            etapaLoja.classList.remove('etapa-saindo');
+
+            window.renderizarOperadores(lojaId);
+
+            if (etapaOperador) {
+                etapaOperador.classList.remove('hidden');
+                etapaOperador.classList.add('etapa-entrando');
+                setTimeout(() => etapaOperador.classList.remove('etapa-entrando'), 500);
+            }
+
+            hideTransitionLoader();
+        }, 500);
+    }
 };
 
 window.renderizarOperadores = (lojaId) => {
@@ -139,14 +201,14 @@ window.renderizarOperadores = (lojaId) => {
     const lojaSel = CONFIG_SISTEMA.lojas.find(l => l.id === lojaId);
     if (!lojaSel) return;
 
-    lojaSel.operadores.forEach(nome => {
+    lojaSel.operadores.forEach((nome, idx) => {
         const card = document.createElement('div');
-
-        // removido fade-in-up daqui para não deixar o card "sumindo"
-        card.className = 'flash-card';
+        card.className = 'flash-card tap-feedback';
+        card.style.animationDelay = `${idx * 60}ms`;
         card.innerHTML = `<div class="avatar-circle">${nome[0]}</div><p>${nome}</p>`;
 
         card.onclick = () => {
+            vibrar();
             document
                 .querySelectorAll('#container-operadores .flash-card')
                 .forEach(c => {
@@ -158,7 +220,13 @@ window.renderizarOperadores = (lojaId) => {
             card.classList.add('selection-pop');
 
             localStorage.setItem('operador_ativo', nome);
-            el('btn-iniciar')?.classList.remove('hidden');
+
+            // Botão iniciar com animação
+            const btnIniciar = el('btn-iniciar');
+            if (btnIniciar) {
+                btnIniciar.classList.remove('hidden');
+                btnIniciar.classList.add('btn-appear');
+            }
         };
 
         container.appendChild(card);
@@ -181,8 +249,27 @@ window.resetar = () => {
 };
 
 window.voltarParaLoja = () => {
-    el('etapa-loja')?.classList.remove('hidden');
-    el('etapa-operador')?.classList.add('hidden');
+    vibrar();
+    showTransitionLoader();
+    const etapaOperador = el('etapa-operador');
+    const etapaLoja = el('etapa-loja');
+
+    if (etapaOperador) {
+        etapaOperador.classList.add('etapa-saindo');
+        setTimeout(() => {
+            etapaOperador.classList.add('hidden');
+            etapaOperador.classList.remove('etapa-saindo');
+
+            if (etapaLoja) {
+                etapaLoja.classList.remove('hidden');
+                etapaLoja.classList.add('etapa-entrando');
+                setTimeout(() => etapaLoja.classList.remove('etapa-entrando'), 500);
+            }
+
+            hideTransitionLoader();
+        }, 500);
+    }
+
     el('btn-iniciar')?.classList.add('hidden');
 };
 
@@ -199,7 +286,7 @@ window.confirmarSaida = (confirmou) => {
 };
 
 // ==========================================
-// 4. SPLASH SCREEN
+// 4. SPLASH SCREEN (mais rápido: 2s)
 // ==========================================
 setTimeout(() => {
     const splash = el('splash-screen');
@@ -211,8 +298,8 @@ setTimeout(() => {
         splash.classList.add('hidden');
         const loginPage = el('login-page');
         if (loginPage) loginPage.style.opacity = '1';
-    }, 600);
-}, 3200);
+    }, 500);
+}, 2500);
 
 // ==========================================
 // 5. LÓGICA DE LOGIN
@@ -239,8 +326,12 @@ if (btnLogin) {
             if (email === CONFIG_SISTEMA.adminEmail) {
                 window.location.replace('dashboard.html');
             } else {
-                el('campos-auth')?.classList.add('hidden');
-                el('config-operacional')?.classList.remove('hidden');
+                showTransitionLoader();
+                setTimeout(() => {
+                    el('campos-auth')?.classList.add('hidden');
+                    el('config-operacional')?.classList.remove('hidden');
+                    hideTransitionLoader();
+                }, 2000);
             }
         } catch (e) {
             showGlobalModal({
@@ -282,6 +373,9 @@ if (document.body.id === 'app-page') {
         const listaSugestoes = el('sugestoes');
         const inputPeso = el('peso-input');
 
+        // Auto-focus no campo de busca
+        setTimeout(() => inputBusca?.focus(), 400);
+
         // === Modal helpers ===
         window.fecharModalDuplicado = () => el('modal-duplicado')?.classList.add('hidden');
         window.fecharModalPesoAlto = () => el('modal-peso-alto')?.classList.add('hidden');
@@ -294,6 +388,7 @@ if (document.body.id === 'app-page') {
             manualMode = true;
             window.produtoSelecionado = null;
             currentUnidade = 'KG';
+            vibrar();
 
             if (inputBusca) inputBusca.value = '';
             el('btn-manual-toggle')?.classList.add('hidden');
@@ -313,14 +408,15 @@ if (document.body.id === 'app-page') {
 
         window.setManualUnit = (u) => {
             currentUnidade = u;
+            vibrar();
             updateManualUnits();
             updateWeightUI();
             if (inputPeso) inputPeso.value = '';
         };
 
         function updateManualUnits() {
-            el('manual-kg').className = 'unit-btn' + (currentUnidade === 'KG' ? ' active' : '');
-            el('manual-un').className = 'unit-btn' + (currentUnidade === 'UN' ? ' active' : '');
+            el('manual-kg').className = 'unit-btn tap-feedback' + (currentUnidade === 'KG' ? ' active' : '');
+            el('manual-un').className = 'unit-btn tap-feedback' + (currentUnidade === 'UN' ? ' active' : '');
         }
 
         window.confirmarManual = () => {
@@ -350,6 +446,7 @@ if (document.body.id === 'app-page') {
 
             updateWeightUI();
             if (inputPeso) inputPeso.value = '';
+            vibrar();
 
             setTimeout(() => inputPeso?.focus(), 100);
         };
@@ -357,13 +454,14 @@ if (document.body.id === 'app-page') {
         // === Unit toggle for catalog ===
         window.setCatUnit = (u) => {
             currentUnidade = u;
+            vibrar();
 
             if (window.produtoSelecionado) {
                 window.produtoSelecionado.unidade = u;
             }
 
-            el('cat-kg').className = 'unit-btn' + (u === 'KG' ? ' active' : '');
-            el('cat-un').className = 'unit-btn' + (u === 'UN' ? ' active' : '');
+            el('cat-kg').className = 'unit-btn tap-feedback' + (u === 'KG' ? ' active' : '');
+            el('cat-un').className = 'unit-btn tap-feedback' + (u === 'UN' ? ' active' : '');
             if (inputPeso) inputPeso.value = '';
 
             updateWeightUI();
@@ -396,12 +494,16 @@ if (document.body.id === 'app-page') {
 
             currentUnidade = 'KG';
             updateWeightUI();
+
+            // Re-focar busca
+            setTimeout(() => inputBusca?.focus(), 150);
         }
 
         function nomeSelecionadoAtual() {
             return window.produtoSelecionado?.nomeExibicao || window.produtoSelecionado?.nome || '';
         }
 
+        // Lista de itens melhorada (sem estilos inline)
         function renderizarListaLotes() {
             const container = el('lista-conferencia');
             if (!container) return;
@@ -413,13 +515,13 @@ if (document.body.id === 'app-page') {
 
                 container.innerHTML += `
                     <div class="item-lote-estilo fade-in-up" style="animation-delay:${index * 50}ms">
-                        <div>
-                            <strong style="font-size:16px;">${item.nome}</strong><br>
-                            <small style="color:var(--texto-suave); font-weight:600;">Cód: ${item.cod}</small>
+                        <div class="item-lote-info">
+                            <span class="item-lote-nome">${item.nome}</span>
+                            <span class="item-lote-cod">Cód: ${item.cod}</span>
                         </div>
-                        <div style="display:flex; align-items:center; gap:15px;">
-                            <strong style="color:var(--verde-dark); font-size:20px;">${pesoFormatado}</strong>
-                            <button onclick="window.removerItem(${index})" class="btn-remover">✕</button>
+                        <div class="item-lote-acoes">
+                            <span class="item-lote-peso">${pesoFormatado}</span>
+                            <button onclick="window.removerItem(${index})" class="btn-remover tap-feedback">✕</button>
                         </div>
                     </div>
                 `;
@@ -429,6 +531,7 @@ if (document.body.id === 'app-page') {
         }
 
         window.removerItem = (i) => {
+            vibrar();
             window.loteAtual.splice(i, 1);
             renderizarListaLotes();
         };
@@ -482,6 +585,8 @@ if (document.body.id === 'app-page') {
                 showError('Preencha corretamente o produto e a quantidade!');
                 return;
             }
+
+            vibrar();
 
             const nomeComparacao = nomeSelecionadoAtual();
 
@@ -655,7 +760,7 @@ if (document.body.id === 'app-page') {
             }
         });
 
-        // === Busca de produtos corrigida ===
+        // === Busca de produtos (melhorada com classes CSS) ===
         inputBusca?.addEventListener('input', (e) => {
             if (bloqueandoBusca) return;
 
@@ -686,34 +791,19 @@ if (document.body.id === 'app-page') {
 
             filtrados.forEach(p => {
                 const div = document.createElement('div');
-                div.style.cssText = `
-                    padding:12px 16px;
-                    border-bottom:1px solid var(--borda-fina);
-                    cursor:pointer;
-                    display:flex;
-                    justify-content:space-between;
-                    align-items:center;
-                    transition:background 0.1s;
-                `;
+                div.className = 'sugestao-item';
 
                 div.innerHTML = `
                     <div>
-                        <span style="font-size:14px; font-weight:700; color:var(--texto-principal);">${p.nome}</span><br/>
-                        <span style="font-size:10px; font-weight:600; color:var(--texto-suave);">Cód: ${p.cod}</span>
+                        <div class="sugestao-nome">${p.nome}</div>
+                        <div class="sugestao-cod">Cód: ${p.cod}</div>
                     </div>
-                    <span style="font-size:10px; font-weight:700; color:var(--texto-suave);">${p.unidade}</span>
+                    <span class="sugestao-unidade">${p.unidade}</span>
                 `;
-
-                div.onmouseenter = () => {
-                    div.style.background = 'var(--fundo-app)';
-                };
-
-                div.onmouseleave = () => {
-                    div.style.background = '';
-                };
 
                 div.onclick = () => {
                     bloqueandoBusca = true;
+                    vibrar();
 
                     const nomeExibicao = (lojaAtiva === 'itapoa_parque' && !p.nome.includes('PARQUE'))
                         ? `${p.nome} PARQUE`
@@ -738,8 +828,8 @@ if (document.body.id === 'app-page') {
                     el('btn-manual-toggle')?.classList.remove('hidden');
                     el('unit-toggle-catalog')?.classList.remove('hidden');
 
-                    el('cat-kg').className = 'unit-btn' + (currentUnidade === 'KG' ? ' active' : '');
-                    el('cat-un').className = 'unit-btn' + (currentUnidade === 'UN' ? ' active' : '');
+                    el('cat-kg').className = 'unit-btn tap-feedback' + (currentUnidade === 'KG' ? ' active' : '');
+                    el('cat-un').className = 'unit-btn tap-feedback' + (currentUnidade === 'UN' ? ' active' : '');
 
                     updateWeightUI();
 
@@ -795,6 +885,68 @@ if (document.body.id === 'admin-page') {
         signOut(auth).then(() => window.location.replace('index.html'));
     });
 
+    // === Toggle Resumo ===
+    window.toggleResumo = () => {
+        AppState.resumoVisivel = !AppState.resumoVisivel;
+        const secao = el('secao-resumo');
+        const btn = el('btn-toggle-resumo');
+
+        if (secao) {
+            secao.style.display = AppState.resumoVisivel ? '' : 'none';
+        }
+        if (btn) {
+            btn.innerHTML = AppState.resumoVisivel
+                ? '👁️ Ocultar Resumo'
+                : '👁️‍🗨️ Mostrar Resumo';
+        }
+    };
+
+    // === Filtros rápidos ===
+    window.filtroRapido = (periodo) => {
+        vibrar();
+        const inicio = el('filtroDataInicio');
+        const fim = el('filtroDataFim');
+
+        // Limpar filtros rápidos ativos
+        document.querySelectorAll('.btn-filtro-rapido').forEach(b => b.classList.remove('active'));
+
+        if (periodo === 'limpar') {
+            AppState.filtroRapidoAtivo = null;
+            if (inicio) inicio.value = '';
+            if (fim) fim.value = '';
+            renderDashboard();
+            return;
+        }
+
+        AppState.filtroRapidoAtivo = periodo;
+
+        // Marcar botão ativo
+        const btns = document.querySelectorAll('.btn-filtro-rapido');
+        btns.forEach(b => {
+            if (b.textContent.trim().toLowerCase().includes(
+                periodo === 'hoje' ? 'hoje' : periodo === '7dias' ? '7 dias' : '30 dias'
+            )) {
+                b.classList.add('active');
+            }
+        });
+
+        const hoje = new Date();
+        let dataInicio = new Date();
+
+        if (periodo === 'hoje') {
+            dataInicio = hoje;
+        } else if (periodo === '7dias') {
+            dataInicio.setDate(hoje.getDate() - 7);
+        } else if (periodo === '30dias') {
+            dataInicio.setDate(hoje.getDate() - 30);
+        }
+
+        if (inicio) inicio.value = dataInicio.toISOString().split('T')[0];
+        if (fim) fim.value = hoje.toISOString().split('T')[0];
+
+        renderDashboard();
+    };
+
     async function carregarDadosFirestore() {
         try {
             const q = query(collection(db, 'quebras'), orderBy('data', 'desc'));
@@ -828,6 +980,7 @@ if (document.body.id === 'admin-page') {
         window.selecaoLotes = [];
         window.selectedBatchId = null;
         window.selectedConsolidadoId = null;
+        vibrar();
 
         el('tab-pendentes')?.classList.toggle('active', aba === 'pendentes');
         el('tab-consolidados')?.classList.toggle('active', aba === 'consolidados');
@@ -845,19 +998,139 @@ if (document.body.id === 'admin-page') {
         return [];
     }
 
+    // Filtro de data melhorado (range)
     function aplicarFiltroData(lista) {
-        const filtroData = el('filtroData');
-        if (!filtroData || !filtroData.value) return lista;
+        const filtroInicio = el('filtroDataInicio');
+        const filtroFim = el('filtroDataFim');
+
+        if (!filtroInicio || !filtroFim) return lista;
+        if (!filtroInicio.value && !filtroFim.value) return lista;
 
         return lista.filter(lote => {
             if (!lote.data || typeof lote.data.toDate !== 'function') return false;
             const dataIso = lote.data.toDate().toISOString().split('T')[0];
-            return dataIso === filtroData.value;
+
+            if (filtroInicio.value && filtroFim.value) {
+                return dataIso >= filtroInicio.value && dataIso <= filtroFim.value;
+            } else if (filtroInicio.value) {
+                return dataIso >= filtroInicio.value;
+            } else if (filtroFim.value) {
+                return dataIso <= filtroFim.value;
+            }
+            return true;
         });
     }
 
     window.filtrarPorData = () => {
+        vibrar();
+        // Limpar filtros rápidos ativos
+        AppState.filtroRapidoAtivo = null;
+        document.querySelectorAll('.btn-filtro-rapido').forEach(b => b.classList.remove('active'));
         renderDashboard();
+    };
+
+    // === Métricas ===
+    function calcularMetricas(lotes) {
+        let totalKG = 0;
+        let totalUN = 0;
+
+        lotes.forEach(lote => {
+            if (!lote.itens) return;
+            lote.itens.forEach(item => {
+                if (item.unidade === 'UN') {
+                    totalUN += item.peso;
+                } else {
+                    totalKG += item.peso;
+                }
+            });
+        });
+
+        return { totalKG, totalUN };
+    }
+
+    // === Rankings ===
+    function calcularRanking(lotes, unidade, top = 5) {
+        const mapa = {};
+
+        lotes.forEach(lote => {
+            if (!lote.itens) return;
+            lote.itens.forEach(item => {
+                if (item.unidade === unidade || (unidade === 'KG' && item.unidade !== 'UN')) {
+                    const key = item.nome;
+                    if (!mapa[key]) {
+                        mapa[key] = { nome: item.nome, total: 0, unidade: item.unidade || unidade };
+                    }
+                    mapa[key].total += item.peso;
+                }
+            });
+        });
+
+        return Object.values(mapa)
+            .sort((a, b) => b.total - a.total)
+            .slice(0, top);
+    }
+
+    function renderRanking(containerId, ranking, unidade) {
+        const container = el(containerId);
+        if (!container) return;
+
+        if (ranking.length === 0) {
+            container.innerHTML = '<p style="font-size:13px; color:var(--texto-suave); text-align:center; padding:16px;">Sem dados</p>';
+            return;
+        }
+
+        container.innerHTML = ranking.map((item, idx) => {
+            const posClass = idx === 0 ? 'top1' : idx === 1 ? 'top2' : idx === 2 ? 'top3' : '';
+            return `
+                <div class="ranking-item">
+                    <span class="ranking-posicao ${posClass}">${idx + 1}°</span>
+                    <span class="ranking-produto-nome">${item.nome}</span>
+                    <span class="ranking-produto-valor">${formatPeso(item.total, unidade)}</span>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // === PDF Ranking ===
+    window.gerarPdfRanking = (unidade) => {
+        const lotesFiltrados = aplicarFiltroData(window.todosOsLotes.filter(b => b.status_lancado));
+        const ranking = calcularRanking(lotesFiltrados, unidade, 10);
+
+        if (ranking.length === 0) {
+            showGlobalModal({ titulo: 'Aviso', mensagem: 'Nenhum dado para exportar!' });
+            return;
+        }
+
+        const win = window.open('', '', 'height=700,width=900');
+        let html = `
+            <html>
+            <head>
+                <title>Ranking Perdas ${unidade} - La Rose</title>
+                <style>
+                    body { font-family:sans-serif; padding:40px; color:#0f172a; }
+                    table { width:100%; border-collapse:collapse; margin-top:20px; }
+                    th, td { border:1px solid #e2e8f0; padding:12px; text-align:left; }
+                    th { background:#022c22; color:white; text-transform:uppercase; font-size:12px; }
+                    h2 { color:#022c22; margin-bottom:5px; }
+                    .pos { font-weight:900; color:#10b981; }
+                    .valor { font-weight:900; color:#e11d48; }
+                </style>
+            </head>
+            <body>
+                <h2>🏆 Ranking de Perdas em ${unidade} - Hortifruti La Rose</h2>
+                <p style="color:gray; margin-bottom:30px;">Gerado em ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</p>
+                <table>
+                    <tr><th>#</th><th>Produto</th><th>Total</th></tr>
+        `;
+
+        ranking.forEach((item, idx) => {
+            html += `<tr><td class="pos">${idx + 1}°</td><td>${item.nome}</td><td class="valor">${formatPeso(item.total, unidade)}</td></tr>`;
+        });
+
+        html += `</table></body></html>`;
+        win.document.write(html);
+        win.document.close();
+        win.print();
     };
 
     function renderDashboard() {
@@ -881,11 +1154,26 @@ if (document.body.id === 'admin-page') {
         el('titulo-resumo').innerText = label;
         el('resumo-total').innerText = baseCount;
 
+        // Métricas
+        const lotesFiltrados = aplicarFiltroData(pending);
+        const metricas = calcularMetricas(lotesFiltrados);
+        const metricaKG = el('metrica-kg');
+        const metricaUN = el('metrica-un');
+        if (metricaKG) metricaKG.innerText = metricas.totalKG.toFixed(3).replace('.', ',');
+        if (metricaUN) metricaUN.innerText = Math.floor(metricas.totalUN);
+
+        // Rankings (baseados nos lotes lançados)
+        const lotesLancados = aplicarFiltroData(completed);
+        const rankingKG = calcularRanking(lotesLancados, 'KG', 5);
+        const rankingUN = calcularRanking(lotesLancados, 'UN', 5);
+        renderRanking('ranking-kg', rankingKG, 'KG');
+        renderRanking('ranking-un', rankingUN, 'UN');
+
         if (selBar) {
             if (window.abaAtual === 'pendentes') {
                 selBar.innerHTML = `
                     <button
-                        class="btn-entrar ${window.modoSelecao ? '' : 'btn-outline'}"
+                        class="btn-entrar ${window.modoSelecao ? '' : 'btn-outline'} tap-feedback"
                         style="width:auto; padding:10px 16px; font-size:10px; border-radius:12px;"
                         onclick="toggleSelecao()"
                     >
@@ -896,7 +1184,7 @@ if (document.body.id === 'admin-page') {
                 if (window.modoSelecao && window.selecaoLotes.length > 0) {
                     selBar.innerHTML += `
                         <button
-                            class="btn-entrar btn-azul fade-in-up"
+                            class="btn-entrar btn-azul fade-in-up tap-feedback"
                             style="width:auto; padding:10px 16px; font-size:10px; border-radius:12px;"
                             onclick="iniciarConsolidar()"
                         >
@@ -919,6 +1207,7 @@ if (document.body.id === 'admin-page') {
         }
     }
 
+    // Incluir hora, nome, data e loja no lote (item 30)
     function renderBatchList(list, container) {
         if (list.length === 0) {
             container.innerHTML = `
@@ -938,7 +1227,9 @@ if (document.body.id === 'admin-page') {
         `;
 
         list.forEach((batch, idx) => {
-            const dataFormatada = batch.data ? batch.data.toDate().toLocaleDateString('pt-BR') : 'N/A';
+            const dataObj = batch.data ? batch.data.toDate() : null;
+            const dataFormatada = dataObj ? dataObj.toLocaleDateString('pt-BR') : 'N/A';
+            const horaFormatada = dataObj ? dataObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '';
             const lojaDisplay = (batch.loja || '').toUpperCase().replace('_', ' ');
             const isSelected = window.selecaoLotes.includes(batch.id);
             const isOpen = window.selectedBatchId === batch.id && !window.modoSelecao;
@@ -960,11 +1251,11 @@ if (document.body.id === 'admin-page') {
             html += `
                 <div style="flex:1">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-size:14px; font-weight:900; text-transform:uppercase; color:var(--verde-dark);">${lojaDisplay}</span>
-                        <span style="font-size:10px; font-weight:700; color:var(--texto-suave);">${dataFormatada}</span>
+                        <span class="lote-nome-loja">${lojaDisplay}</span>
+                        <span class="lote-data-hora">${dataFormatada} ${horaFormatada}</span>
                     </div>
                     <div style="margin-top:4px; display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-size:12px; font-weight:700; color:var(--texto-suave);">👤 ${batch.operador}</span>
+                        <span class="lote-operador-nome">👤 ${batch.operador}</span>
                         <span class="badge-cons" style="color:var(--verde-dark);">${batch.itens.length} itens</span>
                     </div>
                 </div>
@@ -1000,10 +1291,10 @@ if (document.body.id === 'admin-page') {
                         <tr>
                             <td>
                                 <strong>${item.nome}</strong><br>
-                                <small style="color:var(--texto-suave); font-weight:500;">Cód: ${item.cod || 'N/A'}</small>
+                                <small class="item-lote-cod">Cód: ${item.cod || 'N/A'}</small>
                             </td>
-                            <td style="text-align:right; font-weight:900; color:var(--verde-dark); font-size:16px;">
-                                ${formatPeso(item.peso, item.unidade)}
+                            <td style="text-align:right;">
+                                <span class="item-lote-peso">${formatPeso(item.peso, item.unidade)}</span>
                             </td>
                         </tr>
                     `;
@@ -1014,7 +1305,7 @@ if (document.body.id === 'admin-page') {
                 if (!batch.status_lancado) {
                     html += `
                         <button
-                            class="btn-entrar btn-azul"
+                            class="btn-entrar btn-azul tap-feedback"
                             style="margin-top:12px; padding:14px; border-radius:12px;"
                             onclick="event.stopPropagation(); markLancado('${batch.id}', true)"
                         >
@@ -1024,7 +1315,7 @@ if (document.body.id === 'admin-page') {
                 } else {
                     html += `
                         <button
-                            class="btn-entrar btn-rosa"
+                            class="btn-entrar btn-rosa tap-feedback"
                             style="margin-top:12px; padding:14px; border-radius:12px;"
                             onclick="event.stopPropagation(); markLancado('${batch.id}', false)"
                         >
@@ -1039,6 +1330,7 @@ if (document.body.id === 'admin-page') {
             card.innerHTML = html;
 
             card.onclick = () => {
+                vibrar();
                 if (window.modoSelecao) {
                     if (window.selecaoLotes.includes(batch.id)) {
                         window.selecaoLotes = window.selecaoLotes.filter(x => x !== batch.id);
@@ -1083,8 +1375,8 @@ if (document.body.id === 'admin-page') {
                     </div>
                     <div style="flex:1">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <span style="font-size:14px; font-weight:900; text-transform:uppercase; color:var(--verde-dark);">${cons.concluido ? '✅ Concluído' : '📊 Somado'}</span>
-                            <span style="font-size:10px; font-weight:700; color:var(--texto-suave);">${d}</span>
+                            <span class="lote-nome-loja">${cons.concluido ? '✅ Concluído' : '📊 Somado'}</span>
+                            <span class="lote-data-hora">${d}</span>
                         </div>
                         <div style="margin-top:4px; display:flex; gap:12px;">
                             <span class="badge-cons" style="color:var(--verde-dark);">${cons.itens.length} produtos</span>
@@ -1117,10 +1409,10 @@ if (document.body.id === 'admin-page') {
                         <tr>
                             <td>
                                 <strong>${item.nome}</strong><br>
-                                <small style="color:var(--texto-suave); font-weight:500;">Cód: ${item.cod}</small>
+                                <small class="item-lote-cod">Cód: ${item.cod}</small>
                             </td>
-                            <td style="text-align:right; font-weight:900; color:var(--verde-dark); font-size:16px;">
-                                ${formatPeso(item.pesoTotal, item.unidade)}
+                            <td style="text-align:right;">
+                                <span class="item-lote-peso">${formatPeso(item.pesoTotal, item.unidade)}</span>
                             </td>
                         </tr>
                     `;
@@ -1131,7 +1423,7 @@ if (document.body.id === 'admin-page') {
                 if (!cons.concluido) {
                     html += `
                         <button
-                            class="btn-entrar"
+                            class="btn-entrar tap-feedback"
                             style="margin-top:12px; padding:14px; border-radius:12px;"
                             onclick="event.stopPropagation(); markConcluido('${cons.id}', true)"
                         >
@@ -1141,7 +1433,7 @@ if (document.body.id === 'admin-page') {
                 } else {
                     html += `
                         <button
-                            class="btn-entrar btn-rosa"
+                            class="btn-entrar btn-rosa tap-feedback"
                             style="margin-top:12px; padding:14px; border-radius:12px;"
                             onclick="event.stopPropagation(); markConcluido('${cons.id}', false)"
                         >
@@ -1156,6 +1448,7 @@ if (document.body.id === 'admin-page') {
             card.innerHTML = html;
 
             card.onclick = () => {
+                vibrar();
                 window.selectedConsolidadoId = window.selectedConsolidadoId === cons.id ? null : cons.id;
                 renderDashboard();
             };
@@ -1165,6 +1458,7 @@ if (document.body.id === 'admin-page') {
     }
 
     window.toggleSelecao = () => {
+        vibrar();
         window.modoSelecao = !window.modoSelecao;
         window.selecaoLotes = [];
         renderDashboard();
@@ -1261,7 +1555,7 @@ if (document.body.id === 'admin-page') {
                 try {
                     await updateDoc(doc(db, 'quebras', lid), { status_lancado: concluido });
                 } catch (e) {
-                    // mantém silencioso como no seu fluxo atual
+                    // silencioso
                 }
             });
         }
@@ -1286,7 +1580,7 @@ if (document.body.id === 'admin-page') {
             return all;
         }
 
-        const pending = window.todosOsLotes.filter(b => !b.status_lancado && !b.consolidado);
+        const pending = aplicarFiltroData(window.todosOsLotes.filter(b => !b.status_lancado && !b.consolidado));
 
         if (pending.length === 0) {
             showGlobalModal({
@@ -1306,6 +1600,7 @@ if (document.body.id === 'admin-page') {
                     consolidado[chave] = {
                         nome: item.nome,
                         loja: d.loja,
+                        operador: d.operador || 'N/A',
                         peso: 0,
                         unidade: item.unidade || 'KG'
                     };
@@ -1353,7 +1648,7 @@ if (document.body.id === 'admin-page') {
                 </head>
                 <body>
                     <h2>Relatório Consolidado - Hortifruti La Rose</h2>
-                    <p style="color:gray; margin-bottom:30px;">Soma total agrupada por produto.</p>
+                    <p style="color:gray; margin-bottom:30px;">Gerado em ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}. Soma total agrupada por produto.</p>
                     <table>
                         <tr>
                             <th>Produto</th>
@@ -1401,10 +1696,10 @@ if (document.body.id === 'admin-page') {
                 <tr>
                     <td>
                         <strong>${item.nome}</strong><br>
-                        <small style="color:var(--texto-suave);font-weight:500;">Cód: ${item.cod || 'N/A'}</small>
+                        <small class="item-lote-cod">Cód: ${item.cod || 'N/A'}</small>
                     </td>
-                    <td style="text-align:right;font-weight:900;color:var(--verde-dark);font-size:16px;">
-                        ${formatPeso(item.peso, item.unidade)}
+                    <td style="text-align:right;">
+                        <span class="item-lote-peso">${formatPeso(item.peso, item.unidade)}</span>
                     </td>
                 </tr>
             `;
@@ -1414,12 +1709,10 @@ if (document.body.id === 'admin-page') {
 
         if (lote.status_lancado) {
             btnAcao.innerHTML = '↩️ ESTORNAR';
-            btnAcao.style.background = 'rgba(225,29,72,0.1)';
-            btnAcao.style.color = 'var(--rosa-la-rose)';
+            btnAcao.className = 'btn-entrar btn-rosa tap-feedback';
         } else {
             btnAcao.innerHTML = '✅ LANÇAR ERP';
-            btnAcao.style.background = 'var(--verde-vibrante)';
-            btnAcao.style.color = 'var(--cor-btn-texto)';
+            btnAcao.className = 'btn-entrar tap-feedback';
         }
 
         btnAcao.onclick = async () => {
@@ -1435,33 +1728,32 @@ if (document.body.id === 'admin-page') {
 }
 
 // ==========================================
-// SERVICE WORKER (PWA)
+// SERVICE WORKER (PWA) — Refresh inteligente
 // ==========================================
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
-            .then((reg) => console.log('✅ Service Worker registrado:', reg.scope))
-            .catch((err) => console.error('❌ Erro ao registrar SW:', err));
-    });
-}
+            .then((reg) => {
+                // Verificar atualizações periodicamente
+                setInterval(() => reg.update(), 60000);
 
-// ===== SERVICE WORKER UPDATE =====
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').then(reg => {
-
-        reg.onupdatefound = () => {
-            const newWorker = reg.installing;
-
-            newWorker.onstatechange = () => {
-                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                    showGlobalModal({
-                        titulo: 'Atualização disponível',
-                        mensagem: 'Nova versão do sistema disponível. Atualize a página.',
-                        onConfirm: () => window.location.reload()
-                    });
-                }
-            };
-        };
-
+                reg.addEventListener('updatefound', () => {
+                    const newWorker = reg.installing;
+                    if (newWorker) {
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'activated') {
+                                // Notificar discretamente sobre atualização
+                                showGlobalModal({
+                                    titulo: 'Atualização disponível',
+                                    mensagem: 'Uma nova versão do app está disponível.',
+                                    confirmarTexto: 'ATUALIZAR',
+                                    onConfirm: () => window.location.reload()
+                                });
+                            }
+                        });
+                    }
+                });
+            })
+            .catch((err) => console.warn('SW falhou:', err));
     });
 }

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'larose-v13.3-hybrid';
+const CACHE_NAME = 'larose-v15.0-hybrid';
 
 const ASSETS_TO_CACHE = [
     '/',
@@ -6,9 +6,9 @@ const ASSETS_TO_CACHE = [
     '/lancamento.html',
     '/dashboard.html',
     '/manifest.json',
-    '/css/style.css?v=13.2',
-    '/js/modal.js?v=13.2',
-    '/js/app.js?v=13.2',
+    '/css/style.css?v=14.0',
+    '/js/modal.js?v=14.0',
+    '/js/app.js?v=14.0',
     '/js/data.js',
     '/js/firebase-config.js',
     '/assets/images/logo.png',
@@ -44,6 +44,7 @@ self.addEventListener('fetch', (event) => {
 
     if (request.method !== 'GET') return;
 
+    // HTML: Network-first (sempre busca a versão mais recente)
     if (request.headers.get('accept')?.includes('text/html')) {
         event.respondWith(
             fetch(request)
@@ -59,6 +60,7 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
+    // Assets: Cache-first
     event.respondWith(
         caches.match(request).then((cached) => {
             if (cached) return cached;
