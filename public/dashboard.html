@@ -11,9 +11,9 @@
     <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
 
     <!-- 🚀 PERFORMANCE -->
-    <link rel="preload" href="css/style.css?v=14.0" as="style">
-    <link rel="preload" href="js/app.js?v=14.0" as="script">
-    <link rel="stylesheet" href="css/style.css?v=14.0">
+    <link rel="preload" href="css/style.css?v=15.0" as="style">
+    <link rel="preload" href="js/app.js?v=15.0" as="script">
+    <link rel="stylesheet" href="css/style.css?v=15.0">
 
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
@@ -133,7 +133,7 @@
 
             <!-- SEÇÃO DE RESUMO (pode ser ocultada) -->
             <div id="secao-resumo">
-                <!-- MÉTRICAS -->
+                <!-- MELHORIA 06: MÉTRICAS LIVE STATS — 4 cards que reagem ao filtro -->
                 <div id="metricas-container" class="metricas-container">
                     <div class="metrica-card">
                         <div class="metrica-icone">⚖️</div>
@@ -144,6 +144,16 @@
                         <div class="metrica-icone">#️⃣</div>
                         <div id="metrica-un" class="metrica-valor">0</div>
                         <div class="metrica-label">Total UN</div>
+                    </div>
+                    <div class="metrica-card">
+                        <div class="metrica-icone">📦</div>
+                        <div id="metrica-itens" class="metrica-valor">0</div>
+                        <div class="metrica-label">Total Itens</div>
+                    </div>
+                    <div class="metrica-card">
+                        <div class="metrica-icone">📋</div>
+                        <div id="metrica-lotes" class="metrica-valor">0</div>
+                        <div class="metrica-label">Total Lotes</div>
                     </div>
                 </div>
 
@@ -186,18 +196,6 @@
                 </div>
             </div>
 
-            <!-- FILTRO POR DATA (range) 
-            <div class="filtro-data-box">
-                <div class="filtro-data-linha">
-                    <input type="date" id="filtroDataInicio" class="input-premium" title="Data início">
-                    <span class="filtro-data-separador">até</span>
-                    <input type="date" id="filtroDataFim" class="input-premium" title="Data fim">
-                    <button onclick="window.filtrarPorData()" class="btn-entrar btn-filtrar-data tap-feedback">
-                        FILTRAR
-                    </button>
-                </div>
-            </div>-->
-
             <!-- TABS -->
             <div class="tabs-container">
                 <button id="tab-pendentes" class="tab-btn active tap-feedback" onclick="window.mudarAba('pendentes')">⏳ PENDENTES</button>
@@ -228,7 +226,7 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="js/modal.js?v=14.0"></script>
-    <script type="module" src="js/app.js?v=14.0"></script>
+    <script src="js/modal.js?v=1.0"></script>
+    <script type="module" src="js/app.js?v=1.0"></script>
 </body>
 </html>

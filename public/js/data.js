@@ -96,3 +96,26 @@ export const CONFIG_SISTEMA = {
     ],
     adminEmail: "xaviermarcio80@gmail.com"
 };
+
+// ==========================================
+// MELHORIA 04: Catálogo Dinâmico
+// Produtos manuais persistidos em localStorage
+// O app "aprende" novos itens automaticamente
+// ==========================================
+export function getProdutosExtras() {
+    try {
+        return JSON.parse(localStorage.getItem('produtos_extra') || '[]');
+    } catch { return []; }
+}
+
+export function addProdutoExtra(produto) {
+    const extras = getProdutosExtras();
+    if (!extras.find(p => p.nome === produto.nome)) {
+        extras.push(produto);
+        localStorage.setItem('produtos_extra', JSON.stringify(extras));
+    }
+}
+
+export function getAllProdutos() {
+    return [...CONFIG_SISTEMA.produtos, ...getProdutosExtras()];
+}

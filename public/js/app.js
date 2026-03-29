@@ -14,7 +14,8 @@ import {
     updateDoc
 } from './firebase-config.js';
 
-import { CONFIG_SISTEMA } from './data.js';
+// MELHORIA 04: importar funções do catálogo dinâmico
+import { CONFIG_SISTEMA, getAllProdutos, addProdutoExtra } from './data.js';
 
 // ==========================================
 // 1. ESTADO GLOBAL DO SISTEMA
@@ -142,6 +143,25 @@ function formatPeso(peso, unidade) {
     return unidade === 'UN'
         ? `${Math.floor(peso)} UN`
         : `${peso.toFixed(3).replace('.', ',')} KG`;
+}
+
+// ==========================================
+// MELHORIA 03: Helper para download seguro (mobile-safe)
+// Gera HTML como Blob e faz download sem fechar a aba
+// ==========================================
+function downloadHtmlAsPrintable(htmlContent, filename) {
+    const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }, 200);
 }
 
 // ==========================================
@@ -436,6 +456,13 @@ if (document.body.id === 'app-page') {
                 nome,
                 unidade: currentUnidade
             };
+
+            // MELHORIA 04: Persistir produto manual no catálogo dinâmico
+            addProdutoExtra({
+                cod: 'EXTRA_' + Date.now(),
+                nome: name.toUpperCase(),
+                unidade: currentUnidade
+            });
 
             if (inputBusca) inputBusca.value = `➕ ${nome}`;
             el('manual-area')?.classList.add('hidden');
@@ -761,7 +788,7 @@ if (document.body.id === 'app-page') {
             }
         });
 
-        // === Busca de produtos (melhorada com classes CSS) ===
+        // === Busca de produtos (MELHORIA 04: usa getAllProdutos para incluir extras) ===
         inputBusca?.addEventListener('input', (e) => {
             if (bloqueandoBusca) return;
 
@@ -781,7 +808,8 @@ if (document.body.id === 'app-page') {
                 return;
             }
 
-            const filtrados = CONFIG_SISTEMA.produtos.filter(
+            // MELHORIA 04: Busca inclui produtos extras persistidos
+            const filtrados = getAllProdutos().filter(
                 p => p.nome.toLowerCase().includes(termo) || p.cod.includes(termo)
             );
 
@@ -1030,13 +1058,15 @@ if (document.body.id === 'admin-page') {
         renderDashboard();
     };
 
-    // === Métricas ===
+    // === Métricas (MELHORIA 06: Live Stats — reagem ao filtro) ===
     function calcularMetricas(lotes) {
         let totalKG = 0;
         let totalUN = 0;
+        let totalItens = 0;
 
         lotes.forEach(lote => {
             if (!lote.itens) return;
+            totalItens += lote.itens.length;
             lote.itens.forEach(item => {
                 if (item.unidade === 'UN') {
                     totalUN += item.peso;
@@ -1046,7 +1076,7 @@ if (document.body.id === 'admin-page') {
             });
         });
 
-        return { totalKG, totalUN };
+        return { totalKG, totalUN, totalItens, totalLotes: lotes.length };
     }
 
     // === Rankings ===
@@ -1120,7 +1150,7 @@ if (document.body.id === 'admin-page') {
         }).join('');
     }
 
-    // === PDF Ranking (por loja) ===
+    // === MELHORIA 01+02+03: PDF Ranking (por loja) com Pareto Top 10 + download blob ===
     window.gerarPdfRanking = (unidade) => {
         const lotesFiltrados = aplicarFiltroData(window.todosOsLotes.filter(b => b.status_lancado));
         const lojaFiltro = AppState.rankingLojaFiltro || 'todas';
@@ -1147,7 +1177,6 @@ if (document.body.id === 'admin-page') {
         const dataStr = new Date().toLocaleDateString('pt-BR');
         const horaStr = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
-        const win = window.open('', '', 'height=700,width=900');
         let html = `
             <html>
             <head>
@@ -1163,11 +1192,11 @@ if (document.body.id === 'admin-page') {
                     .valor { font-weight:900; color:#e11d48; }
                     .loja-badge { display:inline-block; padding:4px 12px; border-radius:6px; font-size:11px; font-weight:800; margin-left:8px; }
                     .separador { border:none; border-top:3px solid #e2e8f0; margin:35px 0; }
-                    @media print { .separador { page-break-before: auto; } }
+                    @media print { .separador { page-break-before: auto; } body { padding: 20px; } }
                 </style>
             </head>
             <body>
-                <h2>🏆 Ranking de Perdas em ${unidade}</h2>
+                <h2>🏆 Ranking de Perdas em ${unidade} — Top 10 Pareto</h2>
                 <p style="font-size:18px; font-weight:700; color:#022c22; margin-bottom:4px;">Hortifruti La Rose</p>
                 <p style="color:gray; margin-bottom:10px;">Gerado em ${dataStr} às ${horaStr}</p>
                 <p style="color:#64748b; font-size:13px; margin-bottom:20px;">
@@ -1186,22 +1215,39 @@ if (document.body.id === 'admin-page') {
                 return;
             }
 
+            // Calcular total geral para percentual Pareto
+            const totalGeral = ranking.reduce((acc, item) => acc + item.total, 0);
+
             html += `
                 <table>
-                    <tr><th>#</th><th>Produto</th><th>Total</th></tr>
+                    <tr><th>#</th><th>Produto</th><th>Total</th><th>% Pareto</th></tr>
             `;
 
+            let acumulado = 0;
             ranking.forEach((item, idx) => {
-                html += `<tr><td class="pos">${idx + 1}°</td><td>${item.nome}</td><td class="valor">${formatPeso(item.total, unidade)}</td></tr>`;
+                acumulado += item.total;
+                const pct = totalGeral > 0 ? ((item.total / totalGeral) * 100).toFixed(1) : '0.0';
+                const pctAcum = totalGeral > 0 ? ((acumulado / totalGeral) * 100).toFixed(1) : '0.0';
+                html += `<tr>
+                    <td class="pos">${idx + 1}°</td>
+                    <td>${item.nome}</td>
+                    <td class="valor">${formatPeso(item.total, unidade)}</td>
+                    <td style="font-size:12px; color:#64748b;">${pct}% (acum: ${pctAcum}%)</td>
+                </tr>`;
             });
 
             html += `</table>`;
+
+            // Subtotal da loja
+            html += `<div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px 16px; margin-bottom:10px;">
+                <strong>Subtotal ${nomeLojas[loja]}:</strong> ${formatPeso(totalGeral, unidade)}
+            </div>`;
         });
 
         html += `</body></html>`;
-        win.document.write(html);
-        win.document.close();
-        win.print();
+
+        // MELHORIA 03: Download como blob (não fecha aba no mobile)
+        downloadHtmlAsPrintable(html, `Ranking_${unidade}_LaRose_${dataStr.replace(/\//g, '-')}.html`);
     };
 
     function renderDashboard() {
@@ -1225,13 +1271,17 @@ if (document.body.id === 'admin-page') {
         el('titulo-resumo').innerText = label;
         el('resumo-total').innerText = baseCount;
 
-        // Métricas
+        // MELHORIA 06: Live Stats — Métricas reagem ao filtro do calendário
         const lotesFiltrados = aplicarFiltroData(pending);
         const metricas = calcularMetricas(lotesFiltrados);
         const metricaKG = el('metrica-kg');
         const metricaUN = el('metrica-un');
+        const metricaItens = el('metrica-itens');
+        const metricaLotes = el('metrica-lotes');
         if (metricaKG) metricaKG.innerText = metricas.totalKG.toFixed(3).replace('.', ',');
         if (metricaUN) metricaUN.innerText = Math.floor(metricas.totalUN);
+        if (metricaItens) metricaItens.innerText = metricas.totalItens;
+        if (metricaLotes) metricaLotes.innerText = metricas.totalLotes;
 
         // Rankings (baseados nos lotes lançados, filtrados por loja)
         const lotesLancados = aplicarFiltroData(completed);
@@ -1700,6 +1750,7 @@ if (document.body.id === 'admin-page') {
         XLSX.writeFile(wb, 'Relatorio_LaRose_Consolidado.xlsx');
     });
 
+    // MELHORIA 01+02+03: PDF Consolidado com Pareto Top 10 + Multi-Loja Split + Download Blob
     window.gerarRelatorioPDF = () => {
         const dados = window.obterDadosConsolidados();
         if (!dados) return;
@@ -1708,15 +1759,13 @@ if (document.body.id === 'admin-page') {
         const dataStr = new Date().toLocaleDateString('pt-BR');
         const horaStr = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
-        // Agrupar por loja
+        // MELHORIA 02: Agrupar por loja
         const porLoja = {};
         dados.forEach(c => {
             const loja = c.Loja || 'SEM LOJA';
             if (!porLoja[loja]) porLoja[loja] = [];
             porLoja[loja].push(c);
         });
-
-        const win = window.open('', '', 'height=700,width=900');
 
         let html = `
             <html>
@@ -1729,11 +1778,13 @@ if (document.body.id === 'admin-page') {
                         th { background:#022c22; color:white; text-transform:uppercase; font-size:12px; }
                         h2 { color:#022c22; margin-bottom:5px; }
                         h3 { color:#10b981; margin-top:30px; padding:10px 0; border-bottom:2px solid #10b981; }
+                        h4 { color:#e11d48; margin-top:25px; margin-bottom:10px; }
                         .separador { border:none; border-top:3px solid #e2e8f0; margin:35px 0; }
                         .valor { font-weight:900; color:#e11d48; }
                         .resumo-box { background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:15px 20px; margin:15px 0; }
                         .resumo-item { display:flex; justify-content:space-between; padding:6px 0; }
-                        @media print { h3 { page-break-before: auto; } }
+                        .pareto-badge { display:inline-block; background:#fef2f2; color:#e11d48; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:700; }
+                        @media print { h3 { page-break-before: auto; } body { padding: 20px; } }
                     </style>
                 </head>
                 <body>
@@ -1767,6 +1818,54 @@ if (document.body.id === 'admin-page') {
             });
 
             html += `</table>`;
+
+            // MELHORIA 01: Pareto Top 10 por loja
+            // Calcular ranking dos 10 maiores perdas dessa loja
+            const lotesLancados = aplicarFiltroData(window.todosOsLotes.filter(b => b.status_lancado));
+            const lojaId = loja === 'ENTRE LAGOS' ? 'entre_lagos' : loja === 'ITAPOA PARQUE' ? 'itapoa_parque' : '';
+
+            if (lojaId) {
+                const topKG = calcularRanking(lotesLancados, 'KG', 10, lojaId);
+                const topUN = calcularRanking(lotesLancados, 'UN', 10, lojaId);
+
+                if (topKG.length > 0) {
+                    const totalKG = topKG.reduce((a, b) => a + b.total, 0);
+                    html += `<h4>🏆 Top 10 Perdas KG — ${nomeLoja}</h4>`;
+                    html += `<table><tr><th>#</th><th>Produto</th><th>Total KG</th><th>% Pareto</th></tr>`;
+                    let acumKG = 0;
+                    topKG.forEach((item, i) => {
+                        acumKG += item.total;
+                        const pct = totalKG > 0 ? ((item.total / totalKG) * 100).toFixed(1) : '0.0';
+                        const pctAcum = totalKG > 0 ? ((acumKG / totalKG) * 100).toFixed(1) : '0.0';
+                        html += `<tr>
+                            <td style="font-weight:900; color:#10b981;">${i + 1}°</td>
+                            <td>${item.nome}</td>
+                            <td class="valor">${formatPeso(item.total, 'KG')}</td>
+                            <td><span class="pareto-badge">${pct}%</span> <small style="color:#64748b;">(acum: ${pctAcum}%)</small></td>
+                        </tr>`;
+                    });
+                    html += `</table>`;
+                }
+
+                if (topUN.length > 0) {
+                    const totalUN = topUN.reduce((a, b) => a + b.total, 0);
+                    html += `<h4>🏆 Top 10 Perdas UN — ${nomeLoja}</h4>`;
+                    html += `<table><tr><th>#</th><th>Produto</th><th>Total UN</th><th>% Pareto</th></tr>`;
+                    let acumUN = 0;
+                    topUN.forEach((item, i) => {
+                        acumUN += item.total;
+                        const pct = totalUN > 0 ? ((item.total / totalUN) * 100).toFixed(1) : '0.0';
+                        const pctAcum = totalUN > 0 ? ((acumUN / totalUN) * 100).toFixed(1) : '0.0';
+                        html += `<tr>
+                            <td style="font-weight:900; color:#10b981;">${i + 1}°</td>
+                            <td>${item.nome}</td>
+                            <td class="valor">${formatPeso(item.total, 'UN')}</td>
+                            <td><span class="pareto-badge">${pct}%</span> <small style="color:#64748b;">(acum: ${pctAcum}%)</small></td>
+                        </tr>`;
+                    });
+                    html += `</table>`;
+                }
+            }
         });
 
         html += `
@@ -1774,9 +1873,8 @@ if (document.body.id === 'admin-page') {
             </html>
         `;
 
-        win.document.write(html);
-        win.document.close();
-        win.print();
+        // MELHORIA 03: Download como blob (não fecha aba no mobile)
+        downloadHtmlAsPrintable(html, `Relatorio_LaRose_${dataStr.replace(/\//g, '-')}.html`);
     };
 
     // Compatibilidade com modal antigo de detalhes

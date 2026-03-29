@@ -2103,3 +2103,218 @@ body#index-page .transition-loader {
     from { opacity: 0; }
     to { opacity: 1; }
 }
+
+/* ==========================================
+   MELHORIA 05: Desktop Pro Mode
+   Ícones compactos (max 22px), layout grid,
+   maior densidade de dados em telas grandes
+   ========================================== */
+@media (min-width: 1024px) {
+    /* Ícones compactos */
+    .icon-uniform,
+    .btn-icon {
+        font-size: 16px;
+        width: 36px;
+        height: 36px;
+    }
+
+    .metrica-icone {
+        font-size: 22px;
+        margin-bottom: 4px;
+    }
+
+    .metrica-card {
+        padding: 14px 12px;
+    }
+
+    .metrica-valor {
+        font-size: 28px;
+    }
+
+    .metrica-label {
+        font-size: 9px;
+        margin-top: 4px;
+    }
+
+    /* Grid compacto para métricas */
+    .metricas-container {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+    }
+
+    /* Rankings lado a lado */
+    .ranking-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .ranking-store-tabs,
+    .ranking-loja-label {
+        grid-column: 1 / -1;
+    }
+
+    .ranking-card {
+        margin-bottom: 0;
+        padding: 16px;
+    }
+
+    .ranking-item {
+        padding: 8px 0;
+    }
+
+    .ranking-posicao {
+        width: 24px;
+        height: 24px;
+        font-size: 10px;
+        margin-right: 8px;
+    }
+
+    .ranking-produto-nome {
+        font-size: 12px;
+    }
+
+    .ranking-produto-valor {
+        font-size: 13px;
+    }
+
+    /* Tabs compactos */
+    .tab-btn {
+        font-size: 11px;
+        padding: 10px;
+    }
+
+    /* Cards de lote mais compactos */
+    .card-lote-expandable {
+        padding: 16px 20px;
+    }
+
+    .lote-nome-loja {
+        font-size: 13px;
+    }
+
+    .lote-data-hora,
+    .lote-operador-nome {
+        font-size: 10px;
+    }
+
+    /* Header compacto */
+    .header-app {
+        padding: 28px 30px 55px;
+    }
+
+    .nome-operador {
+        font-size: 28px;
+    }
+
+    /* Botões menores no desktop */
+    .btn-entrar {
+        padding: 14px 18px;
+        font-size: 12px;
+    }
+
+    .btn-outline {
+        padding: 10px 16px;
+        font-size: 11px;
+    }
+
+    /* Avatar compacto */
+    .avatar-circle {
+        width: 48px;
+        height: 48px;
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+
+    .flash-card {
+        min-height: 120px;
+        padding: 18px 12px;
+    }
+
+    .flash-card p {
+        font-size: 14px;
+    }
+
+    /* Filtros mais compactos */
+    .filtro-data-box {
+        padding: 12px 16px;
+    }
+
+    .filtro-data-box .input-premium[type="date"] {
+        min-height: 42px;
+        padding: 10px 14px;
+        font-size: 13px;
+    }
+
+    .btn-filtrar-data {
+        padding: 10px 20px;
+        font-size: 11px;
+    }
+
+    .btn-filtro-rapido {
+        padding: 8px 14px;
+        font-size: 11px;
+    }
+
+    /* Resumo compacto */
+    .resumo-admin-card {
+        padding: 20px;
+    }
+
+    .resumo-admin-total {
+        font-size: 42px;
+    }
+
+    .resumo-admin-acoes .btn-entrar {
+        font-size: 11px;
+        padding: 12px;
+    }
+
+    /* Lista admin grid em desktop */
+    .lista-admin-box {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .lista-admin-box > .glass-card:first-child {
+        grid-column: 1 / -1;
+    }
+
+    /* Modal compacto */
+    .modal-estruturado {
+        max-width: 560px;
+    }
+
+    .modal-centered {
+        max-width: 420px;
+        padding: 28px;
+    }
+
+    /* Toggle resumo compacto */
+    .btn-toggle-resumo {
+        padding: 8px;
+        font-size: 11px;
+    }
+
+    /* Scrollbar fina */
+    ::-webkit-scrollbar {
+        width: 4px;
+    }
+}
+
+/* Desktop extra-wide: layout mais denso */
+@media (min-width: 1440px) {
+    .metricas-container {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+    }
+
+    .lista-admin-box {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .ranking-container {
+        grid-template-columns: 1fr 1fr;
+    }
+}

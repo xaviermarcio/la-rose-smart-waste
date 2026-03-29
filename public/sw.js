@@ -1,4 +1,4 @@
-const CACHE_NAME = 'larose-v1.1-hybrid';
+const CACHE_NAME = 'larose-v1.0-hybrid';
 
 const ASSETS_TO_CACHE = [
     '/',
