@@ -814,7 +814,82 @@ if (document.body.id === 'app-page') {
             );
 
             if (filtrados.length === 0) {
-                lista.classList.add('hidden');
+                // Produto não encontrado — mostrar opção de cadastro dentro da lista
+                const nomeDigitado = e.target.value.trim().toUpperCase();
+
+                lista.innerHTML = `
+                    <div class="sugestao-nao-cadastrado">
+                        <div class="sugestao-nao-cadastrado-msg">
+                            ⚠️ Produto não cadastrado
+                        </div>
+                        <div class="sugestao-nao-cadastrado-acao">
+                            <span class="sugestao-nao-cadastrado-nome">"${nomeDigitado}"</span>
+                            <span class="sugestao-nao-cadastrado-sub">Selecione o tipo de medida para cadastrar:</span>
+                            <div class="sugestao-unidade-escolha">
+                                <button class="sugestao-btn-unidade tap-feedback" data-unidade="KG">
+                                    ⚖️ KG
+                                    <span>Quilograma</span>
+                                </button>
+                                <button class="sugestao-btn-unidade tap-feedback" data-unidade="UN">
+                                    # UN
+                                    <span>Unidade</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Ao clicar em KG ou UN — cadastra e segue o fluxo
+                lista.querySelectorAll('.sugestao-btn-unidade').forEach(btn => {
+                    btn.onclick = () => {
+                        bloqueandoBusca = true;
+                        vibrar();
+
+                        const unidadeEscolhida = btn.dataset.unidade;
+                        let nome = nomeDigitado;
+                        if (lojaAtiva === 'itapoa_parque' && !nome.includes('PARQUE')) {
+                            nome += ' PARQUE';
+                        }
+
+                        // Salva permanentemente no catálogo local
+                        addProdutoExtra({
+                            cod: 'EXTRA_' + Date.now(),
+                            nome: nomeDigitado,
+                            unidade: unidadeEscolhida
+                        });
+
+                        window.produtoSelecionado = {
+                            cod: 'MANUAL',
+                            nomeOriginal: nomeDigitado,
+                            nomeExibicao: nome,
+                            nome,
+                            unidade: unidadeEscolhida
+                        };
+
+                        currentUnidade = unidadeEscolhida;
+
+                        inputBusca.value = nome;
+                        lista.innerHTML = '';
+                        lista.classList.add('hidden');
+                        inputBusca.blur();
+
+                        manualMode = false;
+                        el('manual-area')?.classList.add('hidden');
+                        el('btn-manual-toggle')?.classList.remove('hidden');
+                        el('unit-toggle-catalog')?.classList.add('hidden');
+
+                        updateWeightUI();
+
+                        if (inputPeso) {
+                            inputPeso.value = '';
+                            setTimeout(() => inputPeso.focus(), 120);
+                        }
+
+                        setTimeout(() => { bloqueandoBusca = false; }, 150);
+                    };
+                });
+
+                lista.classList.remove('hidden');
                 return;
             }
 

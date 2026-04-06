@@ -1,4 +1,4 @@
-const CACHE_NAME = 'larose-v1.1-hybrid';
+const CACHE_NAME = 'larose-v17.0';
 
 const ASSETS_TO_CACHE = [
     '/',
@@ -6,9 +6,9 @@ const ASSETS_TO_CACHE = [
     '/lancamento.html',
     '/dashboard.html',
     '/manifest.json',
-    '/css/style.css?v=14.0',
-    '/js/modal.js?v=14.0',
-    '/js/app.js?v=14.0',
+    '/css/style.css?v=17.0',
+    '/js/modal.js?v=1.0',
+    '/js/app.js?v=17.0',
     '/js/data.js',
     '/js/firebase-config.js',
     '/assets/images/logo.png',
@@ -30,9 +30,7 @@ self.addEventListener('activate', (event) => {
         caches.keys().then((cacheNames) =>
             Promise.all(
                 cacheNames.map((cache) => {
-                    if (cache !== CACHE_NAME) {
-                        return caches.delete(cache);
-                    }
+                    if (cache !== CACHE_NAME) return caches.delete(cache);
                 })
             )
         ).then(() => self.clients.claim())
@@ -41,18 +39,15 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
     const request = event.request;
-
     if (request.method !== 'GET') return;
 
-    // HTML: Network-first (sempre busca a versão mais recente)
+    // HTML: Network-first
     if (request.headers.get('accept')?.includes('text/html')) {
         event.respondWith(
             fetch(request)
                 .then((response) => {
-                    const responseClone = response.clone();
-                    caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(request, responseClone);
-                    });
+                    const clone = response.clone();
+                    caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
                     return response;
                 })
                 .catch(() => caches.match(request).then((cached) => cached || caches.match('/index.html')))
@@ -64,12 +59,9 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
         caches.match(request).then((cached) => {
             if (cached) return cached;
-
             return fetch(request).then((response) => {
-                const responseClone = response.clone();
-                caches.open(CACHE_NAME).then((cache) => {
-                    cache.put(request, responseClone);
-                });
+                const clone = response.clone();
+                caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
                 return response;
             });
         })

@@ -7,7 +7,7 @@
   "display": "standalone",
   "display_override": ["standalone", "browser"],
   "orientation": "portrait-primary",
-  "background_color": "#090E17",
+  "background_color": "#060c14",
   "theme_color": "#10b981",
   "categories": ["business", "productivity"],
   "icons": [

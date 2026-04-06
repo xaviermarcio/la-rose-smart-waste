@@ -2,137 +2,106 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>La Rose - Smart Waste</title>
+
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="La Rose">
+    <meta name="application-name" content="La Rose">
+    <meta name="theme-color" content="#060c14">
+    <meta name="description" content="Sistema Inteligente de Gestão de Quebras - Hortifruti La Rose">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
 
-    <!-- 🚀 PERFORMANCE -->
-    <link rel="preload" href="css/style.css?v=14.0" as="style">
-    <link rel="preload" href="js/app.js?v=14.0" as="script">
-    <link rel="stylesheet" href="css/style.css?v=14.0">
+    <link rel="preload" href="css/style.css?v=17.0" as="style">
+    <link rel="preload" href="js/app.js?v=17.0" as="script">
+    <link rel="stylesheet" href="css/style.css?v=17.0">
 
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-    <meta name="theme-color" content="#090E17">
 </head>
 
 <body id="index-page">
     <div class="app-container">
 
-        <!-- SPLASH (mais rápido: 2s) -->
         <div id="splash-screen" class="splash-screen">
             <img src="assets/images/logo.png" class="splash-logo" alt="La Rose">
-
             <div class="splash-dots">
                 <span class="splash-dot dot-delay-0"></span>
                 <span class="splash-dot dot-delay-1"></span>
                 <span class="splash-dot dot-delay-2"></span>
             </div>
-
-            <p class="splash-text fade-in-up">Smart Waste System</p>
+            <p class="splash-text">Smart Waste System</p>
         </div>
 
-        <!-- LOGIN -->
         <main id="login-page" class="login-page">
             <div class="glass-card login-card">
-                <!-- BOTÃO REFRESH 
-                <div class="login-refresh">
-                    <button onclick="window.location.reload()" class="btn-icon tap-feedback" title="Recarregar">
-                        🔄
-                    </button>
-                </div>-->
 
                 <img src="assets/images/logo.png" class="login-logo" alt="La Rose">
-                <h2 class="titulo-login">Acesso La Rose</h2>
+                <h2 class="titulo-login">La Rose</h2>
                 <p class="subtitulo-login">Smart Waste v1.1</p>
 
-                <!-- PERFIL -->
                 <div id="seletor-perfil">
                     <button onclick="window.definirPerfil('operacional')" class="btn-entrar mb-15 tap-feedback">
                         👥 ACESSO EQUIPE
                     </button>
-
                     <button onclick="window.definirPerfil('admin')" class="btn-outline w-full tap-feedback">
                         👤 ACESSO GESTÃO (ADMIN)
                     </button>
-                    <br><br>
-                    <p class="subtitulo-login-dev" style="text-align: center !important; display: block !important; width: 100% !important; margin-top: 40px !important; font-size: 14px;">Developed by Márcio Xavier</p>
+                    <p class="subtitulo-login-dev">Developed by Márcio Xavier</p>
                 </div>
 
-                <!-- LOGIN ADMIN -->
                 <div id="campos-auth" class="hidden fade-in-up">
-                    <input type="email" id="email" placeholder="E-mail" class="input-premium mb-15">
-                    <input type="password" id="senha" placeholder="Senha" class="input-premium mb-25">
-
-                    <button id="btn-fazer-login" class="btn-entrar tap-feedback">
-                        ENTRAR NO SISTEMA
-                    </button>
-
-                    <button onclick="window.location.reload()" class="btn-manual-helper btn-sem-borda tap-feedback">
-                        VOLTAR
-                    </button>
+                    <input type="email" id="email" placeholder="E-mail" class="input-premium mb-15" autocomplete="email">
+                    <input type="password" id="senha" placeholder="Senha" class="input-premium mb-25" autocomplete="current-password">
+                    <button id="btn-fazer-login" class="btn-entrar tap-feedback">ENTRAR NO SISTEMA</button>
+                    <button onclick="window.location.reload()" class="btn-manual-helper btn-sem-borda tap-feedback">VOLTAR</button>
                 </div>
 
-                <!-- OPERACIONAL -->
                 <div id="config-operacional" class="hidden fade-in-up">
-
-                    <!-- LOJA (etapa com transição) -->
                     <div id="etapa-loja" class="etapa-transicao">
-                        <p class="section-label">
-                            📍 Selecione a Unidade
-                        </p>
-
+                        <p class="section-label">📍 Selecione a Unidade</p>
                         <div class="grid-cards unidades-grid">
                             <div class="flash-card tap-feedback" onclick="window.selecionarLoja('entre_lagos')">
                                 <div class="avatar-circle">EL</div>
                                 <p>Entre Lagos</p>
                             </div>
-
                             <div class="flash-card tap-feedback" onclick="window.selecionarLoja('itapoa_parque')">
                                 <div class="avatar-circle">IP</div>
                                 <p>Itapoã Parque</p>
                             </div>
                         </div>
-
                         <button onclick="window.resetar()" class="btn-manual-helper btn-sem-borda btn-sair-sistema tap-feedback">
                             ❌ SAIR DO SISTEMA
                         </button>
                     </div>
 
-                    <!-- OPERADOR (etapa com transição) -->
                     <div id="etapa-operador" class="hidden etapa-transicao">
-                        <p class="section-label">
-                            👥 Quem está operando?
-                        </p>
-
+                        <p class="section-label">👥 Quem está operando?</p>
                         <div id="container-operadores" class="grid-cards operadores-grid"></div>
-
                         <button onclick="window.voltarParaLoja()" class="btn-manual-helper btn-sem-borda mt-20 tap-feedback">
                             ALTERAR UNIDADE
                         </button>
                     </div>
 
-                    <!-- BOTÃO INICIAR (com animação) -->
                     <button id="btn-iniciar" onclick="window.location.href='lancamento.html'" class="btn-entrar hidden btn-appear mt-30 tap-feedback">
                         INICIAR
                     </button>
-
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- MODAL GLOBAL -->
     <div id="modal-global" class="modal-overlay hidden">
         <div class="modal-centered pop-in">
             <div class="modal-icon">⚠️</div>
             <h3 id="modalTitulo">Título</h3>
             <p class="modal-msg" id="modalMensagem"></p>
-
             <div class="modal-actions">
                 <button id="modalConfirmar" class="btn-entrar tap-feedback">OK</button>
                 <button id="modalCancelar" class="cancel-link">Cancelar</button>
@@ -141,6 +110,6 @@
     </div>
 
     <script src="js/modal.js?v=1.0"></script>
-    <script type="module" src="js/app.js?v=1.0"></script>
+    <script type="module" src="js/app.js?v=16.0"></script>
 </body>
 </html>

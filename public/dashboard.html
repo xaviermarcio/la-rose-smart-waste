@@ -2,22 +2,26 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Gestão La Rose - Smart Waste</title>
+
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="La Rose Gestão">
+    <meta name="theme-color" content="#10b981">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
 
-    <!-- 🚀 PERFORMANCE -->
-    <link rel="preload" href="css/style.css?v=15.0" as="style">
-    <link rel="preload" href="js/app.js?v=15.0" as="script">
-    <link rel="stylesheet" href="css/style.css?v=15.0">
+    <link rel="preload" href="css/style.css?v=17.0" as="style">
+    <link rel="preload" href="js/app.js?v=17.0" as="script">
+    <link rel="stylesheet" href="css/style.css?v=17.0">
 
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-    <meta name="theme-color" content="#10b981">
 </head>
 
 <body id="admin-page" class="page-fade">
@@ -32,7 +36,6 @@
                 </div>
                 <div id="detalhe-loja" class="badge-loja">LOJA</div>
             </div>
-
             <div class="modal-corpo">
                 <table class="tabela-detalhes">
                     <thead>
@@ -44,7 +47,6 @@
                     <tbody id="lista-itens-detalhe"></tbody>
                 </table>
             </div>
-
             <div class="modal-rodape">
                 <button onclick="window.fecharModalDetalhes()" class="btn-outline tap-feedback">FECHAR</button>
                 <button id="btn-acao-lancamento" class="btn-entrar tap-feedback">✅ DAR BAIXA</button>
@@ -58,7 +60,6 @@
             <div class="modal-icon modal-success">📊</div>
             <h3>Somar Lotes?</h3>
             <p class="modal-msg" id="msg-somar"></p>
-
             <div class="modal-actions">
                 <button id="btn-confirmar-somar" class="btn-entrar tap-feedback">SOMAR LOTES</button>
                 <button onclick="document.getElementById('modal-somar').classList.add('hidden')" class="cancel-link">Cancelar</button>
@@ -72,7 +73,6 @@
             <div class="modal-icon">⚠️</div>
             <h3>Deseja sair?</h3>
             <p class="modal-msg">Você será desconectado do painel administrativo.</p>
-
             <div class="modal-actions">
                 <button id="btn-confirmar-sair-admin" class="btn-entrar btn-rosa tap-feedback">SIM, QUERO SAIR</button>
                 <button onclick="document.getElementById('modal-sair-admin').classList.add('hidden')" class="cancel-link">CANCELAR</button>
@@ -81,20 +81,18 @@
     </div>
 
     <div class="app-container">
-        <!-- Header padronizado (mesmo estilo do lançamento) -->
         <header class="header-app">
             <div>
                 <div class="badge-loja">👤 PAINEL ADMIN</div>
                 <h1 class="nome-operador">Painel La Rose</h1>
             </div>
-
             <div class="header-actions">
                 <button onclick="window.location.reload()" class="btn-icon tap-feedback" title="Recarregar">
-                    🔄
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/>
+                    </svg>
                 </button>
-                <button id="btn-logout" class="btn-outline btn-sair-header tap-feedback">
-                    SAIR
-                </button>
+                <button id="btn-logout" class="btn-outline btn-sair-header tap-feedback">SAIR</button>
             </div>
         </header>
 
@@ -106,15 +104,13 @@
                     <small id="titulo-resumo" class="resumo-admin-label">Pendentes</small>
                     <h2 id="resumo-total" class="resumo-admin-total">0</h2>
                 </div>
-
                 <div class="resumo-admin-acoes">
                     <button id="btn-excel" class="btn-entrar tap-feedback">📊 EXCEL</button>
                     <button onclick="window.gerarRelatorioPDF()" class="btn-entrar btn-rosa tap-feedback">📄 PDF</button>
                 </div>
             </div>
 
-
-             <!-- FILTRO POR DATA (range) -->
+            <!-- FILTRO DATA -->
             <div class="filtro-data-box">
                 <div class="filtro-data-linha">
                     <input type="date" id="filtroDataInicio" class="input-premium" title="Data início">
@@ -126,32 +122,48 @@
                 </div>
             </div>
 
-            <!-- BOTÃO OCULTAR/MOSTRAR RESUMO -->
+            <!-- TOGGLE RESUMO -->
             <button id="btn-toggle-resumo" class="btn-toggle-resumo tap-feedback" onclick="window.toggleResumo()">
                 👁️ Ocultar Resumo
             </button>
 
-            <!-- SEÇÃO DE RESUMO (pode ser ocultada) -->
+            <!-- SEÇÃO RESUMO -->
             <div id="secao-resumo">
-                <!-- MELHORIA 06: MÉTRICAS LIVE STATS — 4 cards que reagem ao filtro -->
+                <!-- MÉTRICAS -->
                 <div id="metricas-container" class="metricas-container">
                     <div class="metrica-card">
-                        <div class="metrica-icone">⚖️</div>
+                        <div class="metrica-icone">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--verde-vibrante)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+                            </svg>
+                        </div>
                         <div id="metrica-kg" class="metrica-valor">0</div>
                         <div class="metrica-label">Total KG</div>
                     </div>
                     <div class="metrica-card">
-                        <div class="metrica-icone">#️⃣</div>
+                        <div class="metrica-icone">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--azul-consolidar)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/>
+                            </svg>
+                        </div>
                         <div id="metrica-un" class="metrica-valor">0</div>
                         <div class="metrica-label">Total UN</div>
                     </div>
                     <div class="metrica-card">
-                        <div class="metrica-icone">📦</div>
+                        <div class="metrica-icone">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--rosa-la-rose)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
+                            </svg>
+                        </div>
                         <div id="metrica-itens" class="metrica-valor">0</div>
                         <div class="metrica-label">Total Itens</div>
                     </div>
                     <div class="metrica-card">
-                        <div class="metrica-icone">📋</div>
+                        <div class="metrica-icone">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/>
+                            </svg>
+                        </div>
                         <div id="metrica-lotes" class="metrica-valor">0</div>
                         <div class="metrica-label">Total Lotes</div>
                     </div>
@@ -165,9 +177,8 @@
                     <button class="btn-filtro-rapido btn-limpar tap-feedback" onclick="window.filtroRapido('limpar')">✕ Limpar</button>
                 </div>
 
-                <!-- RANKINGS POR LOJA -->
+                <!-- RANKINGS -->
                 <div id="ranking-container" class="ranking-container">
-                    <!-- Filtro de loja para rankings -->
                     <div class="ranking-store-tabs">
                         <button class="ranking-store-tab active tap-feedback" onclick="window.setRankingLoja('todas')">📊 Todas</button>
                         <button class="ranking-store-tab tap-feedback" onclick="window.setRankingLoja('entre_lagos')">🏬 Entre Lagos</button>
@@ -176,7 +187,6 @@
 
                     <div id="ranking-loja-label" class="ranking-loja-label">Todas as lojas</div>
 
-                    <!-- Ranking KG -->
                     <div class="ranking-card">
                         <div class="ranking-header">
                             <span class="ranking-titulo">🏆 Top Perdas KG</span>
@@ -185,7 +195,6 @@
                         <div id="ranking-kg"></div>
                     </div>
 
-                    <!-- Ranking UN -->
                     <div class="ranking-card">
                         <div class="ranking-header">
                             <span class="ranking-titulo">🏆 Top Perdas UN</span>
@@ -217,7 +226,6 @@
             <div class="modal-icon">⚠️</div>
             <h3 id="modalTitulo">Título</h3>
             <p class="modal-msg" id="modalMensagem"></p>
-
             <div class="modal-actions">
                 <button id="modalConfirmar" class="btn-entrar tap-feedback">OK</button>
                 <button id="modalCancelar" class="cancel-link">Cancelar</button>
@@ -227,6 +235,6 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="js/modal.js?v=1.0"></script>
-    <script type="module" src="js/app.js?v=1.0"></script>
+    <script type="module" src="js/app.js?v=16.0"></script>
 </body>
 </html>

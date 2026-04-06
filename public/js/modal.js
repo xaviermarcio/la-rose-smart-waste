@@ -19,12 +19,17 @@ window.modal = ({
 
   modal.classList.remove("hidden");
 
-  document.getElementById("modalConfirmar").onclick = () => {
-    if (onConfirm) onConfirm();
-    modal.classList.add("hidden");
+  // Fechar ao clicar no overlay (fundo escuro)
+  const fechar = () => modal.classList.add("hidden");
+
+  modal.onclick = (e) => {
+    if (e.target === modal) fechar();
   };
 
-  document.getElementById("modalCancelar").onclick = () => {
-    modal.classList.add("hidden");
+  document.getElementById("modalConfirmar").onclick = () => {
+    if (onConfirm) onConfirm();
+    fechar();
   };
+
+  document.getElementById("modalCancelar").onclick = fechar;
 };
