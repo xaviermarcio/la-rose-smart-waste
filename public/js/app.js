@@ -1,3 +1,61 @@
+// ==========================================
+// BUSCA FUZZY — tolerância a erros de digitação
+// ==========================================
+function fuzzyMatch(texto, termo) {
+    texto = texto.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    termo = termo.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    if (texto.includes(termo)) return true;
+    // Verifica se todos os caracteres do termo aparecem em ordem no texto
+    let j = 0;
+    for (let i = 0; i < texto.length && j < termo.length; i++) {
+        if (texto[i] === termo[j]) j++;
+    }
+    return j === termo.length && termo.length >= 3;
+}
+
+// ==========================================
+// CATÁLOGO DINÂMICO — Firebase Sync
+// Produtos extras salvos no Firebase e
+// sincronizados para todos os dispositivos
+// ==========================================
+async function addProdutoFirebase(produto) {
+    // Salva localmente primeiro (funciona offline)
+    addProdutoExtra(produto);
+
+    // Tenta salvar no Firebase
+    try {
+        const todosExtras = await getDocs(collection(db, 'produtos_extra'));
+        const jaExiste = todosExtras.docs.some(d => d.data().nome === produto.nome);
+        if (!jaExiste) {
+            await addDoc(collection(db, 'produtos_extra'), {
+                cod: produto.cod,
+                nome: produto.nome,
+                unidade: produto.unidade,
+                criadoEm: serverTimestamp()
+            });
+        }
+    } catch (e) {
+        // Falhou o Firebase — localStorage já foi salvo, ok
+        console.warn('Produto salvo localmente apenas:', e);
+    }
+}
+
+async function carregarProdutosFirebase() {
+    try {
+        const snap = await getDocs(collection(db, 'produtos_extra'));
+        snap.forEach(d => {
+            const p = d.data();
+            if (p.nome) {
+                // Sincroniza com localStorage local
+                addProdutoExtra({ cod: p.cod || 'EXTRA', nome: p.nome, unidade: p.unidade || 'KG' });
+            }
+        });
+    } catch (e) {
+        // Sem internet — usa o localStorage local
+        console.warn('Usando catálogo local (offline):', e);
+    }
+}
+
 import {
     auth,
     signInWithEmailAndPassword,
@@ -386,6 +444,9 @@ if (document.body.id === 'app-page') {
         el('display-operador').innerText = operadorAtivo;
         document.body.style.opacity = '1';
 
+        // Sincroniza produtos extras do Firebase ao abrir
+        carregarProdutosFirebase();
+
         let currentUnidade = 'KG';
         let manualMode = false;
         let bloqueandoBusca = false;
@@ -457,8 +518,8 @@ if (document.body.id === 'app-page') {
                 unidade: currentUnidade
             };
 
-            // MELHORIA 04: Persistir produto manual no catálogo dinâmico
-            addProdutoExtra({
+            // Persiste no Firebase (sincroniza para todos os dispositivos)
+            addProdutoFirebase({
                 cod: 'EXTRA_' + Date.now(),
                 nome: name.toUpperCase(),
                 unidade: currentUnidade
@@ -705,18 +766,61 @@ if (document.body.id === 'app-page') {
             doAddItem(pesoVal);
         });
 
+        // === Wake Lock — impede tela apagar durante lançamento ===
+        let wakeLock = null;
+        async function ativarWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                }
+            } catch (e) { /* silencioso */ }
+        }
+        ativarWakeLock();
+
+        // Reativa wake lock se a tela voltar ao foco
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') ativarWakeLock();
+        });
+
         el('btn-finalizar-lote')?.addEventListener('click', () => {
             if (window.loteAtual.length === 0) {
                 showError('A lista de produtos está vazia!');
                 return;
             }
 
+            // Calcular totais para o resumo
+            let totalKG = 0, totalUN = 0;
+            window.loteAtual.forEach(item => {
+                if (item.unidade === 'UN') totalUN += item.peso;
+                else totalKG += item.peso;
+            });
+
+            const resumoItens = window.loteAtual.map(item =>
+                `<div class="resumo-item-linha">
+                    <span class="resumo-item-nome">${item.nome}</span>
+                    <span class="resumo-item-peso">${formatPeso(item.peso, item.unidade)}</span>
+                </div>`
+            ).join('');
+
+            const resumoTotais = `
+                <div class="resumo-totais">
+                    ${totalKG > 0 ? `<div class="resumo-total-chip resumo-chip-kg">⚖️ ${totalKG.toFixed(3).replace('.', ',')} KG</div>` : ''}
+                    ${totalUN > 0 ? `<div class="resumo-total-chip resumo-chip-un"># ${Math.floor(totalUN)} UN</div>` : ''}
+                </div>
+            `;
+
             const modalEnvio = el('modal-envio');
             const msgEnvio = el('msg-envio');
             const btnConfirmarEnvio = el('btn-confirmar-envio');
 
             if (modalEnvio && msgEnvio && btnConfirmarEnvio) {
-                msgEnvio.innerHTML = `<b>${operadorAtivo}</b>, você está prestes a enviar <b>${window.loteAtual.length} itens</b> no lote.`;
+                msgEnvio.innerHTML = `
+                    <b>${operadorAtivo}</b>, confira o lote antes de enviar:
+                    <div class="resumo-lote-preview">
+                        ${resumoItens}
+                    </div>
+                    ${resumoTotais}
+                `;
 
                 btnConfirmarEnvio.onclick = async () => {
                     window.fecharModalEnvio();
@@ -808,9 +912,9 @@ if (document.body.id === 'app-page') {
                 return;
             }
 
-            // MELHORIA 04: Busca inclui produtos extras persistidos
+            // Busca com tolerância a erros de digitação (fuzzy)
             const filtrados = getAllProdutos().filter(
-                p => p.nome.toLowerCase().includes(termo) || p.cod.includes(termo)
+                p => fuzzyMatch(p.nome, termo) || p.cod.includes(termo)
             );
 
             if (filtrados.length === 0) {
@@ -851,8 +955,8 @@ if (document.body.id === 'app-page') {
                             nome += ' PARQUE';
                         }
 
-                        // Salva permanentemente no catálogo local
-                        addProdutoExtra({
+                        // Persiste no Firebase (sincroniza para todos os dispositivos)
+                        addProdutoFirebase({
                             cod: 'EXTRA_' + Date.now(),
                             nome: nomeDigitado,
                             unidade: unidadeEscolhida
@@ -1133,7 +1237,77 @@ if (document.body.id === 'admin-page') {
         renderDashboard();
     };
 
-    // === Métricas (MELHORIA 06: Live Stats — reagem ao filtro) ===
+    // === Gráfico de Tendência Semanal ===
+    function calcularTendenciaSemanal(lotes) {
+        const semanas = {};
+        const agora = new Date();
+
+        lotes.forEach(lote => {
+            if (!lote.data || typeof lote.data.toDate !== 'function') return;
+            const data = lote.data.toDate();
+            // Calcular semana relativa (0 = atual, 1 = anterior, etc.)
+            const diffDias = Math.floor((agora - data) / (1000 * 60 * 60 * 24));
+            const semana = Math.floor(diffDias / 7);
+            if (semana > 7) return; // só últimas 8 semanas
+
+            if (!semanas[semana]) semanas[semana] = { kg: 0, un: 0, lotes: 0 };
+            semanas[semana].lotes++;
+            if (lote.itens) {
+                lote.itens.forEach(item => {
+                    if (item.unidade === 'UN') semanas[semana].un += item.peso;
+                    else semanas[semana].kg += item.peso;
+                });
+            }
+        });
+
+        return semanas;
+    }
+
+    function renderGraficoTendencia(lotes) {
+        const container = el('grafico-tendencia');
+        if (!container) return;
+
+        const semanas = calcularTendenciaSemanal(lotes);
+        const labels = [];
+        const valoresKG = [];
+
+        for (let s = 6; s >= 0; s--) {
+            const dados = semanas[s] || { kg: 0 };
+            if (s === 0) labels.push('Esta sem.');
+            else if (s === 1) labels.push('Sem. ant.');
+            else labels.push(`-${s} sem.`);
+            valoresKG.push(parseFloat(dados.kg.toFixed(2)));
+        }
+
+        const maxVal = Math.max(...valoresKG, 1);
+        const barras = valoresKG.map((val, i) => {
+            const pct = Math.round((val / maxVal) * 100);
+            const isAtual = i === 6;
+            const trend = i > 0 ? (val > valoresKG[i - 1] ? '↑' : val < valoresKG[i - 1] ? '↓' : '→') : '';
+            const trendClass = trend === '↑' ? 'trend-up' : trend === '↓' ? 'trend-down' : '';
+
+            return `
+                <div class="grafico-coluna">
+                    <div class="grafico-valor">${val > 0 ? val.toFixed(1) : ''}</div>
+                    <div class="grafico-barra-wrap">
+                        <div class="grafico-barra ${isAtual ? 'grafico-barra-atual' : ''}" style="height:${pct}%"></div>
+                    </div>
+                    <div class="grafico-label">${labels[i]}</div>
+                    ${trend ? `<div class="grafico-trend ${trendClass}">${trend}</div>` : ''}
+                </div>
+            `;
+        }).join('');
+
+        container.innerHTML = `
+            <div class="grafico-header">
+                <span class="grafico-titulo">📈 Tendência de Perdas KG</span>
+                <span class="grafico-sub">Últimas 7 semanas</span>
+            </div>
+            <div class="grafico-barras">${barras}</div>
+        `;
+    }
+
+    // === Métricas (Live Stats) ===
     function calcularMetricas(lotes) {
         let totalKG = 0;
         let totalUN = 0;
@@ -1346,9 +1520,14 @@ if (document.body.id === 'admin-page') {
         el('titulo-resumo').innerText = label;
         el('resumo-total').innerText = baseCount;
 
-        // MELHORIA 06: Live Stats — Métricas reagem ao filtro do calendário
+        // Live Stats — Métricas reagem ao filtro de data E ao filtro de loja
         const lotesFiltrados = aplicarFiltroData(pending);
-        const metricas = calcularMetricas(lotesFiltrados);
+        const lojaFiltro = AppState.rankingLojaFiltro || 'todas';
+        const lotesFiltradosPorLoja = lojaFiltro === 'todas'
+            ? lotesFiltrados
+            : lotesFiltrados.filter(b => b.loja === lojaFiltro);
+
+        const metricas = calcularMetricas(lotesFiltradosPorLoja);
         const metricaKG = el('metrica-kg');
         const metricaUN = el('metrica-un');
         const metricaItens = el('metrica-itens');
@@ -1357,6 +1536,12 @@ if (document.body.id === 'admin-page') {
         if (metricaUN) metricaUN.innerText = Math.floor(metricas.totalUN);
         if (metricaItens) metricaItens.innerText = metricas.totalItens;
         if (metricaLotes) metricaLotes.innerText = metricas.totalLotes;
+
+        // Gráfico de tendência semanal — também filtra por loja
+        const lotesGrafico = lojaFiltro === 'todas'
+            ? window.todosOsLotes.filter(b => !b.status_lancado && !b.consolidado)
+            : window.todosOsLotes.filter(b => !b.status_lancado && !b.consolidado && b.loja === lojaFiltro);
+        renderGraficoTendencia(lotesGrafico);
 
         // Rankings (baseados nos lotes lançados, filtrados por loja)
         const lotesLancados = aplicarFiltroData(completed);

@@ -2994,3 +2994,283 @@ body#index-page .transition-loader { background: rgba(6,12,20,0.9); }
 .sugestao-btn-unidade:active {
     transform: scale(0.95);
 }
+/* =========================================
+   v18.0 — Gráfico Tendência + Resumo Lote
+   + Fonte melhorada + WakeLock ready
+   ========================================= */
+
+/* ======== FONTE MELHORADA — DASHBOARD ======== */
+/* Números grandes com Syne */
+#admin-page .resumo-admin-total,
+#admin-page .metrica-valor,
+#admin-page .ranking-produto-valor,
+#admin-page .footer-total-numero {
+    font-family: 'Syne', 'Inter', system-ui, sans-serif;
+    letter-spacing: -1px;
+}
+
+/* Títulos do dashboard com Syne */
+#admin-page .nome-operador,
+#admin-page .lote-nome-loja,
+#admin-page .titulo-modal-lote {
+    font-family: 'Syne', 'Inter', system-ui, sans-serif;
+}
+
+/* Tabs mais legíveis */
+#admin-page .tab-btn {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+}
+
+/* Labels das métricas maiores */
+#admin-page .metrica-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* Ranking título mais impactante */
+#admin-page .ranking-titulo {
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 0.3px;
+}
+
+/* ======== GRÁFICO DE TENDÊNCIA SEMANAL ======== */
+.grafico-tendencia-card {
+    background: var(--branco-puro);
+    border: 1px solid var(--borda-fina);
+    border-radius: var(--radius-lg);
+    padding: 18px;
+    box-shadow: var(--sombra-card);
+    width: 92%;
+    margin: 0 auto 14px;
+    animation: fadeUp 0.4s var(--ease-out-expo) both;
+}
+
+#grafico-tendencia {
+    width: 100%;
+}
+
+.grafico-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.grafico-titulo {
+    font-size: 13px;
+    font-weight: 900;
+    color: var(--verde-dark);
+    font-family: 'Syne', 'Inter', sans-serif;
+}
+
+.grafico-sub {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--texto-suave);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.grafico-barras {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 6px;
+    height: 100px;
+}
+
+.grafico-coluna {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    height: 100%;
+    position: relative;
+}
+
+.grafico-valor {
+    font-size: 9px;
+    font-weight: 800;
+    color: var(--texto-suave);
+    min-height: 12px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.grafico-barra-wrap {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.grafico-barra {
+    width: 80%;
+    min-height: 4px;
+    background: var(--borda-fina);
+    border-radius: 6px 6px 0 0;
+    transition: height 0.6s var(--ease-out-expo), background 0.3s ease;
+}
+
+.grafico-barra-atual {
+    background: var(--verde-vibrante);
+    box-shadow: 0 4px 12px rgba(16,185,129,0.3);
+}
+
+.grafico-label {
+    font-size: 8px;
+    font-weight: 700;
+    color: var(--texto-suave);
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+}
+
+.grafico-trend {
+    font-size: 10px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.trend-up { color: var(--rosa-la-rose); }
+.trend-down { color: var(--verde-vibrante); }
+
+/* PC compacto */
+@media (min-width: 1024px) and (max-width: 1366px) and (max-height: 800px) {
+    .grafico-tendencia-card { width: 100%; padding: 12px 14px; }
+    .grafico-barras { height: 70px; gap: 4px; }
+    .grafico-titulo { font-size: 11px; }
+    .grafico-label { font-size: 7px; }
+    .grafico-valor { font-size: 8px; }
+}
+
+/* ======== RESUMO DO LOTE — Modal Envio ======== */
+.resumo-lote-preview {
+    background: var(--fundo-app);
+    border-radius: var(--radius-md);
+    padding: 10px 14px;
+    margin: 12px 0 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    text-align: left;
+}
+
+.resumo-item-linha {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--borda-fina);
+    gap: 8px;
+}
+
+.resumo-item-linha:last-child {
+    border-bottom: none;
+}
+
+.resumo-item-nome {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--verde-dark);
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.resumo-item-peso {
+    font-size: 12px;
+    font-weight: 900;
+    color: var(--verde-vibrante);
+    white-space: nowrap;
+    font-family: 'Syne', 'Inter', sans-serif;
+}
+
+.resumo-totais {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 4px;
+}
+
+.resumo-total-chip {
+    padding: 6px 14px;
+    border-radius: var(--radius-pill);
+    font-size: 13px;
+    font-weight: 900;
+    font-family: 'Syne', 'Inter', sans-serif;
+}
+
+.resumo-chip-kg {
+    background: rgba(16,185,129,0.1);
+    color: #059669;
+    border: 1px solid rgba(16,185,129,0.25);
+}
+
+.resumo-chip-un {
+    background: rgba(59,130,246,0.1);
+    color: var(--azul-consolidar);
+    border: 1px solid rgba(59,130,246,0.25);
+}
+
+/* Responsividade dashboard */
+@media (min-width: 1024px) {
+    .grafico-tendencia-card { width: 100%; }
+}
+
+/* =========================================
+   CORREÇÃO v18.1 — Fonte tabs loja + filtro
+   ========================================= */
+
+/* Tabs de loja — Inter pura, sem Syne, sem letter-spacing */
+.ranking-store-tab {
+    font-family: 'Inter', system-ui, sans-serif !important;
+    font-size: 10px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+    white-space: nowrap;
+}
+
+/* Label da loja selecionada — Inter */
+.ranking-loja-label {
+    font-family: 'Inter', system-ui, sans-serif;
+    letter-spacing: 0;
+}
+
+/* Tabs principais do dashboard — Inter legível */
+.tab-btn {
+    font-family: 'Inter', system-ui, sans-serif !important;
+    letter-spacing: 0.3px !important;
+    font-size: 10px !important;
+}
+
+/* Filtros rápidos — Inter */
+.btn-filtro-rapido {
+    font-family: 'Inter', system-ui, sans-serif;
+    letter-spacing: 0;
+}
+
+/* Syne APENAS em números e títulos grandes — nunca em botões */
+.ranking-store-tab,
+.tab-btn,
+.btn-filtro-rapido,
+.btn-entrar,
+.btn-outline,
+.btn-pdf-ranking,
+.badge-loja,
+.campo-label,
+.metrica-label,
+.resumo-admin-label {
+    font-family: 'Inter', system-ui, sans-serif;
+}

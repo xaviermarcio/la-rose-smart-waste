@@ -16,9 +16,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
 
-    <link rel="preload" href="css/style.css?v=1.0" as="style">
-    <link rel="preload" href="js/app.js?v=1.0" as="script">
-    <link rel="stylesheet" href="css/style.css?v=1.0">
+    <link rel="preload" href="css/style.css?v=18.0" as="style">
+    <link rel="preload" href="js/app.js?v=18.0" as="script">
+    <link rel="stylesheet" href="css/style.css?v=18.0">
 
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
@@ -177,6 +177,25 @@
                     <button class="btn-filtro-rapido btn-limpar tap-feedback" onclick="window.filtroRapido('limpar')">✕ Limpar</button>
                 </div>
 
+                <!-- GRÁFICO DE TENDÊNCIA SEMANAL -->
+                <div class="grafico-tendencia-card">
+                    <div id="grafico-tendencia">
+                        <div class="grafico-header">
+                            <span class="grafico-titulo">📈 Tendência de Perdas KG</span>
+                            <span class="grafico-sub">Últimas 7 semanas</span>
+                        </div>
+                        <div class="grafico-barras">
+                            <div class="grafico-coluna"><div class="grafico-barra-wrap"><div class="grafico-barra skeleton-line" style="height:30%"></div></div></div>
+                            <div class="grafico-coluna"><div class="grafico-barra-wrap"><div class="grafico-barra skeleton-line" style="height:50%"></div></div></div>
+                            <div class="grafico-coluna"><div class="grafico-barra-wrap"><div class="grafico-barra skeleton-line" style="height:40%"></div></div></div>
+                            <div class="grafico-coluna"><div class="grafico-barra-wrap"><div class="grafico-barra skeleton-line" style="height:70%"></div></div></div>
+                            <div class="grafico-coluna"><div class="grafico-barra-wrap"><div class="grafico-barra skeleton-line" style="height:60%"></div></div></div>
+                            <div class="grafico-coluna"><div class="grafico-barra-wrap"><div class="grafico-barra skeleton-line" style="height:45%"></div></div></div>
+                            <div class="grafico-coluna"><div class="grafico-barra-wrap"><div class="grafico-barra grafico-barra-atual skeleton-line" style="height:55%"></div></div></div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- RANKINGS -->
                 <div id="ranking-container" class="ranking-container">
                     <div class="ranking-store-tabs">
@@ -235,6 +254,6 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="js/modal.js?v=1.0"></script>
-    <script type="module" src="js/app.js?v=1.0"></script>
+    <script type="module" src="js/app.js?v=18.0"></script>
 </body>
 </html>
