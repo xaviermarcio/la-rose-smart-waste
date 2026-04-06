@@ -1,61 +1,3 @@
-// ==========================================
-// BUSCA FUZZY — tolerância a erros de digitação
-// ==========================================
-function fuzzyMatch(texto, termo) {
-    texto = texto.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    termo = termo.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    if (texto.includes(termo)) return true;
-    // Verifica se todos os caracteres do termo aparecem em ordem no texto
-    let j = 0;
-    for (let i = 0; i < texto.length && j < termo.length; i++) {
-        if (texto[i] === termo[j]) j++;
-    }
-    return j === termo.length && termo.length >= 3;
-}
-
-// ==========================================
-// CATÁLOGO DINÂMICO — Firebase Sync
-// Produtos extras salvos no Firebase e
-// sincronizados para todos os dispositivos
-// ==========================================
-async function addProdutoFirebase(produto) {
-    // Salva localmente primeiro (funciona offline)
-    addProdutoExtra(produto);
-
-    // Tenta salvar no Firebase
-    try {
-        const todosExtras = await getDocs(collection(db, 'produtos_extra'));
-        const jaExiste = todosExtras.docs.some(d => d.data().nome === produto.nome);
-        if (!jaExiste) {
-            await addDoc(collection(db, 'produtos_extra'), {
-                cod: produto.cod,
-                nome: produto.nome,
-                unidade: produto.unidade,
-                criadoEm: serverTimestamp()
-            });
-        }
-    } catch (e) {
-        // Falhou o Firebase — localStorage já foi salvo, ok
-        console.warn('Produto salvo localmente apenas:', e);
-    }
-}
-
-async function carregarProdutosFirebase() {
-    try {
-        const snap = await getDocs(collection(db, 'produtos_extra'));
-        snap.forEach(d => {
-            const p = d.data();
-            if (p.nome) {
-                // Sincroniza com localStorage local
-                addProdutoExtra({ cod: p.cod || 'EXTRA', nome: p.nome, unidade: p.unidade || 'KG' });
-            }
-        });
-    } catch (e) {
-        // Sem internet — usa o localStorage local
-        console.warn('Usando catálogo local (offline):', e);
-    }
-}
-
 import {
     auth,
     signInWithEmailAndPassword,
@@ -72,8 +14,55 @@ import {
     updateDoc
 } from './firebase-config.js';
 
-// MELHORIA 04: importar funções do catálogo dinâmico
 import { CONFIG_SISTEMA, getAllProdutos, addProdutoExtra } from './data.js';
+
+// ==========================================
+// BUSCA FUZZY — tolerância a erros de digitação
+// ==========================================
+function fuzzyMatch(texto, termo) {
+    texto = texto.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    termo = termo.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    if (texto.includes(termo)) return true;
+    let j = 0;
+    for (let i = 0; i < texto.length && j < termo.length; i++) {
+        if (texto[i] === termo[j]) j++;
+    }
+    return j === termo.length && termo.length >= 3;
+}
+
+// ==========================================
+// CATÁLOGO DINÂMICO — Firebase Sync
+// ==========================================
+async function addProdutoFirebase(produto) {
+    // Salva localmente primeiro — imediato, não bloqueia
+    addProdutoExtra(produto);
+
+    // Salva no Firebase em background sem await
+    addDoc(collection(db, 'produtos_extra'), {
+        cod: produto.cod,
+        nome: produto.nome,
+        unidade: produto.unidade,
+        criadoEm: serverTimestamp()
+    }).catch(e => console.warn('Firebase offline, salvo localmente:', e));
+}
+
+async function carregarProdutosFirebase() {
+    try {
+        const snap = await getDocs(collection(db, 'produtos_extra'));
+        snap.forEach(d => {
+            const p = d.data();
+            if (p.nome) {
+                addProdutoExtra({
+                    cod: p.cod || 'EXTRA',
+                    nome: p.nome,
+                    unidade: p.unidade || 'KG'
+                });
+            }
+        });
+    } catch (e) {
+        console.warn('Usando catálogo local (offline):', e);
+    }
+}
 
 // ==========================================
 // 1. ESTADO GLOBAL DO SISTEMA
