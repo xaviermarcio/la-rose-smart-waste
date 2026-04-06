@@ -2005,24 +2005,25 @@ if (document.body.id === 'admin-page') {
 
 // ==========================================
 // SERVICE WORKER (PWA) — Refresh inteligente
+// Funciona no desktop E no celular em background
 // ==========================================
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
             .then((reg) => {
-                // Verificar atualizações periodicamente
+                // Verificar atualizações a cada 60 segundos
                 setInterval(() => reg.update(), 60000);
 
+                // Desktop: detecta quando novo SW instala
                 reg.addEventListener('updatefound', () => {
                     const newWorker = reg.installing;
                     if (newWorker) {
                         newWorker.addEventListener('statechange', () => {
                             if (newWorker.state === 'activated') {
-                                // Notificar discretamente sobre atualização
                                 showGlobalModal({
-                                    titulo: 'Atualização disponível',
+                                    titulo: '🚀 Atualização disponível',
                                     mensagem: 'Uma nova versão do app está disponível.',
-                                    confirmarTexto: 'ATUALIZAR',
+                                    confirmarTexto: 'ATUALIZAR AGORA',
                                     onConfirm: () => window.location.reload()
                                 });
                             }
@@ -2031,5 +2032,17 @@ if ('serviceWorker' in navigator) {
                 });
             })
             .catch((err) => console.warn('SW falhou:', err));
+
+        // Celular: recebe mensagem do SW quando ativa em background
+        navigator.serviceWorker.addEventListener('message', (event) => {
+            if (event.data?.type === 'SW_ATUALIZADO') {
+                showGlobalModal({
+                    titulo: '🚀 Atualização disponível',
+                    mensagem: 'Uma nova versão do app está disponível.',
+                    confirmarTexto: 'ATUALIZAR AGORA',
+                    onConfirm: () => window.location.reload()
+                });
+            }
+        });
     });
 }

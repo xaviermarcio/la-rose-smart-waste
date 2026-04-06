@@ -1,4 +1,4 @@
-const CACHE_NAME = 'larose-v17.0';
+const CACHE_NAME = 'larose-v1.1';
 
 const ASSETS_TO_CACHE = [
     '/',
@@ -19,6 +19,7 @@ const ASSETS_TO_CACHE = [
 ];
 
 self.addEventListener('install', (event) => {
+    // Força o novo SW a assumir imediatamente, sem esperar fechar o app
     self.skipWaiting();
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE))
@@ -27,13 +28,26 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('activate', (event) => {
     event.waitUntil(
-        caches.keys().then((cacheNames) =>
-            Promise.all(
-                cacheNames.map((cache) => {
-                    if (cache !== CACHE_NAME) return caches.delete(cache);
-                })
+        caches.keys()
+            .then((cacheNames) =>
+                Promise.all(
+                    cacheNames.map((cache) => {
+                        if (cache !== CACHE_NAME) return caches.delete(cache);
+                    })
+                )
             )
-        ).then(() => self.clients.claim())
+            .then(() => self.clients.claim())
+            .then(() => {
+                // Avisa TODOS os clientes abertos (inclusive no celular em background)
+                // para recarregar e pegar a nova versão
+                return self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+            })
+            .then((clients) => {
+                clients.forEach((client) => {
+                    // Envia mensagem para o app mostrar o modal de atualização
+                    client.postMessage({ type: 'SW_ATUALIZADO' });
+                });
+            })
     );
 });
 
@@ -41,7 +55,7 @@ self.addEventListener('fetch', (event) => {
     const request = event.request;
     if (request.method !== 'GET') return;
 
-    // HTML: Network-first
+    // HTML: Network-first — sempre busca versão mais recente
     if (request.headers.get('accept')?.includes('text/html')) {
         event.respondWith(
             fetch(request)
