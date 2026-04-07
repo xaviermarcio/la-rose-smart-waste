@@ -1534,7 +1534,6 @@ if (document.body.id === 'admin-page') {
 
         // Rankings (baseados nos lotes lançados, filtrados por loja)
         const lotesLancados = aplicarFiltroData(completed);
-        const lojaFiltro = AppState.rankingLojaFiltro || 'todas';
         const rankingKG = calcularRanking(lotesLancados, 'KG', 5, lojaFiltro);
         const rankingUN = calcularRanking(lotesLancados, 'UN', 5, lojaFiltro);
         renderRanking('ranking-kg', rankingKG, 'KG');
@@ -1573,7 +1572,11 @@ if (document.body.id === 'admin-page') {
         if (window.abaAtual === 'consolidados') {
             renderConsolidados(container);
         } else {
-            const list = aplicarFiltroData(getLotesDaAbaAtual());
+            // Aplica filtro de data E de loja na lista de lotes
+            let list = aplicarFiltroData(getLotesDaAbaAtual());
+            if (lojaFiltro !== 'todas') {
+                list = list.filter(b => b.loja === lojaFiltro);
+            }
             renderBatchList(list, container);
         }
     }

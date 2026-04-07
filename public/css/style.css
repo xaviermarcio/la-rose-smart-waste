@@ -3274,3 +3274,50 @@ body#index-page .transition-loader { background: rgba(6,12,20,0.9); }
 .resumo-admin-label {
     font-family: 'Inter', system-ui, sans-serif;
 }
+
+/* =========================================
+   CORREÇÃO DEFINITIVA v18.2
+   Fonte Inter forçada em todos os elementos
+   interativos — elimina Syne esticada
+   ========================================= */
+#admin-page .ranking-store-tab,
+#admin-page .ranking-store-tabs button,
+#admin-page .tab-btn,
+#admin-page .tabs-container button,
+#admin-page .btn-filtro-rapido,
+#admin-page .btn-entrar,
+#admin-page .btn-outline,
+#admin-page .btn-pdf-ranking,
+#admin-page .badge-loja,
+#admin-page .campo-label,
+#admin-page .metrica-label,
+#admin-page .resumo-admin-label,
+#admin-page .ranking-loja-label,
+#admin-page .lote-data-hora,
+#admin-page .lote-operador-nome,
+#admin-page .btn-toggle-resumo,
+#admin-page small,
+#admin-page label,
+#admin-page p,
+#admin-page span {
+    font-family: 'Inter', system-ui, sans-serif !important;
+    letter-spacing: normal !important;
+}
+
+/* Syne APENAS nestes elementos específicos */
+#admin-page .resumo-admin-total,
+#admin-page .metrica-valor,
+#admin-page .ranking-produto-valor,
+#admin-page .nome-operador,
+#admin-page .lote-nome-loja {
+    font-family: 'Syne', 'Inter', system-ui, sans-serif !important;
+}
+
+/* Tabs de loja — tamanho e espaçamento corretos */
+#admin-page .ranking-store-tab {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0 !important;
+    text-transform: capitalize !important;
+    padding: 10px 8px !important;
+}
