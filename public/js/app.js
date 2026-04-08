@@ -114,6 +114,7 @@ const AppState = {
     filtroRapidoAtivo: null,
     resumoVisivel: true,
     rankingLojaFiltro: 'todas',
+    filtroOperador: 'todos',
 };
 
 // Manter compatibilidade com window.*
@@ -127,6 +128,44 @@ window.modoSelecao = false;
 window.selecaoLotes = [];
 window.selectedBatchId = null;
 window.selectedConsolidadoId = null;
+
+// ==========================================
+// 3. INDICADOR ONLINE/OFFLINE
+// ==========================================
+function mostrarStatusRede() {
+    const online = navigator.onLine;
+    let badge = document.getElementById('badge-rede');
+
+    if (!badge) {
+        badge = document.createElement('div');
+        badge.id = 'badge-rede';
+        badge.style.cssText = `
+            position: fixed; bottom: calc(80px + env(safe-area-inset-bottom)); right: 16px;
+            padding: 6px 14px; border-radius: 100px; font-size: 11px; font-weight: 700;
+            z-index: 9998; transition: all 0.3s ease; pointer-events: none;
+            font-family: 'Inter', sans-serif; letter-spacing: 0.3px;
+        `;
+        document.body.appendChild(badge);
+    }
+
+    if (online) {
+        badge.textContent = '🟢 Online';
+        badge.style.background = 'rgba(16,185,129,0.1)';
+        badge.style.color = '#059669';
+        badge.style.border = '1px solid rgba(16,185,129,0.25)';
+        badge.style.opacity = '1';
+        setTimeout(() => { badge.style.opacity = '0'; }, 2000);
+    } else {
+        badge.textContent = '🔴 Sem conexão';
+        badge.style.background = 'rgba(225,29,72,0.1)';
+        badge.style.color = '#e11d48';
+        badge.style.border = '1px solid rgba(225,29,72,0.25)';
+        badge.style.opacity = '1';
+    }
+}
+
+window.addEventListener('online',  mostrarStatusRede);
+window.addEventListener('offline', mostrarStatusRede);
 
 // ==========================================
 // 2. HELPERS GLOBAIS
@@ -469,6 +508,34 @@ if (document.body.id === 'app-page') {
         // Sincroniza produtos extras do Firebase ao abrir
         carregarProdutosFirebase();
 
+        // === 2. Recuperar lote salvo automaticamente ===
+        setTimeout(() => {
+            const loteSalvo = localStorage.getItem('lote_backup_' + lojaAtiva + '_' + operadorAtivo);
+            if (loteSalvo) {
+                try {
+                    const loteRecuperado = JSON.parse(loteSalvo);
+                    if (loteRecuperado.length > 0) {
+                        showGlobalModal({
+                            titulo: '📦 Lote não finalizado',
+                            mensagem: `Você tem um lote com <b>${loteRecuperado.length} item(s)</b> salvo. Deseja continuar de onde parou?`,
+                            confirmarTexto: 'SIM, CONTINUAR',
+                            cancelarTexto: 'DESCARTAR',
+                            mostrarCancelar: true,
+                            onConfirm: () => {
+                                window.loteAtual = loteRecuperado;
+                                renderizarListaLotes();
+                            },
+                            onCancel: () => {
+                                localStorage.removeItem('lote_backup_' + lojaAtiva + '_' + operadorAtivo);
+                            }
+                        });
+                    }
+                } catch(e) {
+                    localStorage.removeItem('lote_backup_' + lojaAtiva + '_' + operadorAtivo);
+                }
+            }
+        }, 800);
+
         let currentUnidade = 'KG';
         let manualMode = false;
         let bloqueandoBusca = false;
@@ -484,7 +551,49 @@ if (document.body.id === 'app-page') {
         window.fecharModalDuplicado = () => el('modal-duplicado')?.classList.add('hidden');
         window.fecharModalPesoAlto = () => el('modal-peso-alto')?.classList.add('hidden');
         window.fecharModalEnvio = () => el('modal-envio')?.classList.add('hidden');
-        window.fecharModalSucesso = () => el('modal-sucesso')?.classList.add('hidden');
+        window.fecharModalSucesso = () => {
+            el('modal-sucesso')?.classList.add('hidden');
+            renderizarLotesHoje();
+        };
+
+        // === 10. Mostrar lotes enviados hoje ===
+        async function renderizarLotesHoje() {
+            const container = el('lotes-hoje-lista');
+            if (!container) return;
+
+            const hoje = new Date().toISOString().split('T')[0];
+
+            try {
+                const q = query(collection(db, 'quebras'), orderBy('data', 'desc'));
+                const snap = await getDocs(q);
+                const lotesHoje = [];
+
+                snap.forEach(d => {
+                    const data = d.data();
+                    if (!data.data) return;
+                    const dataLote = data.data.toDate().toISOString().split('T')[0];
+                    if (dataLote === hoje && data.operador === operadorAtivo && data.loja === lojaAtiva) {
+                        lotesHoje.push({ ...data, id: d.id });
+                    }
+                });
+
+                const secao = el('secao-lotes-hoje');
+                if (secao) secao.style.display = lotesHoje.length > 0 ? 'block' : 'none';
+
+                container.innerHTML = lotesHoje.map(lote => {
+                    const hora = lote.data.toDate().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                    return `
+                        <div class="lote-hoje-card">
+                            <div class="lote-hoje-hora">🕐 ${hora}</div>
+                            <div class="lote-hoje-info">${lote.itens.length} itens enviados</div>
+                        </div>
+                    `;
+                }).join('');
+            } catch(e) { /* silencioso */ }
+        }
+
+        // Carregar lotes de hoje ao abrir
+        setTimeout(renderizarLotesHoje, 1200);
         window.fecharModalErro = () => el('modal-erro')?.classList.add('hidden');
 
         // === Manual mode ===
@@ -645,6 +754,7 @@ if (document.body.id === 'app-page') {
             vibrar();
             window.loteAtual.splice(i, 1);
             renderizarListaLotes();
+            localStorage.setItem('lote_backup_' + lojaAtiva + '_' + operadorAtivo, JSON.stringify(window.loteAtual));
         };
 
         // === Peso input ===
@@ -685,6 +795,8 @@ if (document.body.id === 'app-page') {
 
             resetInputs();
             renderizarListaLotes();
+            // Backup automático do lote
+            localStorage.setItem('lote_backup_' + lojaAtiva + '_' + operadorAtivo, JSON.stringify(window.loteAtual));
         }
 
         el('btn-adicionar')?.addEventListener('click', () => {
@@ -861,6 +973,7 @@ if (document.body.id === 'app-page') {
                         });
 
                         window.loteAtual = [];
+                        localStorage.removeItem('lote_backup_' + lojaAtiva + '_' + operadorAtivo);
                         renderizarListaLotes();
                         btn.innerHTML = '📤 FINALIZAR';
                         btn.disabled = false;
@@ -1099,11 +1212,18 @@ if (document.body.id === 'app-page') {
 if (document.body.id === 'admin-page') {
     document.body.style.opacity = '1';
 
+    // === 1. Validação de sessão + reconexão ===
     onAuthStateChanged(auth, (user) => {
         if (user && user.email === CONFIG_SISTEMA.adminEmail) {
             carregarDadosFirestore();
-        } else {
-            window.location.replace('index.html');
+        } else if (user === null) {
+            // Sessão expirada
+            showGlobalModal({
+                titulo: '⏱️ Sessão expirada',
+                mensagem: 'Sua sessão foi encerrada. Faça login novamente.',
+                confirmarTexto: 'IR PARA LOGIN',
+                onConfirm: () => window.location.replace('index.html')
+            });
         }
     });
 
@@ -1194,6 +1314,7 @@ if (document.body.id === 'admin-page') {
                 window.todosOsLotes.push(d);
             });
 
+            renderFiltroOperadores();
             renderDashboard();
         } catch (e) {
             el('lista-admin').innerHTML = `
@@ -1202,6 +1323,33 @@ if (document.body.id === 'admin-page') {
                 </p>
             `;
         }
+    }
+
+    // === 4. Filtro por operador — renderiza botões ===
+    function renderFiltroOperadores() {
+        const container = el('filtro-operador-container');
+        if (!container) return;
+
+        const operadores = [...new Set(
+            window.todosOsLotes.map(b => b.operador).filter(Boolean)
+        )].sort();
+
+        if (operadores.length === 0) { container.innerHTML = ''; return; }
+
+        const filtroAtual = AppState.filtroOperador || 'todos';
+
+        container.innerHTML = `
+            <button class="btn-filtro-operador tap-feedback ${filtroAtual === 'todos' ? 'active' : ''}"
+                data-operador="todos" onclick="window.setFiltroOperador('todos')">
+                👥 Todos
+            </button>
+            ${operadores.map(op => `
+                <button class="btn-filtro-operador tap-feedback ${filtroAtual === op ? 'active' : ''}"
+                    data-operador="${op}" onclick="window.setFiltroOperador('${op}')">
+                    👤 ${op}
+                </button>
+            `).join('')}
+        `;
     }
 
     window.mudarAba = (aba) => {
@@ -1375,6 +1523,18 @@ if (document.body.id === 'admin-page') {
     }
 
     // Store filter for rankings
+    // === 4. Filtro por operador ===
+    window.setFiltroOperador = (operador) => {
+        vibrar();
+        AppState.filtroOperador = operador;
+
+        document.querySelectorAll('.btn-filtro-operador').forEach(b => {
+            b.classList.toggle('active', b.dataset.operador === operador);
+        });
+
+        renderDashboard();
+    };
+
     window.setRankingLoja = (loja) => {
         vibrar();
         AppState.rankingLojaFiltro = loja;
@@ -1565,10 +1725,10 @@ if (document.body.id === 'admin-page') {
             : window.todosOsLotes.filter(b => !b.status_lancado && !b.consolidado && b.loja === lojaFiltro);
         renderGraficoTendencia(lotesGrafico);
 
-        // Rankings (baseados nos lotes lançados, filtrados por loja)
-        const lotesLancados = aplicarFiltroData(completed);
-        const rankingKG = calcularRanking(lotesLancados, 'KG', 5, lojaFiltro);
-        const rankingUN = calcularRanking(lotesLancados, 'UN', 5, lojaFiltro);
+        // Rankings — inclui pendentes + lançados (visão completa)
+        const todosParaRanking = aplicarFiltroData([...pending, ...completed]);
+        const rankingKG = calcularRanking(todosParaRanking, 'KG', 5, lojaFiltro);
+        const rankingUN = calcularRanking(todosParaRanking, 'UN', 5, lojaFiltro);
         renderRanking('ranking-kg', rankingKG, 'KG');
         renderRanking('ranking-un', rankingUN, 'UN');
 
@@ -1610,6 +1770,10 @@ if (document.body.id === 'admin-page') {
             if (lojaFiltro !== 'todas') {
                 list = list.filter(b => b.loja === lojaFiltro);
             }
+            const filtroOp = AppState.filtroOperador || 'todos';
+            if (filtroOp !== 'todos') {
+                list = list.filter(b => b.operador === filtroOp);
+            }
             renderBatchList(list, container);
         }
     }
@@ -1642,7 +1806,8 @@ if (document.body.id === 'admin-page') {
             const isOpen = window.selectedBatchId === batch.id && !window.modoSelecao;
 
             const card = document.createElement('div');
-            card.className = `card-lote-expandable slide-in-right ${window.modoSelecao && isSelected ? 'ring-selected' : ''}`;
+            const corLoja = batch.loja === 'entre_lagos' ? 'lote-entre-lagos' : 'lote-itapoa-parque';
+            card.className = `card-lote-expandable slide-in-right ${corLoja} ${window.modoSelecao && isSelected ? 'ring-selected' : ''}`;
             card.style.animationDelay = `${idx * 80}ms`;
 
             let html = `<div style="display:flex; align-items:center; gap:16px;">`;
@@ -1714,7 +1879,7 @@ if (document.body.id === 'admin-page') {
                         <button
                             class="btn-entrar btn-azul tap-feedback"
                             style="margin-top:12px; padding:14px; border-radius:12px;"
-                            onclick="event.stopPropagation(); markLancado('${batch.id}', true)"
+                            onclick="event.stopPropagation(); confirmarBaixa('${batch.id}', true)"
                         >
                             ✅ MARCAR COMO LANÇADO ERP
                         </button>
@@ -1724,7 +1889,7 @@ if (document.body.id === 'admin-page') {
                         <button
                             class="btn-entrar btn-rosa tap-feedback"
                             style="margin-top:12px; padding:14px; border-radius:12px;"
-                            onclick="event.stopPropagation(); markLancado('${batch.id}', false)"
+                            onclick="event.stopPropagation(); confirmarBaixa('${batch.id}', false)"
                         >
                             ↩️ ESTORNAR LANÇAMENTO
                         </button>
@@ -1928,6 +2093,25 @@ if (document.body.id === 'admin-page') {
         window.modoSelecao = false;
         window.mudarAba('consolidados');
     }
+
+    // === 8. Confirmação antes de dar baixa ===
+    window.confirmarBaixa = (docId, novoStatus) => {
+        vibrar();
+        const lote = window.todosOsLotes.find(l => l.id === docId);
+        const lojaDisplay = (lote?.loja || '').toUpperCase().replace('_', ' ');
+        const msg = novoStatus
+            ? `Confirma o lançamento do lote de <b>${lojaDisplay}</b> com <b>${lote?.itens?.length || 0} itens</b> no ERP?`
+            : `Deseja estornar o lançamento deste lote?`;
+
+        showGlobalModal({
+            titulo: novoStatus ? '✅ Confirmar Baixa' : '↩️ Confirmar Estorno',
+            mensagem: msg,
+            confirmarTexto: novoStatus ? 'SIM, LANÇAR' : 'SIM, ESTORNAR',
+            cancelarTexto: 'CANCELAR',
+            mostrarCancelar: true,
+            onConfirm: () => window.markLancado(docId, novoStatus)
+        });
+    };
 
     window.markLancado = async (docId, novoStatus) => {
         try {

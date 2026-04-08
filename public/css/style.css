@@ -4079,3 +4079,126 @@ p, span, small, label, button {
         padding: 9px 6px !important;
     }
 }
+/* =========================================
+   v20.0 — 8 melhorias funcionais
+   ========================================= */
+
+/* === 9. COR POR LOJA NOS CARDS === */
+.lote-entre-lagos {
+    border-left: 4px solid #10b981 !important;
+}
+
+.lote-itapoa-parque {
+    border-left: 4px solid #e11d48 !important;
+}
+
+.lote-entre-lagos .lote-nome-loja::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #10b981;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
+.lote-itapoa-parque .lote-nome-loja::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #e11d48;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
+/* === 10. LOTES ENVIADOS HOJE — Lançamento === */
+#secao-lotes-hoje {
+    display: none;
+    width: 92%;
+    margin: 0 auto 12px;
+}
+
+.lotes-hoje-header {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--texto-suave);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+#lotes-hoje-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.lote-hoje-card {
+    background: var(--verde-light);
+    border: 1px solid var(--verde-header-border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    animation: fadeUp 0.3s var(--ease-out-expo) both;
+}
+
+.lote-hoje-hora {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--verde-dark);
+}
+
+.lote-hoje-info {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--verde-vibrante);
+}
+
+/* === 4. FILTRO POR OPERADOR === */
+.filtro-operador-box {
+    width: 92%;
+    margin: 0 auto 14px;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.btn-filtro-operador {
+    padding: 8px 14px;
+    border-radius: var(--radius-pill);
+    border: 1.5px solid var(--borda-fina);
+    background: var(--branco-puro);
+    color: var(--texto-suave);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    touch-action: manipulation;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn-filtro-operador:hover {
+    border-color: var(--verde-header-border);
+    background: var(--verde-light);
+    color: var(--verde-dark);
+}
+
+.btn-filtro-operador.active {
+    background: var(--verde-dark);
+    color: #fff;
+    border-color: var(--verde-dark);
+}
+
+/* === 3. BADGE DE REDE === */
+#badge-rede {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
