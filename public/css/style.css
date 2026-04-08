@@ -3321,3 +3321,761 @@ body#index-page .transition-loader { background: rgba(6,12,20,0.9); }
     text-transform: capitalize !important;
     padding: 10px 8px !important;
 }
+/* =========================================
+   LA ROSE — v19.0 PREMIUM EDITION
+   Paleta original + Tipografia refinada
+   Visual PWA nível profissional máximo
+   ========================================= */
+
+/* ======== VARIÁVEIS PREMIUM ADICIONAIS ======== */
+:root {
+    /* Gradientes de marca */
+    --grad-verde: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    --grad-verde-suave: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    --grad-dark: linear-gradient(135deg, #022c22 0%, #065f46 100%);
+    --grad-rosa: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+    --grad-azul: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+
+    /* Glassmorphism */
+    --glass-bg: rgba(255,255,255,0.72);
+    --glass-border: rgba(255,255,255,0.5);
+    --glass-shadow: 0 8px 32px rgba(0,0,0,0.08);
+
+    /* Tipografia premium */
+    --font-display: 'Syne', system-ui, sans-serif;
+    --font-body: 'Inter', system-ui, sans-serif;
+}
+
+/* ======== TIPOGRAFIA — HIERARQUIA CLARA ======== */
+
+/* Display: apenas em números grandes e títulos hero */
+.resumo-admin-total,
+.footer-total-numero,
+.metrica-valor,
+.titulo-login {
+    font-family: var(--font-display) !important;
+    letter-spacing: -1.5px !important;
+}
+
+/* Semi-display: nomes de destaque */
+.nome-operador,
+.lote-nome-loja,
+.ranking-produto-valor,
+.titulo-modal-lote {
+    font-family: var(--font-display) !important;
+    letter-spacing: -0.5px !important;
+}
+
+/* Tudo mais: Inter pura */
+.tab-btn,
+.ranking-store-tab,
+.btn-filtro-rapido,
+.btn-entrar,
+.btn-outline,
+.btn-pdf-ranking,
+.badge-loja,
+.metrica-label,
+.resumo-admin-label,
+.campo-label,
+.lote-data-hora,
+.lote-operador-nome,
+.ranking-titulo,
+.grafico-titulo,
+.grafico-label,
+.sugestao-nome,
+.sugestao-cod,
+.item-lote-nome,
+.item-lote-cod,
+.ranking-produto-nome,
+.footer-total-label,
+p, span, small, label, button {
+    font-family: var(--font-body) !important;
+    letter-spacing: normal !important;
+}
+
+/* ======== DASHBOARD PREMIUM ======== */
+
+/* Header com gradiente sutil */
+#admin-page .header-app {
+    background: linear-gradient(160deg, #f0fdf4 0%, #ffffff 60%, #f8fafc 100%);
+    border-bottom: 1px solid rgba(167,243,208,0.6);
+    box-shadow: 0 1px 0 rgba(167,243,208,0.4), 0 4px 24px rgba(16,185,129,0.06);
+}
+
+/* Card resumo com gradiente premium */
+#admin-page .resumo-admin-card {
+    background: var(--grad-verde);
+    border: none;
+    box-shadow: 0 8px 32px rgba(16,185,129,0.25);
+}
+
+#admin-page .resumo-admin-label {
+    color: rgba(255,255,255,0.75) !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    letter-spacing: 1.5px !important;
+    text-transform: uppercase !important;
+}
+
+#admin-page .resumo-admin-total {
+    color: #ffffff !important;
+    font-size: 52px !important;
+    letter-spacing: -3px !important;
+    line-height: 1 !important;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+#admin-page .resumo-admin-acoes .btn-entrar {
+    background: rgba(255,255,255,0.2) !important;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.35) !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.5px !important;
+}
+
+#admin-page .resumo-admin-acoes .btn-entrar:hover {
+    background: rgba(255,255,255,0.3) !important;
+    transform: translateY(-1px);
+}
+
+#admin-page .resumo-admin-acoes .btn-rosa {
+    background: rgba(225,29,72,0.85) !important;
+    border-color: rgba(255,255,255,0.2) !important;
+}
+
+/* Métricas premium */
+#admin-page .metrica-card {
+    background: #ffffff;
+    border: 1px solid rgba(226,232,240,0.8);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.03);
+    border-radius: 20px;
+    transition: all 0.2s ease;
+}
+
+#admin-page .metrica-card:hover {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+    border-color: rgba(167,243,208,0.5);
+}
+
+#admin-page .metrica-valor {
+    font-size: 28px !important;
+    letter-spacing: -1px !important;
+    color: #022c22 !important;
+    line-height: 1.1;
+}
+
+#admin-page .metrica-label {
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    color: #94a3b8 !important;
+    letter-spacing: 0.8px !important;
+    text-transform: uppercase !important;
+    margin-top: 4px;
+}
+
+/* Filtros rápidos premium */
+#admin-page .btn-filtro-rapido {
+    border-radius: 100px !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    padding: 8px 16px !important;
+    border: 1.5px solid #e2e8f0 !important;
+    background: #ffffff !important;
+    color: #64748b !important;
+    transition: all 0.18s ease !important;
+}
+
+#admin-page .btn-filtro-rapido:hover {
+    border-color: #a7f3d0 !important;
+    background: #f0fdf4 !important;
+    color: #022c22 !important;
+}
+
+#admin-page .btn-filtro-rapido.active {
+    background: var(--grad-verde) !important;
+    border-color: transparent !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(16,185,129,0.3) !important;
+    font-weight: 700 !important;
+}
+
+#admin-page .btn-filtro-rapido.btn-limpar {
+    color: #e11d48 !important;
+    border-color: rgba(225,29,72,0.2) !important;
+}
+
+/* Tabs de loja — pills limpos */
+#admin-page .ranking-store-tabs {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 4px;
+    gap: 3px;
+}
+
+#admin-page .ranking-store-tab {
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+    border-radius: 10px !important;
+    padding: 9px 12px !important;
+    color: #64748b !important;
+    transition: all 0.18s ease !important;
+    white-space: nowrap !important;
+}
+
+#admin-page .ranking-store-tab.active {
+    background: var(--grad-verde) !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 8px rgba(16,185,129,0.3) !important;
+    font-weight: 700 !important;
+}
+
+/* Tabs principais — mais limpas */
+#admin-page .tabs-container {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 4px;
+}
+
+#admin-page .tab-btn {
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.3px !important;
+    border-radius: 12px !important;
+    padding: 11px 8px !important;
+    text-transform: uppercase !important;
+}
+
+#admin-page .tab-btn.active {
+    background: var(--grad-verde) !important;
+    color: #ffffff !important;
+    box-shadow: 0 3px 10px rgba(16,185,129,0.3) !important;
+}
+
+/* Cards de lote premium */
+#admin-page .card-lote-expandable {
+    border-radius: 18px;
+    border: 1px solid rgba(226,232,240,0.7);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    padding: 18px 20px;
+    transition: all 0.2s ease;
+}
+
+#admin-page .card-lote-expandable:hover {
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    border-color: rgba(167,243,208,0.5);
+    transform: translateY(-1px);
+}
+
+#admin-page .card-lote-expandable.ring-selected {
+    border-color: #10b981;
+    box-shadow: 0 0 0 2px rgba(16,185,129,0.2), 0 4px 16px rgba(16,185,129,0.1);
+}
+
+#admin-page .lote-nome-loja {
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    color: #022c22 !important;
+    letter-spacing: -0.3px !important;
+}
+
+#admin-page .lote-data-hora,
+#admin-page .lote-operador-nome {
+    font-size: 11px !important;
+    color: #94a3b8 !important;
+    font-weight: 500 !important;
+}
+
+/* Rankings premium */
+#admin-page .ranking-card {
+    border-radius: 18px;
+    border: 1px solid rgba(226,232,240,0.7);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+#admin-page .ranking-titulo {
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    color: #022c22 !important;
+    letter-spacing: 0.3px !important;
+    text-transform: uppercase !important;
+}
+
+#admin-page .ranking-produto-nome {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: #0f172a !important;
+}
+
+#admin-page .ranking-produto-valor {
+    font-size: 15px !important;
+    font-weight: 900 !important;
+    letter-spacing: -0.5px !important;
+}
+
+#admin-page .ranking-posicao {
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 900;
+}
+
+/* ======== MODAL ENVIO — RESUMO PREMIUM ======== */
+.modal-centered h3 {
+    font-family: var(--font-display) !important;
+    font-size: 20px !important;
+    letter-spacing: -0.5px !important;
+}
+
+.resumo-lote-preview {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 12px 16px;
+    margin: 14px 0 10px;
+    max-height: 220px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    text-align: left;
+}
+
+.resumo-item-linha {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #f1f5f9;
+    gap: 10px;
+}
+
+.resumo-item-linha:last-child { border-bottom: none; }
+
+.resumo-item-nome {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: #0f172a !important;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: var(--font-body) !important;
+}
+
+.resumo-item-peso {
+    font-size: 13px !important;
+    font-weight: 900 !important;
+    color: #10b981 !important;
+    white-space: nowrap;
+    font-family: var(--font-display) !important;
+    letter-spacing: -0.3px !important;
+}
+
+.resumo-totais {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.resumo-total-chip {
+    padding: 8px 18px;
+    border-radius: 100px;
+    font-size: 14px !important;
+    font-weight: 900 !important;
+    font-family: var(--font-display) !important;
+    letter-spacing: -0.5px !important;
+}
+
+.resumo-chip-kg {
+    background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(5,150,105,0.08));
+    color: #059669 !important;
+    border: 1.5px solid rgba(16,185,129,0.25);
+}
+
+.resumo-chip-un {
+    background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(29,78,216,0.06));
+    color: #2563eb !important;
+    border: 1.5px solid rgba(59,130,246,0.2);
+}
+
+/* ======== LANÇAMENTO — CAMPO BUSCA PREMIUM ======== */
+#app-page .glass-card {
+    border-radius: 24px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04);
+    border: 1px solid rgba(226,232,240,0.7);
+}
+
+#app-page .campo-label {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    color: #94a3b8 !important;
+    letter-spacing: 1px !important;
+    text-transform: uppercase !important;
+}
+
+#app-page .input-premium {
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 14px;
+    font-size: 16px !important;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+#app-page .input-premium:focus {
+    border-color: #10b981;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(16,185,129,0.1);
+}
+
+#app-page .input-peso {
+    font-family: var(--font-display) !important;
+    font-size: clamp(48px, 13vw, 64px) !important;
+    letter-spacing: -3px !important;
+    color: #022c22 !important;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 18px;
+    text-align: center;
+}
+
+#app-page .input-peso:focus {
+    border-color: #10b981;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(16,185,129,0.1);
+}
+
+/* Unit toggle premium */
+#app-page .unit-btn {
+    border-radius: 12px;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    border: 1.5px solid #e2e8f0;
+    background: #f8fafc;
+    transition: all 0.18s ease;
+}
+
+#app-page .unit-btn.active {
+    background: var(--grad-verde);
+    border-color: transparent;
+    color: #ffffff !important;
+    box-shadow: 0 3px 10px rgba(16,185,129,0.25);
+}
+
+/* Item do lote premium */
+#app-page .item-lote-estilo {
+    border-radius: 14px;
+    border: 1px solid rgba(226,232,240,0.7);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    padding: 14px 16px;
+}
+
+#app-page .item-lote-nome {
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+}
+
+#app-page .item-lote-cod {
+    font-size: 11px !important;
+    color: #94a3b8 !important;
+}
+
+#app-page .item-lote-peso {
+    font-size: 15px !important;
+    font-weight: 900 !important;
+    color: #022c22 !important;
+    font-family: var(--font-display) !important;
+    letter-spacing: -0.3px !important;
+}
+
+/* Footer lançamento premium */
+#app-page .footer-action {
+    background: rgba(255,255,255,0.96);
+    border-top: 1px solid rgba(226,232,240,0.6);
+    box-shadow: 0 -8px 32px rgba(0,0,0,0.06);
+}
+
+#app-page .footer-total-label {
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    color: #94a3b8 !important;
+    letter-spacing: 1.5px !important;
+    text-transform: uppercase !important;
+}
+
+#app-page .footer-total-numero {
+    font-family: var(--font-display) !important;
+    font-size: 40px !important;
+    letter-spacing: -2px !important;
+    color: #022c22 !important;
+    line-height: 1 !important;
+}
+
+#app-page .btn-finalizar-lote {
+    background: var(--grad-verde) !important;
+    border-radius: 100px !important;
+    padding: 16px 32px !important;
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.5px !important;
+    box-shadow: 0 6px 20px rgba(16,185,129,0.35) !important;
+}
+
+/* Botão adicionar */
+#app-page .btn-adicionar-lote {
+    background: var(--grad-verde) !important;
+    border-radius: 14px !important;
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.5px !important;
+    box-shadow: 0 4px 14px rgba(16,185,129,0.3) !important;
+    margin-top: 28px;
+}
+
+/* ======== PRODUTO NÃO CADASTRADO — PREMIUM ======== */
+.sugestao-nao-cadastrado {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1.5px solid rgba(245,158,11,0.3);
+    background: #ffffff;
+}
+
+.sugestao-nao-cadastrado-msg {
+    background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(251,191,36,0.06));
+    padding: 10px 16px;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    color: #92400e !important;
+    letter-spacing: 0.5px !important;
+    text-transform: uppercase !important;
+    border-bottom: 1px solid rgba(245,158,11,0.15);
+}
+
+.sugestao-nao-cadastrado-nome {
+    font-size: 15px !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+}
+
+.sugestao-nao-cadastrado-sub {
+    font-size: 11px !important;
+    color: #64748b !important;
+}
+
+.sugestao-btn-unidade {
+    border-radius: 12px !important;
+    padding: 16px 12px !important;
+    font-size: 14px !important;
+    font-weight: 800 !important;
+    border: 2px solid #e2e8f0 !important;
+    background: #f8fafc !important;
+    color: #0f172a !important;
+    transition: all 0.18s ease !important;
+}
+
+.sugestao-btn-unidade span {
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    color: #94a3b8 !important;
+}
+
+.sugestao-btn-unidade:hover {
+    border-color: #10b981 !important;
+    background: #f0fdf4 !important;
+    color: #022c22 !important;
+    box-shadow: 0 4px 12px rgba(16,185,129,0.15) !important;
+}
+
+/* ======== MODAIS PREMIUM ======== */
+.modal-centered {
+    border-radius: 24px !important;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.18) !important;
+}
+
+.modal-centered h3 {
+    font-size: 20px !important;
+    letter-spacing: -0.5px !important;
+    color: #022c22 !important;
+}
+
+.modal-centered .modal-msg {
+    font-size: 14px !important;
+    line-height: 1.65 !important;
+    color: #64748b !important;
+}
+
+.modal-centered .btn-entrar {
+    border-radius: 12px !important;
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.5px !important;
+    min-height: 48px !important;
+}
+
+/* ======== SUGESTÕES PREMIUM ======== */
+.sugestoes-box {
+    border-radius: 16px !important;
+    border: 1px solid rgba(226,232,240,0.8) !important;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.12) !important;
+    overflow: hidden;
+}
+
+.sugestao-item {
+    padding: 13px 18px !important;
+    transition: background 0.15s ease !important;
+}
+
+.sugestao-item:hover {
+    background: #f0fdf4 !important;
+}
+
+.sugestao-nome {
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+}
+
+.sugestao-cod {
+    font-size: 11px !important;
+    color: #94a3b8 !important;
+}
+
+.sugestao-unidade {
+    background: #f0fdf4 !important;
+    color: #059669 !important;
+    border: 1px solid rgba(16,185,129,0.2) !important;
+    border-radius: 8px !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    padding: 4px 10px !important;
+}
+
+/* ======== GRÁFICO PREMIUM ======== */
+.grafico-tendencia-card {
+    border-radius: 20px !important;
+    border: 1px solid rgba(226,232,240,0.7) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
+}
+
+.grafico-titulo {
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    color: #022c22 !important;
+    font-family: var(--font-body) !important;
+}
+
+.grafico-sub {
+    font-size: 10px !important;
+    color: #94a3b8 !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px !important;
+}
+
+.grafico-barra {
+    border-radius: 8px 8px 0 0 !important;
+    background: #e2e8f0 !important;
+}
+
+.grafico-barra-atual {
+    background: var(--grad-verde) !important;
+    box-shadow: 0 4px 12px rgba(16,185,129,0.25) !important;
+}
+
+.grafico-valor {
+    font-size: 9px !important;
+    font-weight: 800 !important;
+    color: #64748b !important;
+}
+
+.grafico-label {
+    font-size: 8px !important;
+    font-weight: 600 !important;
+    color: #94a3b8 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.3px !important;
+}
+
+/* ======== BADGE LOJA — PREMIUM ======== */
+.badge-loja {
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7) !important;
+    border: 1px solid rgba(167,243,208,0.8) !important;
+    color: #059669 !important;
+    font-size: 10px !important;
+    font-weight: 800 !important;
+    letter-spacing: 1px !important;
+    border-radius: 100px !important;
+    padding: 5px 12px !important;
+}
+
+/* ======== HEADER LANÇAMENTO — SEM BOTÃO REFRESH ======== */
+/* O botão reload foi removido do lancamento.html
+   pois limpava a lista ao ser pressionado */
+#app-page .header-app .header-actions {
+    gap: 8px;
+}
+
+/* ======== FILTRO DATA — PREMIUM ======== */
+#admin-page .filtro-data-box {
+    border-radius: 18px !important;
+    border: 1px solid rgba(226,232,240,0.7) !important;
+    background: #ffffff !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
+}
+
+#admin-page .filtro-data-box .input-premium[type="date"] {
+    background: #f8fafc !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+}
+
+#admin-page .btn-filtrar-data {
+    background: var(--grad-verde) !important;
+    border-radius: 12px !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.5px !important;
+    box-shadow: 0 4px 12px rgba(16,185,129,0.25) !important;
+    border: none !important;
+}
+
+/* ======== BOTÃO TOGGLE RESUMO ======== */
+#admin-page .btn-toggle-resumo {
+    border-radius: 12px !important;
+    border: 1px solid rgba(226,232,240,0.7) !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    color: #64748b !important;
+    background: #f8fafc !important;
+}
+
+/* ======== PC 1280x720 — ajustes premium ======== */
+@media (min-width: 1024px) and (max-width: 1366px) and (max-height: 800px) {
+    #admin-page .resumo-admin-total {
+        font-size: 36px !important;
+        letter-spacing: -2px !important;
+    }
+
+    #admin-page .metrica-valor {
+        font-size: 22px !important;
+    }
+
+    #admin-page .ranking-store-tab {
+        font-size: 10px !important;
+        padding: 7px 10px !important;
+    }
+
+    #admin-page .tab-btn {
+        font-size: 10px !important;
+        padding: 9px 6px !important;
+    }
+}

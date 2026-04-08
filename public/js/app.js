@@ -31,36 +31,69 @@ function fuzzyMatch(texto, termo) {
 }
 
 // ==========================================
-// CATÁLOGO DINÂMICO — Firebase Sync
+// CATÁLOGO DINÂMICO — Firebase como fonte única
+// Produtos extras salvos no Firebase e
+// sincronizados para todos os dispositivos
 // ==========================================
-async function addProdutoFirebase(produto) {
-    // Salva localmente primeiro — imediato, não bloqueia
-    addProdutoExtra(produto);
 
-    // Salva no Firebase em background sem await
-    addDoc(collection(db, 'produtos_extra'), {
-        cod: produto.cod,
-        nome: produto.nome,
-        unidade: produto.unidade,
-        criadoEm: serverTimestamp()
-    }).catch(e => console.warn('Firebase offline, salvo localmente:', e));
-}
+// Cache local dos produtos extras (recarregado do Firebase ao iniciar)
+let _produtosExtrasCache = null;
 
 async function carregarProdutosFirebase() {
     try {
         const snap = await getDocs(collection(db, 'produtos_extra'));
+        const produtosFirebase = [];
+
         snap.forEach(d => {
             const p = d.data();
             if (p.nome) {
-                addProdutoExtra({
+                produtosFirebase.push({
                     cod: p.cod || 'EXTRA',
-                    nome: p.nome,
-                    unidade: p.unidade || 'KG'
+                    nome: p.nome.toUpperCase().trim(),
+                    unidade: p.unidade || 'KG',
+                    _docId: d.id
                 });
             }
         });
+
+        // Atualiza o localStorage com os dados do Firebase (fonte única)
+        localStorage.setItem('produtos_extra', JSON.stringify(produtosFirebase));
+        _produtosExtrasCache = produtosFirebase;
+
+        console.log(`✅ ${produtosFirebase.length} produtos extras carregados do Firebase`);
     } catch (e) {
-        console.warn('Usando catálogo local (offline):', e);
+        // Offline — usa o que está no localStorage
+        console.warn('Offline, usando catálogo local:', e);
+        _produtosExtrasCache = null;
+    }
+}
+
+async function addProdutoFirebase(produto) {
+    const nomeLimpo = produto.nome.toUpperCase().trim();
+
+    // Salva localmente primeiro (UX imediato)
+    addProdutoExtra({ ...produto, nome: nomeLimpo });
+
+    // Verifica no Firebase se já existe antes de salvar
+    try {
+        const snap = await getDocs(collection(db, 'produtos_extra'));
+        const jaExiste = snap.docs.some(d =>
+            (d.data().nome || '').toUpperCase().trim() === nomeLimpo
+        );
+
+        if (!jaExiste) {
+            await addDoc(collection(db, 'produtos_extra'), {
+                cod: produto.cod,
+                nome: nomeLimpo,
+                unidade: produto.unidade,
+                criadoEm: serverTimestamp()
+            });
+            console.log(`✅ Produto "${nomeLimpo}" salvo no Firebase`);
+        } else {
+            console.log(`ℹ️ Produto "${nomeLimpo}" já existe no Firebase`);
+        }
+    } catch (e) {
+        console.warn('Firebase offline — produto salvo só localmente:', e);
     }
 }
 
