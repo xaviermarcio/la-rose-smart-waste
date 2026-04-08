@@ -1,8 +1,8 @@
-const CACHE_NAME = 'larose-v20.0';
+const CACHE_NAME = 'larose-v1.1';
 
 const ASSETS_TO_CACHE = [
     '/','/index.html','/lancamento.html','/dashboard.html','/manifest.json',
-    '/css/style.css?v=20.0','/js/modal.js?v=1.0','/js/app.js?v=20.0',
+    '/css/style.css?v=21.0','/js/modal.js?v=1.0','/js/app.js?v=21.0',
     '/js/data.js','/js/firebase-config.js',
     '/assets/images/logo.png','/assets/icons/icon-192.png','/assets/icons/icon-512.png',
     'https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap',

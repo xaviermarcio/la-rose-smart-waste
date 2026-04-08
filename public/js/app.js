@@ -1325,30 +1325,47 @@ if (document.body.id === 'admin-page') {
         }
     }
 
-    // === 4. Filtro por operador — renderiza botões ===
+    // === 4. Ranking de operadores por loja ===
     function renderFiltroOperadores() {
         const container = el('filtro-operador-container');
         if (!container) return;
 
-        const operadores = [...new Set(
-            window.todosOsLotes.map(b => b.operador).filter(Boolean)
-        )].sort();
+        const lojaFiltro = AppState.rankingLojaFiltro || 'todas';
+        const lotesFiltrados = aplicarFiltroData(window.todosOsLotes);
 
-        if (operadores.length === 0) { container.innerHTML = ''; return; }
+        // Contar lançamentos por operador
+        const contagem = {};
+        lotesFiltrados.forEach(lote => {
+            if (!lote.operador) return;
+            if (lojaFiltro !== 'todas' && lote.loja !== lojaFiltro) return;
+            contagem[lote.operador] = (contagem[lote.operador] || 0) + 1;
+        });
 
-        const filtroAtual = AppState.filtroOperador || 'todos';
+        const ranking = Object.entries(contagem)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5);
+
+        if (ranking.length === 0) { container.innerHTML = ''; return; }
+
+        const medalhas = ['🥇', '🥈', '🥉', '4°', '5°'];
+        const lojaLabel = lojaFiltro === 'todas' ? 'Todas as lojas'
+            : lojaFiltro === 'entre_lagos' ? 'Entre Lagos' : 'Itapoã Parque';
 
         container.innerHTML = `
-            <button class="btn-filtro-operador tap-feedback ${filtroAtual === 'todos' ? 'active' : ''}"
-                data-operador="todos" onclick="window.setFiltroOperador('todos')">
-                👥 Todos
-            </button>
-            ${operadores.map(op => `
-                <button class="btn-filtro-operador tap-feedback ${filtroAtual === op ? 'active' : ''}"
-                    data-operador="${op}" onclick="window.setFiltroOperador('${op}')">
-                    👤 ${op}
-                </button>
-            `).join('')}
+            <div class="ranking-operadores-card">
+                <div class="ranking-operadores-header">
+                    <span class="ranking-operadores-titulo">👤 Mais ativos — ${lojaLabel}</span>
+                </div>
+                <div class="ranking-operadores-lista">
+                    ${ranking.map(([nome, qtd], i) => `
+                        <div class="ranking-operador-item">
+                            <span class="ranking-op-medalha">${medalhas[i]}</span>
+                            <span class="ranking-op-nome">${nome}</span>
+                            <span class="ranking-op-qtd">${qtd} lote${qtd > 1 ? 's' : ''}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
         `;
     }
 
@@ -1523,18 +1540,6 @@ if (document.body.id === 'admin-page') {
     }
 
     // Store filter for rankings
-    // === 4. Filtro por operador ===
-    window.setFiltroOperador = (operador) => {
-        vibrar();
-        AppState.filtroOperador = operador;
-
-        document.querySelectorAll('.btn-filtro-operador').forEach(b => {
-            b.classList.toggle('active', b.dataset.operador === operador);
-        });
-
-        renderDashboard();
-    };
-
     window.setRankingLoja = (loja) => {
         vibrar();
         AppState.rankingLojaFiltro = loja;
@@ -1770,10 +1775,7 @@ if (document.body.id === 'admin-page') {
             if (lojaFiltro !== 'todas') {
                 list = list.filter(b => b.loja === lojaFiltro);
             }
-            const filtroOp = AppState.filtroOperador || 'todos';
-            if (filtroOp !== 'todos') {
-                list = list.filter(b => b.operador === filtroOp);
-            }
+
             renderBatchList(list, container);
         }
     }

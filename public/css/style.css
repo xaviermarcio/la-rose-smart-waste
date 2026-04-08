@@ -1,5 +1,6 @@
 /* =========================================
-   LA ROSE SMART WASTE — CSS v16.0
+   LA ROSE SMART WASTE — CSS v21.0
+   Fonte: Roboto (estilo YouTube) + Inter
    Design Premium + Animações Nativas
    Foco: dinamismo, fluidez, app-feel
    ========================================= */
@@ -528,7 +529,7 @@ body#index-page .flash-card.selected p {
     font-size: clamp(40px, 12vw, 56px);
     font-weight: 900;
     text-align: center;
-    letter-spacing: -2px;
+    letter-spacing: -0.5px;
     padding: 24px 20px;
     color: var(--verde-dark);
 }
@@ -921,7 +922,7 @@ body#index-page .flash-card.selected p {
     font-size: 32px;
     font-weight: 900;
     margin-bottom: 6px;
-    letter-spacing: -1.5px;
+    letter-spacing: -0.3px;
     line-height: 1.05;
     /* Gradiente no título */
     background: linear-gradient(135deg, #00e676 0%, #00c853 60%, #10b981 100%);
@@ -1138,7 +1139,7 @@ body#index-page .flash-card.selected p {
     font-size: 36px;
     font-weight: 900;
     color: var(--verde-dark);
-    letter-spacing: -2px;
+    letter-spacing: -0.5px;
     line-height: 1;
     transition: transform 0.2s var(--ease-spring);
 }
@@ -1188,7 +1189,7 @@ body#index-page .flash-card.selected p {
     font-size: 42px;
     color: var(--verde-dark);
     font-weight: 900;
-    letter-spacing: -2px;
+    letter-spacing: -0.5px;
     margin-top: 4px;
 }
 
@@ -1777,7 +1778,7 @@ body#index-page .transition-loader { background: rgba(6,12,20,0.9); }
         margin: 0 auto;
     }
 
-    .titulo-login { font-size: 48px; letter-spacing: -2px; }
+    .titulo-login { font-size: 48px; letter-spacing: -0.5px; }
     .lista-conferencia-box { width: 100%; padding: 24px 0 0; margin-bottom: 160px; }
     .input-peso { font-size: 72px; }
     .sugestoes-box { max-height: 320px; }
@@ -2625,7 +2626,7 @@ body#index-page .transition-loader { background: rgba(6,12,20,0.9); }
 .lote-nome-loja,
 .metrica-valor,
 .ranking-produto-valor {
-    font-family: 'Syne', 'Inter', system-ui, sans-serif;
+    font-family: 'Roboto', 'Inter', system-ui, sans-serif;
 }
 
 /* item-lote-peso usa Inter — evita quebra de linha no card */
@@ -3005,7 +3006,7 @@ body#index-page .transition-loader { background: rgba(6,12,20,0.9); }
 #admin-page .metrica-valor,
 #admin-page .ranking-produto-valor,
 #admin-page .footer-total-numero {
-    font-family: 'Syne', 'Inter', system-ui, sans-serif;
+    font-family: 'Roboto', 'Inter', system-ui, sans-serif;
     letter-spacing: -1px;
 }
 
@@ -3013,7 +3014,7 @@ body#index-page .transition-loader { background: rgba(6,12,20,0.9); }
 #admin-page .nome-operador,
 #admin-page .lote-nome-loja,
 #admin-page .titulo-modal-lote {
-    font-family: 'Syne', 'Inter', system-ui, sans-serif;
+    font-family: 'Roboto', 'Inter', system-ui, sans-serif;
 }
 
 /* Tabs mais legíveis */
@@ -3065,7 +3066,7 @@ body#index-page .transition-loader { background: rgba(6,12,20,0.9); }
     font-size: 13px;
     font-weight: 900;
     color: var(--verde-dark);
-    font-family: 'Syne', 'Inter', sans-serif;
+    font-family: 'Roboto', 'Inter', system-ui, sans-serif;
 }
 
 .grafico-sub {
@@ -3192,7 +3193,7 @@ body#index-page .transition-loader { background: rgba(6,12,20,0.9); }
     font-weight: 900;
     color: var(--verde-vibrante);
     white-space: nowrap;
-    font-family: 'Syne', 'Inter', sans-serif;
+    font-family: 'Roboto', 'Inter', system-ui, sans-serif;
 }
 
 .resumo-totais {
@@ -3208,7 +3209,7 @@ body#index-page .transition-loader { background: rgba(6,12,20,0.9); }
     border-radius: var(--radius-pill);
     font-size: 13px;
     font-weight: 900;
-    font-family: 'Syne', 'Inter', sans-serif;
+    font-family: 'Roboto', 'Inter', system-ui, sans-serif;
 }
 
 .resumo-chip-kg {
@@ -3310,7 +3311,7 @@ body#index-page .transition-loader { background: rgba(6,12,20,0.9); }
 #admin-page .ranking-produto-valor,
 #admin-page .nome-operador,
 #admin-page .lote-nome-loja {
-    font-family: 'Syne', 'Inter', system-ui, sans-serif !important;
+    font-family: 'Roboto', 'Inter', system-ui, sans-serif !important;
 }
 
 /* Tabs de loja — tamanho e espaçamento corretos */
@@ -3342,7 +3343,7 @@ body#index-page .transition-loader { background: rgba(6,12,20,0.9); }
     --glass-shadow: 0 8px 32px rgba(0,0,0,0.08);
 
     /* Tipografia premium */
-    --font-display: 'Syne', system-ui, sans-serif;
+    --font-display: 'Roboto', 'Inter', system-ui, sans-serif;
     --font-body: 'Inter', system-ui, sans-serif;
 }
 
@@ -3353,8 +3354,8 @@ body#index-page .transition-loader { background: rgba(6,12,20,0.9); }
 .footer-total-numero,
 .metrica-valor,
 .titulo-login {
-    font-family: var(--font-display) !important;
-    letter-spacing: -1.5px !important;
+    font-family: 'Roboto', 'Inter', system-ui, sans-serif !important;
+    letter-spacing: -0.5px !important;
 }
 
 /* Semi-display: nomes de destaque */
@@ -3362,7 +3363,7 @@ body#index-page .transition-loader { background: rgba(6,12,20,0.9); }
 .lote-nome-loja,
 .ranking-produto-valor,
 .titulo-modal-lote {
-    font-family: var(--font-display) !important;
+    font-family: 'Roboto', 'Inter', system-ui, sans-serif !important;
     letter-spacing: -0.5px !important;
 }
 
@@ -3420,7 +3421,7 @@ p, span, small, label, button {
 #admin-page .resumo-admin-total {
     color: #ffffff !important;
     font-size: 52px !important;
-    letter-spacing: -3px !important;
+    letter-spacing: -1px !important;
     line-height: 1 !important;
     text-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
@@ -3628,7 +3629,7 @@ p, span, small, label, button {
 
 /* ======== MODAL ENVIO — RESUMO PREMIUM ======== */
 .modal-centered h3 {
-    font-family: var(--font-display) !important;
+    font-family: 'Roboto', 'Inter', system-ui, sans-serif !important;
     font-size: 20px !important;
     letter-spacing: -0.5px !important;
 }
@@ -3672,7 +3673,7 @@ p, span, small, label, button {
     font-weight: 900 !important;
     color: #10b981 !important;
     white-space: nowrap;
-    font-family: var(--font-display) !important;
+    font-family: 'Roboto', 'Inter', system-ui, sans-serif !important;
     letter-spacing: -0.3px !important;
 }
 
@@ -3689,7 +3690,7 @@ p, span, small, label, button {
     border-radius: 100px;
     font-size: 14px !important;
     font-weight: 900 !important;
-    font-family: var(--font-display) !important;
+    font-family: 'Roboto', 'Inter', system-ui, sans-serif !important;
     letter-spacing: -0.5px !important;
 }
 
@@ -3736,9 +3737,9 @@ p, span, small, label, button {
 }
 
 #app-page .input-peso {
-    font-family: var(--font-display) !important;
+    font-family: 'Roboto', 'Inter', system-ui, sans-serif !important;
     font-size: clamp(48px, 13vw, 64px) !important;
-    letter-spacing: -3px !important;
+    letter-spacing: -1px !important;
     color: #022c22 !important;
     background: #f8fafc;
     border: 1.5px solid #e2e8f0;
@@ -3792,7 +3793,7 @@ p, span, small, label, button {
     font-size: 15px !important;
     font-weight: 900 !important;
     color: #022c22 !important;
-    font-family: var(--font-display) !important;
+    font-family: 'Roboto', 'Inter', system-ui, sans-serif !important;
     letter-spacing: -0.3px !important;
 }
 
@@ -3812,9 +3813,9 @@ p, span, small, label, button {
 }
 
 #app-page .footer-total-numero {
-    font-family: var(--font-display) !important;
+    font-family: 'Roboto', 'Inter', system-ui, sans-serif !important;
     font-size: 40px !important;
-    letter-spacing: -2px !important;
+    letter-spacing: -0.5px !important;
     color: #022c22 !important;
     line-height: 1 !important;
 }
@@ -4062,7 +4063,7 @@ p, span, small, label, button {
 @media (min-width: 1024px) and (max-width: 1366px) and (max-height: 800px) {
     #admin-page .resumo-admin-total {
         font-size: 36px !important;
-        letter-spacing: -2px !important;
+        letter-spacing: -0.5px !important;
     }
 
     #admin-page .metrica-valor {
@@ -4201,4 +4202,263 @@ p, span, small, label, button {
 #badge-rede {
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
+}
+
+/* =========================================
+   v21.0 — FONTE ROBOTO (estilo YouTube)
+   Moderna, neutra, profissional
+   ========================================= */
+
+/* Roboto nos números e títulos de destaque */
+.resumo-admin-total,
+.footer-total-numero,
+.metrica-valor,
+.titulo-login,
+.nome-operador,
+.lote-nome-loja,
+.ranking-produto-valor,
+.titulo-modal-lote,
+.item-lote-peso,
+.resumo-item-peso,
+.resumo-total-chip {
+    font-family: 'Roboto', 'Inter', system-ui, sans-serif !important;
+    font-weight: 700 !important;
+}
+
+/* Inter no corpo — igual ao YouTube usa para textos */
+body, p, span, label, button, input, select, textarea,
+.tab-btn, .ranking-store-tab, .btn-filtro-rapido,
+.btn-entrar, .btn-outline, .campo-label, .metrica-label,
+.lote-data-hora, .lote-operador-nome, .ranking-produto-nome,
+.sugestao-nome, .item-lote-nome, .footer-total-label,
+.ranking-titulo, .grafico-titulo {
+    font-family: 'Inter', system-ui, sans-serif !important;
+}
+
+/* =========================================
+   RANKING DE OPERADORES — Card premium
+   ========================================= */
+.ranking-operadores-card {
+    background: var(--branco-puro);
+    border: 1px solid var(--borda-fina);
+    border-radius: var(--radius-lg);
+    padding: 16px 18px;
+    box-shadow: var(--sombra-card);
+    width: 92%;
+    margin: 0 auto 14px;
+    animation: fadeUp 0.4s var(--ease-out-expo) both;
+}
+
+.ranking-operadores-header {
+    margin-bottom: 12px;
+}
+
+.ranking-operadores-titulo {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--verde-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-family: 'Inter', sans-serif !important;
+}
+
+.ranking-operadores-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ranking-operador-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: var(--fundo-app);
+    transition: var(--transition-fast);
+}
+
+.ranking-operador-item:first-child {
+    background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(5,150,105,0.05));
+    border: 1px solid rgba(16,185,129,0.15);
+}
+
+.ranking-op-medalha {
+    font-size: 18px;
+    width: 28px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.ranking-op-nome {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--verde-dark);
+    font-family: 'Inter', sans-serif !important;
+}
+
+.ranking-op-qtd {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--verde-vibrante);
+    font-family: 'Roboto', 'Inter', sans-serif !important;
+    background: rgba(16,185,129,0.1);
+    padding: 3px 10px;
+    border-radius: 100px;
+    border: 1px solid rgba(16,185,129,0.2);
+}
+
+/* PC compacto */
+@media (min-width: 1024px) and (max-width: 1366px) and (max-height: 800px) {
+    .ranking-operadores-card { width: 100%; padding: 12px 14px; }
+    .ranking-operador-item { padding: 6px 10px; }
+    .ranking-op-medalha { font-size: 14px; }
+    .ranking-op-nome { font-size: 12px; }
+    .ranking-op-qtd { font-size: 11px; }
+}
+
+@media (min-width: 1024px) {
+    .ranking-operadores-card { width: 100%; }
+}
+
+/* =========================================
+   LOGIN v21.1 — Cards de loja com identidade
+   Entre Lagos = Verde | Itapoã Parque = Vermelho
+   ========================================= */
+
+/* Card Entre Lagos — Verde */
+.flash-card.card-entre-lagos {
+    border-color: rgba(16,185,129,0.2);
+}
+
+.flash-card.card-entre-lagos .avatar-circle {
+    background: rgba(16,185,129,0.15);
+    color: #10b981;
+    border-color: rgba(16,185,129,0.3);
+}
+
+.flash-card.card-entre-lagos p {
+    color: #a7f3d0;
+}
+
+.flash-card.card-entre-lagos:hover {
+    border-color: rgba(16,185,129,0.5);
+    background: rgba(16,185,129,0.08);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 28px -6px rgba(16,185,129,0.25);
+}
+
+.flash-card.card-entre-lagos.selected {
+    background: rgba(16,185,129,0.14);
+    border: 1.5px solid #10b981;
+    box-shadow: 0 0 0 1px rgba(16,185,129,0.25),
+                0 8px 32px rgba(16,185,129,0.2);
+}
+
+.flash-card.card-entre-lagos.selected .avatar-circle {
+    background: #10b981;
+    color: #ffffff;
+    border-color: #10b981;
+    box-shadow: 0 6px 20px rgba(16,185,129,0.4);
+    transform: scale(1.08);
+}
+
+.flash-card.card-entre-lagos.selected p {
+    color: #ffffff !important;
+}
+
+/* Card Itapoã Parque — Vermelho */
+.flash-card.card-itapoa-parque {
+    border-color: rgba(225,29,72,0.2);
+}
+
+.flash-card.card-itapoa-parque .avatar-circle {
+    background: rgba(225,29,72,0.12);
+    color: #e11d48;
+    border-color: rgba(225,29,72,0.25);
+}
+
+.flash-card.card-itapoa-parque p {
+    color: #fda4af;
+}
+
+.flash-card.card-itapoa-parque:hover {
+    border-color: rgba(225,29,72,0.45);
+    background: rgba(225,29,72,0.07);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 28px -6px rgba(225,29,72,0.22);
+}
+
+.flash-card.card-itapoa-parque.selected {
+    background: rgba(225,29,72,0.12);
+    border: 1.5px solid #e11d48;
+    box-shadow: 0 0 0 1px rgba(225,29,72,0.2),
+                0 8px 32px rgba(225,29,72,0.18);
+}
+
+.flash-card.card-itapoa-parque.selected .avatar-circle {
+    background: #e11d48;
+    color: #ffffff;
+    border-color: #e11d48;
+    box-shadow: 0 6px 20px rgba(225,29,72,0.35);
+    transform: scale(1.08);
+}
+
+.flash-card.card-itapoa-parque.selected p {
+    color: #ffffff !important;
+}
+
+/* Cards de operador — cor herdada da loja selecionada */
+.operadores-loja-entre-lagos .flash-card:hover {
+    border-color: rgba(16,185,129,0.4);
+    background: rgba(16,185,129,0.06);
+    box-shadow: 0 8px 24px -8px rgba(16,185,129,0.2);
+}
+
+.operadores-loja-entre-lagos .flash-card.selected {
+    background: rgba(16,185,129,0.12);
+    border: 1.5px solid #10b981;
+    box-shadow: 0 0 0 1px rgba(16,185,129,0.2), 0 8px 28px rgba(16,185,129,0.15);
+}
+
+.operadores-loja-entre-lagos .flash-card.selected .avatar-circle {
+    background: #10b981;
+    color: #ffffff;
+    border-color: #10b981;
+    box-shadow: 0 6px 16px rgba(16,185,129,0.35);
+}
+
+.operadores-loja-itapoa .flash-card:hover {
+    border-color: rgba(225,29,72,0.35);
+    background: rgba(225,29,72,0.05);
+    box-shadow: 0 8px 24px -8px rgba(225,29,72,0.18);
+}
+
+.operadores-loja-itapoa .flash-card.selected {
+    background: rgba(225,29,72,0.1);
+    border: 1.5px solid #e11d48;
+    box-shadow: 0 0 0 1px rgba(225,29,72,0.18), 0 8px 28px rgba(225,29,72,0.12);
+}
+
+.operadores-loja-itapoa .flash-card.selected .avatar-circle {
+    background: #e11d48;
+    color: #ffffff;
+    border-color: #e11d48;
+    box-shadow: 0 6px 16px rgba(225,29,72,0.3);
+}
+
+/* Label da seção com cor da loja */
+.section-label-verde { color: #10b981 !important; }
+.section-label-vermelho { color: #e11d48 !important; }
+
+/* Botão INICIAR com cor da loja */
+.btn-iniciar-verde {
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+    box-shadow: 0 8px 24px rgba(16,185,129,0.35) !important;
+}
+
+.btn-iniciar-vermelho {
+    background: linear-gradient(135deg, #e11d48, #be123c) !important;
+    box-shadow: 0 8px 24px rgba(225,29,72,0.35) !important;
 }
