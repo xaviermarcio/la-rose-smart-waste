@@ -345,14 +345,14 @@ window.renderizarOperadores = (lojaId) => {
     // Label "Quem está operando?" com cor da loja
     const labelOp = document.querySelector('#etapa-operador .section-label');
     if (labelOp) {
-        labelOp.className = `section-label ${isEntreLagos ? 'section-label-verde' : 'section-label-vermelho'}`;
+        labelOp.className = `section-label ${isEntreLagos ? 'section-label-verde' : 'section-label-azul'}`;
     }
 
     // Botão INICIAR com cor da loja
     const btnIniciar = el('btn-iniciar');
     if (btnIniciar) {
-        btnIniciar.classList.remove('btn-iniciar-verde', 'btn-iniciar-vermelho');
-        btnIniciar.classList.add(isEntreLagos ? 'btn-iniciar-verde' : 'btn-iniciar-vermelho');
+        btnIniciar.classList.remove('btn-iniciar-verde', 'btn-iniciar-azul');
+        btnIniciar.classList.add(isEntreLagos ? 'btn-iniciar-verde' : 'btn-iniciar-azul');
     }
 
     container.innerHTML = '';
@@ -384,8 +384,8 @@ window.renderizarOperadores = (lojaId) => {
             if (btnIniciar) {
                 btnIniciar.classList.remove('hidden');
                 btnIniciar.classList.add('btn-appear');
-                btnIniciar.classList.remove('btn-iniciar-verde', 'btn-iniciar-vermelho');
-                btnIniciar.classList.add(isEntreLagos ? 'btn-iniciar-verde' : 'btn-iniciar-vermelho');
+                btnIniciar.classList.remove('btn-iniciar-verde', 'btn-iniciar-azul');
+                btnIniciar.classList.add(isEntreLagos ? 'btn-iniciar-verde' : 'btn-iniciar-azul');
             }
         };
 

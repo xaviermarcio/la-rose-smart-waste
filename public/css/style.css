@@ -4090,7 +4090,7 @@ p, span, small, label, button {
 }
 
 .lote-itapoa-parque {
-    border-left: 4px solid #e11d48 !important;
+    border-left: 4px solid #3b82f6 !important;
 }
 
 .lote-entre-lagos .lote-nome-loja::before {
@@ -4109,7 +4109,7 @@ p, span, small, label, button {
     display: inline-block;
     width: 8px;
     height: 8px;
-    background: #e11d48;
+    background: #3b82f6;
     border-radius: 50%;
     margin-right: 6px;
     vertical-align: middle;
@@ -4323,39 +4323,31 @@ body, p, span, label, button, input, select, textarea,
 }
 
 /* =========================================
-   LOGIN v21.1 — Cards de loja com identidade
-   Entre Lagos = Verde | Itapoã Parque = Vermelho
+   LOGIN — Cards de loja com identidade
+   Entre Lagos = VERDE | Itapoã Parque = AZUL
    ========================================= */
 
-/* Card Entre Lagos — Verde */
+/* Card Entre Lagos — VERDE */
 .flash-card.card-entre-lagos {
     border-color: rgba(16,185,129,0.2);
 }
-
 .flash-card.card-entre-lagos .avatar-circle {
     background: rgba(16,185,129,0.15);
     color: #10b981;
     border-color: rgba(16,185,129,0.3);
 }
-
-.flash-card.card-entre-lagos p {
-    color: #a7f3d0;
-}
-
+.flash-card.card-entre-lagos p { color: #a7f3d0; }
 .flash-card.card-entre-lagos:hover {
     border-color: rgba(16,185,129,0.5);
     background: rgba(16,185,129,0.08);
     transform: translateY(-3px);
     box-shadow: 0 8px 28px -6px rgba(16,185,129,0.25);
 }
-
 .flash-card.card-entre-lagos.selected {
     background: rgba(16,185,129,0.14);
     border: 1.5px solid #10b981;
-    box-shadow: 0 0 0 1px rgba(16,185,129,0.25),
-                0 8px 32px rgba(16,185,129,0.2);
+    box-shadow: 0 0 0 1px rgba(16,185,129,0.25), 0 8px 32px rgba(16,185,129,0.2);
 }
-
 .flash-card.card-entre-lagos.selected .avatar-circle {
     background: #10b981;
     color: #ffffff;
@@ -4363,65 +4355,49 @@ body, p, span, label, button, input, select, textarea,
     box-shadow: 0 6px 20px rgba(16,185,129,0.4);
     transform: scale(1.08);
 }
+.flash-card.card-entre-lagos.selected p { color: #ffffff !important; }
 
-.flash-card.card-entre-lagos.selected p {
-    color: #ffffff !important;
-}
-
-/* Card Itapoã Parque — Vermelho */
+/* Card Itapoã Parque — AZUL */
 .flash-card.card-itapoa-parque {
-    border-color: rgba(225,29,72,0.2);
+    border-color: rgba(59,130,246,0.2);
 }
-
 .flash-card.card-itapoa-parque .avatar-circle {
-    background: rgba(225,29,72,0.12);
-    color: #e11d48;
-    border-color: rgba(225,29,72,0.25);
+    background: rgba(59,130,246,0.15);
+    color: #3b82f6;
+    border-color: rgba(59,130,246,0.3);
 }
-
-.flash-card.card-itapoa-parque p {
-    color: #fda4af;
-}
-
+.flash-card.card-itapoa-parque p { color: #93c5fd; }
 .flash-card.card-itapoa-parque:hover {
-    border-color: rgba(225,29,72,0.45);
-    background: rgba(225,29,72,0.07);
+    border-color: rgba(59,130,246,0.5);
+    background: rgba(59,130,246,0.08);
     transform: translateY(-3px);
-    box-shadow: 0 8px 28px -6px rgba(225,29,72,0.22);
+    box-shadow: 0 8px 28px -6px rgba(59,130,246,0.25);
 }
-
 .flash-card.card-itapoa-parque.selected {
-    background: rgba(225,29,72,0.12);
-    border: 1.5px solid #e11d48;
-    box-shadow: 0 0 0 1px rgba(225,29,72,0.2),
-                0 8px 32px rgba(225,29,72,0.18);
+    background: rgba(59,130,246,0.12);
+    border: 1.5px solid #3b82f6;
+    box-shadow: 0 0 0 1px rgba(59,130,246,0.2), 0 8px 32px rgba(59,130,246,0.18);
 }
-
 .flash-card.card-itapoa-parque.selected .avatar-circle {
-    background: #e11d48;
+    background: #3b82f6;
     color: #ffffff;
-    border-color: #e11d48;
-    box-shadow: 0 6px 20px rgba(225,29,72,0.35);
+    border-color: #3b82f6;
+    box-shadow: 0 6px 20px rgba(59,130,246,0.35);
     transform: scale(1.08);
 }
+.flash-card.card-itapoa-parque.selected p { color: #ffffff !important; }
 
-.flash-card.card-itapoa-parque.selected p {
-    color: #ffffff !important;
-}
-
-/* Cards de operador — cor herdada da loja selecionada */
+/* Operadores — verde para Entre Lagos */
 .operadores-loja-entre-lagos .flash-card:hover {
     border-color: rgba(16,185,129,0.4);
     background: rgba(16,185,129,0.06);
     box-shadow: 0 8px 24px -8px rgba(16,185,129,0.2);
 }
-
 .operadores-loja-entre-lagos .flash-card.selected {
     background: rgba(16,185,129,0.12);
     border: 1.5px solid #10b981;
     box-shadow: 0 0 0 1px rgba(16,185,129,0.2), 0 8px 28px rgba(16,185,129,0.15);
 }
-
 .operadores-loja-entre-lagos .flash-card.selected .avatar-circle {
     background: #10b981;
     color: #ffffff;
@@ -4429,36 +4405,34 @@ body, p, span, label, button, input, select, textarea,
     box-shadow: 0 6px 16px rgba(16,185,129,0.35);
 }
 
+/* Operadores — azul para Itapoã Parque */
 .operadores-loja-itapoa .flash-card:hover {
-    border-color: rgba(225,29,72,0.35);
-    background: rgba(225,29,72,0.05);
-    box-shadow: 0 8px 24px -8px rgba(225,29,72,0.18);
+    border-color: rgba(59,130,246,0.4);
+    background: rgba(59,130,246,0.06);
+    box-shadow: 0 8px 24px -8px rgba(59,130,246,0.2);
 }
-
 .operadores-loja-itapoa .flash-card.selected {
-    background: rgba(225,29,72,0.1);
-    border: 1.5px solid #e11d48;
-    box-shadow: 0 0 0 1px rgba(225,29,72,0.18), 0 8px 28px rgba(225,29,72,0.12);
+    background: rgba(59,130,246,0.12);
+    border: 1.5px solid #3b82f6;
+    box-shadow: 0 0 0 1px rgba(59,130,246,0.18), 0 8px 28px rgba(59,130,246,0.15);
 }
-
 .operadores-loja-itapoa .flash-card.selected .avatar-circle {
-    background: #e11d48;
+    background: #3b82f6;
     color: #ffffff;
-    border-color: #e11d48;
-    box-shadow: 0 6px 16px rgba(225,29,72,0.3);
+    border-color: #3b82f6;
+    box-shadow: 0 6px 16px rgba(59,130,246,0.3);
 }
 
-/* Label da seção com cor da loja */
+/* Labels */
 .section-label-verde { color: #10b981 !important; }
-.section-label-vermelho { color: #e11d48 !important; }
+.section-label-azul  { color: #3b82f6 !important; }
 
-/* Botão INICIAR com cor da loja */
+/* Botão INICIAR */
 .btn-iniciar-verde {
     background: linear-gradient(135deg, #10b981, #059669) !important;
     box-shadow: 0 8px 24px rgba(16,185,129,0.35) !important;
 }
-
-.btn-iniciar-vermelho {
-    background: linear-gradient(135deg, #e11d48, #be123c) !important;
-    box-shadow: 0 8px 24px rgba(225,29,72,0.35) !important;
+.btn-iniciar-azul {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+    box-shadow: 0 8px 24px rgba(59,130,246,0.35) !important;
 }
