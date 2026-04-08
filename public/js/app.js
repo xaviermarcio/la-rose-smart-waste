@@ -337,6 +337,24 @@ window.renderizarOperadores = (lojaId) => {
     const container = el('container-operadores');
     if (!container) return;
 
+    // Cor conforme loja — verde ou vermelho
+    const isEntreLagos = lojaId === 'entre_lagos';
+    const classeCorLoja = isEntreLagos ? 'operadores-loja-entre-lagos' : 'operadores-loja-itapoa';
+    container.className = `grid-cards operadores-grid ${classeCorLoja}`;
+
+    // Label "Quem está operando?" com cor da loja
+    const labelOp = document.querySelector('#etapa-operador .section-label');
+    if (labelOp) {
+        labelOp.className = `section-label ${isEntreLagos ? 'section-label-verde' : 'section-label-vermelho'}`;
+    }
+
+    // Botão INICIAR com cor da loja
+    const btnIniciar = el('btn-iniciar');
+    if (btnIniciar) {
+        btnIniciar.classList.remove('btn-iniciar-verde', 'btn-iniciar-vermelho');
+        btnIniciar.classList.add(isEntreLagos ? 'btn-iniciar-verde' : 'btn-iniciar-vermelho');
+    }
+
     container.innerHTML = '';
     const lojaSel = CONFIG_SISTEMA.lojas.find(l => l.id === lojaId);
     if (!lojaSel) return;
@@ -361,11 +379,13 @@ window.renderizarOperadores = (lojaId) => {
 
             localStorage.setItem('operador_ativo', nome);
 
-            // Botão iniciar com animação
+            // Botão iniciar com animação e cor da loja
             const btnIniciar = el('btn-iniciar');
             if (btnIniciar) {
                 btnIniciar.classList.remove('hidden');
                 btnIniciar.classList.add('btn-appear');
+                btnIniciar.classList.remove('btn-iniciar-verde', 'btn-iniciar-vermelho');
+                btnIniciar.classList.add(isEntreLagos ? 'btn-iniciar-verde' : 'btn-iniciar-vermelho');
             }
         };
 
