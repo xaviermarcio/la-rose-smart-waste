@@ -1998,10 +1998,12 @@ if (document.body.id === 'admin-page') {
                             <tbody>
                 `;
 
-                cons.itens.forEach(item => {
+                const itensOrdenados = [...cons.itens].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+                itensOrdenados.forEach((item, idx) => {
                     html += `
                         <tr>
                             <td>
+                                <span style="color:var(--texto-suave); font-size:11px; font-weight:700; margin-right:6px;">${idx + 1}.</span>
                                 <strong>${item.nome}</strong><br>
                                 <small class="item-lote-cod">Cód: ${item.cod}</small>
                             </td>
