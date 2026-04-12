@@ -1,4 +1,4 @@
-const CACHE_NAME = 'larose-v1.3';
+const CACHE_NAME = 'larose-v1.4';
 
 const ASSETS_TO_CACHE = [
     '/','/index.html','/lancamento.html','/dashboard.html','/manifest.json',
