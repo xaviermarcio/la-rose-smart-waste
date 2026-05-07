@@ -5,7 +5,7 @@ export const CONFIG_SISTEMA = {
     ],
     lojas: [
         { id: "entre_lagos", nome: "Entre Lagos", operadores: ["Lindomar", "Márcio Xavier"] },
-        { id: "itapoa_parque", nome: "Itapoã Parque", operadores: ["Amanda", "Italo", "Jemerson", "Ygor"] }
+        { id: "itapoa_parque", nome: "Itapoã Parque", operadores: ["Amanda", "Italo", "Ygor"] }
     ],
     produtos: [
         { cod: "2073", nome: "ABACATE", unidade: "KG" },
