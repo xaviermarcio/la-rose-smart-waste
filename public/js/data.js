@@ -4,8 +4,8 @@ export const CONFIG_SISTEMA = {
         { email: "hortifrutilarose@gmail.com", nome: "Operacional La Rose", cargo: "OPERADOR" }
     ],
     lojas: [
-        { id: "entre_lagos", nome: "Entre Lagos", operadores: ["Lindomar", "Márcio Xavier"] },
-        { id: "itapoa_parque", nome: "Itapoã Parque", operadores: ["Amanda", "Italo", "Ygor"] }
+        { id: "entre_lagos", nome: "Entre Lagos", operadores: ["Lindomar", "Márcio Xavier", "Ítalo"] },
+        { id: "itapoa_parque", nome: "Itapoã Parque", operadores: ["Amanda", "Maria Paula", "Gardênia"] }
     ],
     produtos: [
         { cod: "2073", nome: "ABACATE", unidade: "KG" },
