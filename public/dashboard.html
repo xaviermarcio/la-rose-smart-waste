@@ -16,6 +16,190 @@
     <link rel="stylesheet" href="css/style.css?v=3.0">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+
+    <!-- CSS crítico do layout 3 colunas — embutido para garantir carregamento -->
+    <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body#admin-page { background: #f1f5f9; font-family: 'Inter', system-ui, sans-serif; }
+
+    /* ── GRID RAIZ ── */
+    .adm-layout {
+        display: grid;
+        grid-template-columns: 200px 1fr 220px;
+        min-height: 100vh;
+        background: #f1f5f9;
+    }
+
+    /* ── SIDEBAR ESQUERDA ── */
+    .adm-sidebar-left {
+        background: #0f172a;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        position: sticky;
+        top: 0;
+        overflow-y: auto;
+        z-index: 100;
+    }
+    .adm-brand { display:flex; align-items:center; gap:10px; padding:18px 16px 14px; border-bottom:1px solid rgba(255,255,255,.07); }
+    .adm-logo { width:32px; height:32px; object-fit:contain; border-radius:8px; }
+    .adm-brand-name { font-size:14px; font-weight:800; color:#fff; letter-spacing:-.3px; line-height:1.2; display:block; }
+    .adm-brand-sub { font-size:9px; font-weight:600; color:rgba(255,255,255,.35); text-transform:uppercase; letter-spacing:.8px; display:block; }
+    .adm-nav { display:flex; flex-direction:column; gap:2px; padding:12px 10px; }
+    .adm-nav-btn { display:flex; align-items:center; gap:9px; padding:9px 10px; border-radius:9px; background:transparent; border:none; color:rgba(255,255,255,.45); font-size:12px; font-weight:600; font-family:'Inter',sans-serif; cursor:pointer; transition:all .15s; text-align:left; position:relative; width:100%; }
+    .adm-nav-btn:hover { background:rgba(255,255,255,.06); color:rgba(255,255,255,.8); }
+    .adm-nav-btn.active { background:rgba(16,185,129,.16); color:#10b981; font-weight:700; }
+    .adm-nav-btn.active svg { stroke:#10b981 !important; }
+    .adm-nav-btn svg { flex-shrink:0; opacity:.65; stroke:rgba(255,255,255,.45); }
+    .adm-nav-badge { margin-left:auto; background:#e11d48; color:#fff; font-size:9px; font-weight:800; padding:2px 6px; border-radius:100px; }
+    .adm-nav-badge.hidden { display:none; }
+    .adm-nav-sep { border-top:1px solid rgba(255,255,255,.06); margin:6px 12px; }
+    .adm-nav-label { font-size:9px; font-weight:800; color:rgba(255,255,255,.25); letter-spacing:1px; text-transform:uppercase; padding:0 14px 6px; }
+    .adm-loja-btns { display:flex; flex-direction:column; gap:3px; padding:0 10px; }
+    .adm-loja-btn { display:flex; align-items:center; gap:7px; padding:7px 10px; border-radius:8px; background:transparent; border:1px solid rgba(255,255,255,.08); color:rgba(255,255,255,.45); font-size:11px; font-weight:600; font-family:'Inter',sans-serif; cursor:pointer; transition:all .15s; text-align:left; width:100%; }
+    .adm-loja-btn:hover { background:rgba(255,255,255,.06); color:rgba(255,255,255,.8); }
+    .adm-loja-btn.active { border-color:#10b981; color:#10b981; background:rgba(16,185,129,.1); }
+    .adm-loja-btn.adm-loja-azul.active { border-color:#3b82f6; color:#3b82f6; background:rgba(59,130,246,.1); }
+    .adm-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; display:inline-block; }
+    .adm-dot.verde { background:#10b981; }
+    .adm-dot.azul { background:#3b82f6; }
+    .adm-sidebar-footer { margin-top:auto; padding:12px 10px; border-top:1px solid rgba(255,255,255,.06); }
+    .adm-logout-btn { display:flex; align-items:center; gap:8px; width:100%; padding:9px 10px; border-radius:8px; background:rgba(225,29,72,.08); border:1px solid rgba(225,29,72,.18); color:rgba(255,120,120,.75); font-size:11px; font-weight:700; font-family:'Inter',sans-serif; cursor:pointer; transition:all .15s; }
+    .adm-logout-btn:hover { background:rgba(225,29,72,.16); color:#fca5a5; }
+
+    /* ── ÁREA CENTRAL ── */
+    .adm-main { overflow-y:auto; height:100vh; display:flex; flex-direction:column; }
+    .adm-main-header { display:flex; align-items:center; justify-content:space-between; padding:18px 22px 14px; background:#fff; border-bottom:1px solid #e2e8f0; position:sticky; top:0; z-index:50; }
+    .adm-main-titulo { font-size:18px; font-weight:800; color:#0f172a; letter-spacing:-.4px; font-family:'Roboto','Inter',sans-serif; }
+    .adm-main-sub { font-size:11px; color:#94a3b8; font-weight:500; display:block; margin-top:2px; }
+    .adm-loja-badge-header { padding:4px 11px; border-radius:100px; background:#f0fdf4; border:1px solid #a7f3d0; color:#059669; font-size:10px; font-weight:700; white-space:nowrap; }
+    .adm-secao { padding:18px 22px; flex:1; }
+    .adm-secao.hidden { display:none !important; }
+
+    /* ── MÉTRICAS ── */
+    .adm-metricas { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:16px; }
+    .adm-metrica-card { background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:14px 12px; display:flex; flex-direction:column; gap:6px; box-shadow:0 1px 3px rgba(0,0,0,.04); transition:all .18s; }
+    .adm-metrica-card:hover { box-shadow:0 4px 14px rgba(0,0,0,.07); transform:translateY(-1px); }
+    .adm-metrica-amber { border-left:3px solid #f59e0b; }
+    .adm-metrica-icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; }
+    .adm-metrica-icon.verde { background:rgba(16,185,129,.1); }
+    .adm-metrica-icon.azul  { background:rgba(59,130,246,.1); }
+    .adm-metrica-icon.rosa  { background:rgba(225,29,72,.08); }
+    .adm-metrica-icon.amber { background:rgba(245,158,11,.1); }
+    .adm-metrica-val { font-size:22px; font-weight:900; color:#0f172a; letter-spacing:-.8px; font-family:'Roboto',sans-serif; line-height:1; }
+    .adm-metrica-label { font-size:10px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:.5px; }
+
+    /* ── CARDS ── */
+    .adm-card { background:#fff; border:1px solid #e2e8f0; border-radius:16px; padding:16px 18px; margin-bottom:14px; box-shadow:0 1px 3px rgba(0,0,0,.04); }
+    .adm-card-header { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:14px; }
+    .adm-card-titulo { font-size:12px; font-weight:800; color:#0f172a; text-transform:uppercase; letter-spacing:.3px; }
+    .adm-card-sub { font-size:10px; color:#94a3b8; }
+
+    /* ── TABELA COMPARATIVA ── */
+    .adm-tabela-comp { width:100%; border-collapse:collapse; font-size:12px; }
+    .adm-tabela-comp th { padding:6px 10px; text-align:left; font-size:9px; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:.5px; border-bottom:1px solid #f1f5f9; }
+    .adm-tabela-comp td { padding:9px 10px; border-bottom:1px solid #f8fafc; color:#0f172a; font-weight:500; }
+    .adm-tabela-comp tr:last-child td { border-bottom:none; }
+    .adm-tabela-comp tr:hover td { background:#f8fafc; }
+    .adm-tabela-mes-atual td { background:#f0fdf4 !important; }
+    .adm-tabela-mes-atual .adm-mes-nome { color:#059669 !important; font-weight:800 !important; }
+    .adm-mes-nome { font-weight:700; }
+    .adm-barra-cell { width:100px; }
+    .adm-barra { height:5px; border-radius:100px; background:#e2e8f0; overflow:hidden; }
+    .adm-barra-fill { height:100%; background:linear-gradient(90deg,#10b981,#059669); border-radius:100px; transition:width .4s; }
+    .adm-var { font-size:10px; font-weight:700; padding:2px 7px; border-radius:100px; white-space:nowrap; }
+    .adm-var-up   { background:rgba(225,29,72,.09);  color:#e11d48; }
+    .adm-var-down { background:rgba(16,185,129,.09); color:#059669; }
+    .adm-var-eq   { background:#f1f5f9; color:#94a3b8; }
+
+    /* ── SUB-TABS LOTES ── */
+    .adm-lotes-tabs { display:flex; border-bottom:2px solid #e2e8f0; margin-bottom:14px; }
+    .adm-lote-tab { display:flex; align-items:center; gap:6px; padding:11px 18px; background:transparent; border:none; border-bottom:2px solid transparent; margin-bottom:-2px; font-size:12px; font-weight:700; font-family:'Inter',sans-serif; color:#94a3b8; cursor:pointer; transition:all .16s; white-space:nowrap; }
+    .adm-lote-tab:hover { color:#0f172a; }
+    .adm-lote-tab.active { color:#10b981; border-bottom-color:#10b981; }
+    .adm-lote-badge { background:#e11d48; color:#fff; font-size:9px; font-weight:800; padding:1px 6px; border-radius:100px; }
+
+    /* ── RANKINGS GRID ── */
+    .adm-ranking-store-tabs { display:flex; gap:4px; margin-bottom:10px; flex-wrap:wrap; }
+    .adm-rankings-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+
+    /* ── TABS DE MÊS ── */
+    .tabs-meses-scroll { display:flex; gap:6px; overflow-x:auto; padding-bottom:8px; margin-bottom:12px; scrollbar-width:none; }
+    .tabs-meses-scroll::-webkit-scrollbar { display:none; }
+    .tab-mes-btn { flex-shrink:0; padding:7px 16px; border-radius:100px; border:1.5px solid #e2e8f0; background:#fff; color:#64748b; font-size:12px; font-weight:600; font-family:'Inter',sans-serif; cursor:pointer; transition:all .18s; white-space:nowrap; }
+    .tab-mes-btn:hover { border-color:#10b981; background:#f0fdf4; color:#059669; }
+    .tab-mes-btn.active { background:linear-gradient(135deg,#10b981,#059669); border-color:transparent; color:#fff; font-weight:700; box-shadow:0 3px 10px rgba(16,185,129,.3); }
+
+    /* ── CARDS DE LOTE COMPACTOS — linha única ── */
+    .lista-admin-box { display:flex !important; flex-direction:column; gap:6px; }
+    .lista-admin-box > .glass-card:first-child { margin-bottom:4px; }
+    .card-lote-expandable { border-radius:12px !important; padding:10px 14px !important; display:block !important; cursor:pointer; transition:all .18s; background:#fff; border:1px solid #e2e8f0; box-shadow:0 1px 3px rgba(0,0,0,.04); }
+    .card-lote-expandable:hover { box-shadow:0 3px 12px rgba(0,0,0,.08); transform:translateY(-1px); }
+    .lote-nome-loja { font-size:11px !important; font-weight:800 !important; letter-spacing:.2px !important; text-transform:uppercase !important; }
+    .lote-data-hora { font-size:10px !important; color:#94a3b8 !important; }
+    .lote-operador-nome { font-size:11px !important; color:#64748b !important; font-weight:500 !important; }
+    .lote-entre-lagos   { border-left:3px solid #10b981 !important; }
+    .lote-itapoa-parque { border-left:3px solid #3b82f6 !important; }
+    .lote-entre-lagos .lote-nome-loja::before,
+    .lote-itapoa-parque .lote-nome-loja::before { content:''; display:inline-block; width:6px; height:6px; border-radius:50%; margin-right:5px; vertical-align:middle; }
+    .lote-entre-lagos .lote-nome-loja::before   { background:#10b981; }
+    .lote-itapoa-parque .lote-nome-loja::before { background:#3b82f6; }
+
+    /* ── SIDEBAR DIREITA ── */
+    .adm-sidebar-right { background:#fff; border-left:1px solid #e2e8f0; height:100vh; position:sticky; top:0; overflow-y:auto; padding:18px 14px; display:flex; flex-direction:column; gap:0; }
+    .adm-right-section { padding-bottom:16px; margin-bottom:16px; border-bottom:1px solid #f1f5f9; }
+    .adm-right-section:last-child { border-bottom:none; margin-bottom:0; }
+    .adm-right-label { font-size:9px; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:1px; margin-bottom:9px; }
+    .adm-filtros-rapidos { display:flex; flex-wrap:wrap; gap:4px; }
+    .adm-filtro-btn { padding:5px 11px; border-radius:100px; border:1.5px solid #e2e8f0; background:#f8fafc; color:#64748b; font-size:11px; font-weight:600; font-family:'Inter',sans-serif; cursor:pointer; transition:all .15s; }
+    .adm-filtro-btn:hover { border-color:#10b981; background:#f0fdf4; color:#059669; }
+    .adm-filtro-btn.active { background:#10b981; border-color:#10b981; color:#fff; }
+    .adm-filtro-limpar { color:#e11d48; border-color:rgba(225,29,72,.2); }
+    .adm-filtro-limpar:hover { background:rgba(225,29,72,.08); color:#e11d48; border-color:#e11d48; }
+    .adm-date-row { display:flex; align-items:center; gap:4px; margin-bottom:7px; }
+    .adm-date-input { flex:1; background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:8px; padding:6px 8px; font-size:11px; font-family:'Inter',sans-serif; color:#0f172a; outline:none; min-width:0; }
+    .adm-date-input:focus { border-color:#10b981; }
+    .adm-date-sep { color:#94a3b8; font-size:12px; flex-shrink:0; }
+    .adm-right-btn { width:100%; padding:8px 12px; background:#10b981; border:none; border-radius:9px; color:#fff; font-size:11px; font-weight:700; font-family:'Inter',sans-serif; cursor:pointer; transition:background .15s; }
+    .adm-right-btn:hover { background:#059669; }
+    .adm-export-btn { display:flex; align-items:center; gap:8px; width:100%; padding:9px 12px; border-radius:9px; background:#f8fafc; border:1.5px solid #e2e8f0; color:#374151; font-size:11px; font-weight:600; font-family:'Inter',sans-serif; cursor:pointer; margin-bottom:6px; transition:all .15s; }
+    .adm-export-btn:hover { background:#f0fdf4; border-color:#10b981; color:#059669; }
+    .adm-export-pdf { color:#e11d48; border-color:rgba(225,29,72,.2); }
+    .adm-export-pdf:hover { background:rgba(225,29,72,.06); border-color:#e11d48; color:#e11d48; }
+
+    /* ── RANKING DE OPERADORES ── */
+    .ranking-operadores-card { background:#fff; border:1px solid #e2e8f0; border-radius:16px; padding:16px 18px; box-shadow:0 1px 3px rgba(0,0,0,.04); }
+    .ranking-operadores-header { margin-bottom:12px; }
+    .ranking-operadores-titulo { font-size:11px; font-weight:800; color:#0f172a; text-transform:uppercase; letter-spacing:.5px; }
+    .ranking-operadores-lista { display:flex; flex-direction:column; gap:6px; }
+    .ranking-operador-item { display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:10px; background:#f8fafc; }
+    .ranking-operador-item:first-child { background:linear-gradient(135deg,rgba(16,185,129,.08),rgba(5,150,105,.05)); border:1px solid rgba(16,185,129,.15); }
+    .ranking-op-medalha { font-size:18px; width:28px; text-align:center; flex-shrink:0; }
+    .ranking-op-nome { flex:1; font-size:13px; font-weight:700; color:#0f172a; }
+    .ranking-op-qtd { font-size:12px; font-weight:800; color:#10b981; background:rgba(16,185,129,.1); padding:3px 10px; border-radius:100px; border:1px solid rgba(16,185,129,.2); }
+
+    /* ── RESPONSIVO ── */
+    @media (max-width: 1100px) {
+        .adm-layout { grid-template-columns: 200px 1fr; }
+        .adm-sidebar-right { display:none; }
+        .lista-admin-box { grid-template-columns:repeat(2,1fr) !important; }
+        .adm-rankings-grid { grid-template-columns:1fr; }
+    }
+    @media (max-width: 700px) {
+        .adm-layout { grid-template-columns:1fr; padding-bottom:60px; }
+        .adm-sidebar-left { position:fixed; bottom:0; left:0; right:0; width:100%; height:56px; flex-direction:row; align-items:center; z-index:200; overflow:hidden; }
+        .adm-brand, .adm-nav-sep, .adm-nav-label, .adm-loja-btns, .adm-sidebar-footer { display:none !important; }
+        .adm-nav { flex-direction:row; padding:0; gap:0; flex:1; justify-content:space-around; align-items:stretch; }
+        .adm-nav-btn { flex-direction:column; gap:2px; padding:8px 6px 6px; border-radius:0; font-size:9px; justify-content:center; align-items:center; flex:1; }
+        .adm-nav-btn.active { border-top:2px solid #10b981; background:rgba(16,185,129,.08); }
+        .adm-main { height:auto; }
+        .adm-secao { padding:12px 14px; }
+        .adm-metricas { grid-template-columns:repeat(2,1fr); gap:8px; }
+        .lista-admin-box { grid-template-columns:1fr !important; }
+        .adm-rankings-grid { grid-template-columns:1fr; }
+    }
+    </style>
 </head>
 <body id="admin-page" class="page-fade">
 

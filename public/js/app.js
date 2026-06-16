@@ -1290,11 +1290,8 @@ if (document.body.id === 'admin-page') {
 
         AppState.filtroRapidoAtivo = periodo;
 
-        // Atualiza botões da sidebar direita
-        document.querySelectorAll('.adm-filtro-btn').forEach(b => b.classList.remove('active'));
-
         // Marcar botão ativo
-        const btns = document.querySelectorAll('.btn-filtro-rapido, .adm-filtro-btn');
+        const btns = document.querySelectorAll('.btn-filtro-rapido');
         btns.forEach(b => {
             if (b.textContent.trim().toLowerCase().includes(
                 periodo === 'hoje' ? 'hoje' : periodo === '7dias' ? '7 dias' : '30 dias'
@@ -1317,8 +1314,8 @@ if (document.body.id === 'admin-page') {
         if (inicio) inicio.value = dataInicio.toISOString().split('T')[0];
         if (fim) fim.value = hoje.toISOString().split('T')[0];
 
-        if (window.secaoAtual === 'rankings') renderRankingsSecao();
-        else if (window.secaoAtual === 'visao-geral') { renderVisaoGeral(); renderDashboard(); }
+        if(window.secaoAtual==='rankings') renderRankingsSecao();
+        else if(window.secaoAtual==='visao-geral'){renderVisaoGeral();renderDashboard();}
         else renderDashboard();
     };
 
@@ -1340,8 +1337,8 @@ if (document.body.id === 'admin-page') {
             });
 
             renderFiltroOperadores();
-            if (window.secaoAtual === 'lotes') renderDashboard();
-            else if (window.secaoAtual === 'rankings') renderRankingsSecao();
+            if(window.secaoAtual==='lotes') renderDashboard();
+            else if(window.secaoAtual==='rankings') renderRankingsSecao();
             else { renderVisaoGeral(); renderDashboard(); }
         } catch (e) {
             el('lista-admin').innerHTML = `
@@ -1396,116 +1393,66 @@ if (document.body.id === 'admin-page') {
         `;
     }
 
-    // Seção ativa no dashboard
     window.secaoAtual = 'visao-geral';
-
     window.mudarSecao = (secao) => {
-        window.secaoAtual = secao;
-        vibrar();
-
-        // Esconde todas, mostra a ativa
-        ['visao-geral','lotes','rankings'].forEach(s => {
-            el('secao-' + s)?.classList.toggle('hidden', s !== secao);
-        });
-
-        // Atualiza botões da sidebar esquerda
-        document.querySelectorAll('.adm-nav-btn').forEach(b => {
-            b.classList.toggle('active', b.dataset.secao === secao);
-        });
-
-        // Títulos do cabeçalho
-        const t = { 'visao-geral': ['Visão Geral','Resumo das quebras'], lotes: ['Lotes','Gerencie os lotes'], rankings: ['Rankings','Top produtos com mais perda'] };
-        if (el('adm-titulo')) el('adm-titulo').innerText = t[secao]?.[0] || '';
-        if (el('adm-sub'))    el('adm-sub').innerText    = t[secao]?.[1] || '';
-
-        if (secao === 'lotes')      renderDashboard();
-        if (secao === 'rankings')   renderRankingsSecao();
-        if (secao === 'visao-geral'){ renderVisaoGeral(); renderDashboard(); }
+        window.secaoAtual = secao; vibrar();
+        ['visao-geral','lotes','rankings'].forEach(s => { el('secao-'+s)?.classList.toggle('hidden', s !== secao); });
+        document.querySelectorAll('.adm-nav-btn').forEach(b => b.classList.toggle('active', b.dataset.secao === secao));
+        const t = {'visao-geral':['Visão Geral','Resumo das quebras'],'lotes':['Lotes','Gerencie os lotes'],'rankings':['Rankings','Top produtos com mais perda']};
+        if (el('adm-titulo')) el('adm-titulo').innerText = t[secao]?.[0]||'';
+        if (el('adm-sub'))    el('adm-sub').innerText    = t[secao]?.[1]||'';
+        if (secao==='lotes') renderDashboard();
+        else if (secao==='rankings') renderRankingsSecao();
+        else { renderVisaoGeral(); renderDashboard(); }
     };
-
     function renderVisaoGeral() {
-        const pending   = window.todosOsLotes.filter(b => !b.status_lancado && !b.consolidado);
-        const completed = window.todosOsLotes.filter(b => b.status_lancado);
-        const lojaFiltro = AppState.rankingLojaFiltro || 'todas';
+        const pending = window.todosOsLotes.filter(b=>!b.status_lancado&&!b.consolidado);
+        const lojaFiltro = AppState.rankingLojaFiltro||'todas';
         const lotesFiltrados = aplicarFiltroData(pending);
-        const lotesPorLoja = lojaFiltro === 'todas' ? lotesFiltrados : lotesFiltrados.filter(b => b.loja === lojaFiltro);
-        const metricas = calcularMetricas(lotesPorLoja);
-
-        if (el('metrica-kg'))    el('metrica-kg').innerText    = metricas.totalKG.toFixed(3).replace('.', ',');
-        if (el('metrica-un'))    el('metrica-un').innerText    = Math.floor(metricas.totalUN);
-        if (el('metrica-itens')) el('metrica-itens').innerText = metricas.totalItens;
+        const lotesPorLoja = lojaFiltro==='todas' ? lotesFiltrados : lotesFiltrados.filter(b=>b.loja===lojaFiltro);
+        const m = calcularMetricas(lotesPorLoja);
+        if (el('metrica-kg')) el('metrica-kg').innerText = m.totalKG.toFixed(3).replace('.',',');
+        if (el('metrica-un')) el('metrica-un').innerText = Math.floor(m.totalUN);
+        if (el('metrica-itens')) el('metrica-itens').innerText = m.totalItens;
         if (el('metrica-lotes')) el('metrica-lotes').innerText = pending.length;
-
-        // Badge de pendentes
-        const bs = el('sidebar-badge-pendentes');
-        const bt = el('badge-pendentes');
-        if (bs) { bs.innerText = pending.length; bs.classList.toggle('hidden', pending.length === 0); }
-        if (bt) bt.innerText = pending.length;
-
-        renderTabelaComparativa();
-        renderFiltroOperadores();
+        const bsp=el('sidebar-badge-pendentes'); const btp=el('badge-pendentes');
+        if (bsp) { bsp.innerText=pending.length; bsp.classList.toggle('hidden',pending.length===0); }
+        if (btp) btp.innerText = pending.length;
+        renderTabelaComparativa(); renderFiltroOperadores();
     }
-
     function renderRankingsSecao() {
-        const pending   = window.todosOsLotes.filter(b => !b.status_lancado && !b.consolidado);
-        const completed = window.todosOsLotes.filter(b => b.status_lancado);
-        const lojaFiltro = AppState.rankingLojaFiltro || 'todas';
-        const todos = aplicarFiltroData([...pending, ...completed]);
-        renderRanking('ranking-kg', calcularRanking(todos, 'KG', 10, lojaFiltro), 'KG');
-        renderRanking('ranking-un', calcularRanking(todos, 'UN', 10, lojaFiltro), 'UN');
+        const pending=window.todosOsLotes.filter(b=>!b.status_lancado&&!b.consolidado);
+        const completed=window.todosOsLotes.filter(b=>b.status_lancado);
+        const lojaFiltro=AppState.rankingLojaFiltro||'todas';
+        const todos=aplicarFiltroData([...pending,...completed]);
+        renderRanking('ranking-kg',calcularRanking(todos,'KG',10,lojaFiltro),'KG');
+        renderRanking('ranking-un',calcularRanking(todos,'UN',10,lojaFiltro),'UN');
     }
-
     function renderTabelaComparativa() {
-        const container = el('tabela-comparativa');
-        if (!container) return;
-        const lojaFiltro = AppState.rankingLojaFiltro || 'todas';
-        const porMes = {};
-
-        window.todosOsLotes.forEach(lote => {
-            if (!lote.data || typeof lote.data.toDate !== 'function') return;
-            if (lojaFiltro !== 'todas' && lote.loja !== lojaFiltro) return;
-            const mes = lote.data.toDate().toISOString().slice(0, 7);
-            if (!porMes[mes]) porMes[mes] = { kg: 0, un: 0, lotes: 0 };
+        const container=el('tabela-comparativa'); if(!container) return;
+        const lojaFiltro=AppState.rankingLojaFiltro||'todas';
+        const porMes={};
+        window.todosOsLotes.forEach(lote=>{
+            if(!lote.data||typeof lote.data.toDate!=='function') return;
+            if(lojaFiltro!=='todas'&&lote.loja!==lojaFiltro) return;
+            const mes=lote.data.toDate().toISOString().slice(0,7);
+            if(!porMes[mes]) porMes[mes]={kg:0,un:0,lotes:0};
             porMes[mes].lotes++;
-            if (lote.itens) lote.itens.forEach(i => { if (i.unidade === 'UN') porMes[mes].un += i.peso; else porMes[mes].kg += i.peso; });
+            if(lote.itens) lote.itens.forEach(i=>{ if(i.unidade==='UN') porMes[mes].un+=i.peso; else porMes[mes].kg+=i.peso; });
         });
-
-        const meses = Object.keys(porMes).sort((a,b) => b.localeCompare(a)).slice(0, 6);
-        if (meses.length === 0) { container.innerHTML = '<p style="text-align:center;color:#94a3b8;padding:20px;font-size:12px;">Sem dados ainda.</p>'; return; }
-
-        const maxKG = Math.max(...meses.map(m => porMes[m].kg), 1);
-        const mesAtual = new Date().toISOString().slice(0, 7);
-        const nomeMes = ym => { const [y,m] = ym.split('-'); return ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][parseInt(m)-1] + '/' + y.slice(2); };
-
-        const rows = meses.map((mes, idx) => {
-            const d = porMes[mes];
-            const pct = Math.round((d.kg / maxKG) * 100);
-            const isAtual = mes === mesAtual;
-            let varHtml = '<span class="adm-var adm-var-eq">—</span>';
-            if (idx < meses.length - 1) {
-                const ant = porMes[meses[idx+1]]?.kg || 0;
-                if (ant > 0) {
-                    const diff = ((d.kg - ant) / ant * 100).toFixed(0);
-                    if (diff > 0)      varHtml = `<span class="adm-var adm-var-up">↑${diff}%</span>`;
-                    else if (diff < 0) varHtml = `<span class="adm-var adm-var-down">↓${Math.abs(diff)}%</span>`;
-                }
-            }
-            return `<tr class="${isAtual ? 'adm-tabela-mes-atual' : ''}">
-                <td class="adm-mes-nome">${nomeMes(mes)}${isAtual ? ' ●' : ''}</td>
-                <td><strong>${d.kg.toFixed(3).replace('.', ',')} KG</strong></td>
-                <td>${Math.floor(d.un)} UN</td>
-                <td>${d.lotes} lote${d.lotes !== 1 ? 's' : ''}</td>
-                <td class="adm-barra-cell"><div class="adm-barra"><div class="adm-barra-fill" style="width:${pct}%"></div></div></td>
-                <td>${varHtml}</td>
-            </tr>`;
+        const meses=Object.keys(porMes).sort((a,b)=>b.localeCompare(a)).slice(0,6);
+        if(meses.length===0){container.innerHTML='<p style="text-align:center;color:#94a3b8;padding:20px;font-size:12px;">Sem dados ainda.</p>';return;}
+        const maxKG=Math.max(...meses.map(m=>porMes[m].kg),1);
+        const mesAtual=new Date().toISOString().slice(0,7);
+        const nomeMes=ym=>{const[y,m]=ym.split('-');return ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][parseInt(m)-1]+'/'+y.slice(2);};
+        const rows=meses.map((mes,idx)=>{
+            const d=porMes[mes]; const pct=Math.round((d.kg/maxKG)*100); const isAtual=mes===mesAtual;
+            let v='<span class="adm-var adm-var-eq">—</span>';
+            if(idx<meses.length-1){const ant=porMes[meses[idx+1]]?.kg||0;if(ant>0){const diff=((d.kg-ant)/ant*100).toFixed(0);if(diff>0)v=`<span class="adm-var adm-var-up">↑${diff}%</span>`;else if(diff<0)v=`<span class="adm-var adm-var-down">↓${Math.abs(diff)}%</span>`;}}
+            return `<tr class="${isAtual?'adm-tabela-mes-atual':''}"><td class="adm-mes-nome">${nomeMes(mes)}${isAtual?' ●':''}</td><td><strong>${d.kg.toFixed(3).replace('.',',')} KG</strong></td><td>${Math.floor(d.un)} UN</td><td>${d.lotes} lote${d.lotes!==1?'s':''}</td><td class="adm-barra-cell"><div class="adm-barra"><div class="adm-barra-fill" style="width:${pct}%"></div></div></td><td>${v}</td></tr>`;
         }).join('');
-
-        container.innerHTML = `<table class="adm-tabela-comp">
-            <thead><tr><th>Mês</th><th>KG</th><th>UN</th><th>Lotes</th><th>Volume</th><th>Variação</th></tr></thead>
-            <tbody>${rows}</tbody>
-        </table>`;
+        container.innerHTML=`<table class="adm-tabela-comp"><thead><tr><th>Mês</th><th>KG</th><th>UN</th><th>Lotes</th><th>Volume</th><th>Variação</th></tr></thead><tbody>${rows}</tbody></table>`;
     }
-
     window.mudarAba = (aba) => {
         window.abaAtual = aba;
         window.modoSelecao = false;
@@ -1530,6 +1477,18 @@ if (document.body.id === 'admin-page') {
         return [];
     }
 
+    AppState.mesLancados = AppState.mesLancados || new Date().toISOString().slice(0,7);
+    window.setMesLancados = (mes) => { vibrar(); AppState.mesLancados=mes; renderDashboard(); };
+    function renderTabsMeses(container) {
+        const completed=window.todosOsLotes.filter(b=>b.status_lancado);
+        const mesesSet=new Set();
+        completed.forEach(lote=>{ if(!lote.data||typeof lote.data.toDate!=='function') return; mesesSet.add(lote.data.toDate().toISOString().slice(0,7)); });
+        const meses=[...mesesSet].sort((a,b)=>b.localeCompare(a));
+        if(meses.length===0){container.innerHTML='';return;}
+        if(!meses.includes(AppState.mesLancados)) AppState.mesLancados=meses[0];
+        const nomeMes=ym=>{const[y,m]=ym.split('-');return['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][parseInt(m)-1]+' '+y;};
+        container.innerHTML='<div class="tabs-meses-scroll">'+meses.map(m=>'<button class="tab-mes-btn tap-feedback '+(AppState.mesLancados===m?'active':'')+'" onclick="window.setMesLancados(\''+m+'\')">'+nomeMes(m)+'</button>').join('')+'</div>';
+    }
     // Filtro de data melhorado (range)
     function aplicarFiltroData(lista) {
         const filtroInicio = el('filtroDataInicio');
@@ -1553,6 +1512,17 @@ if (document.body.id === 'admin-page') {
         });
     }
 
+    window.filtrarPorMesAno = () => {
+        const s=el('seletor-mes-relatorio'); if(!s||!s.value) return;
+        const [ano,mes]=s.value.split('-'); const inicio=el('filtroDataInicio'); const fim=el('filtroDataFim'); if(!inicio||!fim) return;
+        const ud=new Date(parseInt(ano),parseInt(mes),0).getDate();
+        inicio.value=`${ano}-${mes}-01`; fim.value=`${ano}-${mes}-${String(ud).padStart(2,'0')}`;
+        AppState.filtroRapidoAtivo=null; document.querySelectorAll('.adm-filtro-btn,.btn-filtro-rapido').forEach(b=>b.classList.remove('active'));
+        vibrar();
+        if(window.secaoAtual==='rankings') renderRankingsSecao();
+        else if(window.secaoAtual==='visao-geral'){renderVisaoGeral();renderDashboard();}
+        else renderDashboard();
+    };
     window.filtrarPorData = () => {
         vibrar();
         // Limpar filtros rápidos ativos
@@ -1678,17 +1648,10 @@ if (document.body.id === 'admin-page') {
 
     // Store filter for rankings
     window.setRankingLoja = (loja) => {
-        vibrar();
-        AppState.rankingLojaFiltro = loja;
-
-        // Sincroniza botões de loja na sidebar esquerda
-        document.querySelectorAll('.adm-loja-btn').forEach(b => {
-            b.classList.toggle('active', b.dataset.loja === loja);
-        });
-        // Badge de loja no cabeçalho
-        const nomesLoja = { todas: 'Todas as lojas', entre_lagos: '🟢 Entre Lagos', itapoa_parque: '🔵 Itapoã Parque' };
-        if (el('admin-loja-label')) el('admin-loja-label').innerText = nomesLoja[loja] || 'Todas as lojas';
-
+        vibrar(); AppState.rankingLojaFiltro = loja;
+        document.querySelectorAll('.adm-loja-btn').forEach(b=>b.classList.toggle('active',b.dataset.loja===loja));
+        const nL={todas:'Todas as lojas',entre_lagos:'🟢 Entre Lagos',itapoa_parque:'🔵 Itapoã Parque'};
+        if (el('admin-loja-label')) el('admin-loja-label').innerText=nL[loja]||'Todas as lojas';
         document.querySelectorAll('.ranking-store-tab').forEach(b => b.classList.remove('active'));
         document.querySelectorAll('.ranking-store-tab').forEach(b => {
             const text = b.textContent.toLowerCase();
@@ -1849,8 +1812,8 @@ if (document.body.id === 'admin-page') {
             ? window.consolidados.length
             : (window.abaAtual === 'pendentes' ? pending.length : completed.length);
 
-        el('titulo-resumo').innerText = label;
-        el('resumo-total').innerText = baseCount;
+        if (el('titulo-resumo')) el('titulo-resumo').innerText = label;
+        if (el('resumo-total'))  el('resumo-total').innerText  = baseCount;
 
         // Live Stats — Métricas reagem ao filtro de data E ao filtro de loja
         const lotesFiltrados = aplicarFiltroData(pending);
@@ -1869,14 +1832,11 @@ if (document.body.id === 'admin-page') {
         if (metricaItens) metricaItens.innerText = metricas.totalItens;
         if (metricaLotes) metricaLotes.innerText = metricas.totalLotes;
 
-        // Rankings (renderizados na aba Rankings via renderRankingsSecao)
+        // Rankings — inclui pendentes + lançados
         const todosParaRanking = aplicarFiltroData([...pending, ...completed]);
         renderRanking('ranking-kg', calcularRanking(todosParaRanking, 'KG', 10, lojaFiltro), 'KG');
         renderRanking('ranking-un', calcularRanking(todosParaRanking, 'UN', 10, lojaFiltro), 'UN');
-
-        // Atualiza badge de pendentes
-        const bsp = el('sidebar-badge-pendentes');
-        const btp = el('badge-pendentes');
+        const bsp = el('sidebar-badge-pendentes'); const btp = el('badge-pendentes');
         if (bsp) { bsp.innerText = pending.length; bsp.classList.toggle('hidden', pending.length === 0); }
         if (btp) btp.innerText = pending.length;
 
@@ -1909,16 +1869,19 @@ if (document.body.id === 'admin-page') {
         }
 
         container.innerHTML = '';
-
         if (window.abaAtual === 'consolidados') {
             renderConsolidados(container);
+        } else if (window.abaAtual === 'lancados') {
+            const tabsMesesEl = el('tabs-meses-container');
+            if (tabsMesesEl) renderTabsMeses(tabsMesesEl);
+            let list = getLotesDaAbaAtual();
+            if (lojaFiltro !== 'todas') list = list.filter(b => b.loja === lojaFiltro);
+            const mesSel = AppState.mesLancados;
+            if (mesSel) list = list.filter(lote => { if(!lote.data||typeof lote.data.toDate!=='function') return false; return lote.data.toDate().toISOString().slice(0,7)===mesSel; });
+            renderBatchList(list, container);
         } else {
-            // Aplica filtro de data E de loja na lista de lotes
             let list = aplicarFiltroData(getLotesDaAbaAtual());
-            if (lojaFiltro !== 'todas') {
-                list = list.filter(b => b.loja === lojaFiltro);
-            }
-
+            if (lojaFiltro !== 'todas') list = list.filter(b => b.loja === lojaFiltro);
             renderBatchList(list, container);
         }
     }
@@ -1955,40 +1918,23 @@ if (document.body.id === 'admin-page') {
             card.className = `card-lote-expandable slide-in-right ${corLoja} ${window.modoSelecao && isSelected ? 'ring-selected' : ''}`;
             card.style.animationDelay = `${idx * 80}ms`;
 
-            let html = `<div style="display:flex; align-items:center; gap:16px;">`;
-
-            if (window.modoSelecao) {
-                html += `
-                    <div class="check-icon ${isSelected ? 'checked' : 'unchecked'}" style="color:${isSelected ? 'white' : 'var(--texto-suave)'}">
-                        ${isSelected ? '☑️' : '☐'}
+            // Card compacto — tudo em linha única
+            let html = `
+                <div style="display:flex; align-items:center; gap:10px; min-width:0;">
+                    ${window.modoSelecao ? `<span class="check-icon ${isSelected ? 'checked' : 'unchecked'}" style="flex-shrink:0; color:${isSelected ? 'var(--verde-vibrante)' : 'var(--texto-suave)'};">${isSelected ? '☑️' : '☐'}</span>` : ''}
+                    <div style="flex:1; min-width:0; display:flex; flex-wrap:wrap; align-items:center; gap:6px 12px;">
+                        <span class="lote-nome-loja" style="flex-shrink:0;">${lojaDisplay}</span>
+                        <span class="lote-operador-nome" style="flex-shrink:0;">👤 ${batch.operador}</span>
+                        <span class="lote-data-hora" style="flex-shrink:0;">${dataFormatada} ${horaFormatada}</span>
                     </div>
-                `;
-            }
-
-            html += `
-                <div style="flex:1">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span class="lote-nome-loja">${lojaDisplay}</span>
-                        <span class="lote-data-hora">${dataFormatada} ${horaFormatada}</span>
-                    </div>
-                    <div style="margin-top:4px; display:flex; justify-content:space-between; align-items:center;">
-                        <span class="lote-operador-nome">👤 ${batch.operador}</span>
-                        <span class="badge-cons" style="color:var(--verde-dark);">${batch.itens.length} itens</span>
-                    </div>
-                </div>
-            `;
-
-            if (!window.modoSelecao) {
-                html += `
-                    <div class="btn-seta-moderno" style="${isOpen ? 'transform:rotate(90deg)' : ''}">
-                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <span style="font-size:11px; font-weight:800; color:var(--verde-dark); flex-shrink:0; white-space:nowrap;">${batch.itens.length} itens</span>
+                    ${!window.modoSelecao ? `<div class="btn-seta-moderno" style="flex-shrink:0; ${isOpen ? 'transform:rotate(90deg)' : ''}">
+                        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
                         </svg>
-                    </div>
-                `;
-            }
-
-            html += `</div>`;
+                    </div>` : ''}
+                </div>
+            `;
 
             if (isOpen) {
                 html += `
@@ -2111,11 +2057,11 @@ if (document.body.id === 'admin-page') {
             if (isOpen) {
                 html += `
                     <div class="detail-section fade-in-up">
-                        <table class="tabela-detalhes">
+                        <table class="tabela-detalhes" style="table-layout:fixed; width:100%;">
                             <thead>
                                 <tr>
-                                    <th>Produto</th>
-                                    <th style="text-align:right;">Total</th>
+                                    <th style="width:75%; padding:6px 10px;">Produto</th>
+                                    <th style="width:25%; text-align:right; padding:6px 10px;">Total</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -2123,15 +2069,18 @@ if (document.body.id === 'admin-page') {
 
                 const itensOrdenados = [...cons.itens].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
                 itensOrdenados.forEach((item, idx) => {
+                    const zebra = idx % 2 === 0 ? '#ffffff' : '#f8fafc';
                     html += `
-                        <tr>
-                            <td>
-                                <span style="color:var(--texto-suave); font-size:11px; font-weight:700; margin-right:6px;">${idx + 1}.</span>
-                                <strong>${item.nome}</strong><br>
-                                <small class="item-lote-cod">Cód: ${item.cod}</small>
+                        <tr style="background:${zebra};">
+                            <td style="padding:7px 10px; display:flex; align-items:center; gap:8px;">
+                                <span style="color:#94a3b8; font-size:10px; font-weight:700; width:18px; flex-shrink:0; text-align:right;">${idx + 1}.</span>
+                                <div style="min-width:0;">
+                                    <div style="font-size:12px; font-weight:700; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.nome}</div>
+                                    <div style="font-size:10px; color:#94a3b8;">Cód: ${item.cod}</div>
+                                </div>
                             </td>
-                            <td style="text-align:right;">
-                                <span class="item-lote-peso">${formatPeso(item.pesoTotal, item.unidade)}</span>
+                            <td style="padding:7px 10px; text-align:right; white-space:nowrap; font-size:12px; font-weight:800; color:#0f172a; background:${zebra};">
+                                ${formatPeso(item.pesoTotal, item.unidade)}
                             </td>
                         </tr>
                     `;
