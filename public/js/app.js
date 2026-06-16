@@ -1,3 +1,7 @@
+// =============================================================
+// 1. IMPORTAÇÕES
+// Firebase Auth, Firestore e módulos do sistema local
+// =============================================================
 import {
     auth,
     signInWithEmailAndPassword,
@@ -30,13 +34,15 @@ function fuzzyMatch(texto, termo) {
     return j === termo.length && termo.length >= 3;
 }
 
-// ==========================================
-// CATÁLOGO DINÂMICO — Firebase como fonte única
-// Produtos extras salvos no Firebase e
-// sincronizados para todos os dispositivos
-// ==========================================
+// =============================================================
+// 2. CATÁLOGO DINÂMICO DE PRODUTOS
+// Produtos extras cadastrados pelos operadores ficam no Firebase
+// e sincronizados para todos os dispositivos.
+// localStorage serve de cache offline.
+// Para adicionar produtos fixos: edite data.js → CONFIG_SISTEMA.produtos
+// =============================================================
 
-// Cache local dos produtos extras (recarregado do Firebase ao iniciar)
+// Cache local em memória (preenchido ao carregar do Firebase)
 let _produtosExtrasCache = null;
 
 async function carregarProdutosFirebase() {
@@ -97,9 +103,11 @@ async function addProdutoFirebase(produto) {
     }
 }
 
-// ==========================================
-// 1. ESTADO GLOBAL DO SISTEMA
-// ==========================================
+// =============================================================
+// 3. ESTADO GLOBAL DA APLICAÇÃO
+// Centraliza todas as variáveis de estado do app.
+// Altere aqui se precisar adicionar novos estados globais.
+// =============================================================
 const AppState = {
     operadorAtivo: '',
     produtoSelecionado: null,
@@ -115,6 +123,7 @@ const AppState = {
     resumoVisivel: true,
     rankingLojaFiltro: 'todas',
     filtroOperador: 'todos',
+    mesLancados: new Date().toISOString().slice(0, 7), // Mês ativo na aba Lançados (formato: 'YYYY-MM')
 };
 
 // Manter compatibilidade com window.*
@@ -129,9 +138,11 @@ window.selecaoLotes = [];
 window.selectedBatchId = null;
 window.selectedConsolidadoId = null;
 
-// ==========================================
-// 3. INDICADOR ONLINE/OFFLINE
-// ==========================================
+// =============================================================
+// 4. INDICADOR DE REDE (ONLINE / OFFLINE)
+// Badge flutuante no canto inferior direito.
+// Verde: aparece 2s e some. Vermelho: fica fixo até reconectar.
+// =============================================================
 function mostrarStatusRede() {
     const online = navigator.onLine;
     let badge = document.getElementById('badge-rede');
@@ -167,9 +178,12 @@ function mostrarStatusRede() {
 window.addEventListener('online',  mostrarStatusRede);
 window.addEventListener('offline', mostrarStatusRede);
 
-// ==========================================
-// 2. HELPERS GLOBAIS
-// ==========================================
+// =============================================================
+// 5. FUNÇÕES UTILITÁRIAS GLOBAIS
+// Helpers reutilizados em todo o sistema.
+// =============================================================
+
+/** Atalho para document.getElementById */
 function el(id) {
     return document.getElementById(id);
 }
@@ -283,9 +297,12 @@ function downloadHtmlAsPrintable(htmlContent, filename) {
     }, 200);
 }
 
-// ==========================================
-// 3. FUNÇÕES GLOBAIS DE INTERFACE & NAVEGAÇÃO
-// ==========================================
+// =============================================================
+// 6. NAVEGAÇÃO E TELA DE LOGIN
+// Fluxo: Tipo de acesso → Login → Loja → Operador → Lançamento
+// Admin: redireciona para dashboard.html após autenticação
+// Operacional: exibe seleção de loja e operador
+// =============================================================
 window.definirPerfil = (tipo) => {
     vibrar();
     showTransitionLoader();
@@ -445,9 +462,11 @@ window.confirmarSaida = (confirmou) => {
     el('modal-sair')?.classList.add('hidden');
 };
 
-// ==========================================
-// 4. SPLASH SCREEN (mais rápido: 2s)
-// ==========================================
+// =============================================================
+// SPLASH SCREEN
+// Exibe por 2 segundos ao abrir o app e faz fade out.
+// Para alterar o tempo: mude o valor 2000 (milissegundos).
+// =============================================================
 setTimeout(() => {
     const splash = el('splash-screen');
     if (!splash) return;
@@ -461,9 +480,11 @@ setTimeout(() => {
     }, 500);
 }, 2000);
 
-// ==========================================
-// 5. LÓGICA DE LOGIN
-// ==========================================
+// =============================================================
+// LÓGICA DE LOGIN
+// Autentica via Firebase Auth.
+// Admin → dashboard.html | Operacional → seleção de loja
+// =============================================================
 const btnLogin = el('btn-fazer-login');
 
 if (btnLogin) {
@@ -511,9 +532,11 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// ==========================================
-// 6. LÓGICA DA TELA DE LANÇAMENTO
-// ==========================================
+// =============================================================
+// 7. TELA DE LANÇAMENTO (operadores)
+// Executado apenas em lancamento.html (body#app-page).
+// Fluxo: buscar produto → peso → adicionar → finalizar → Firebase
+// =============================================================
 if (document.body.id === 'app-page') {
     const lojaAtiva = localStorage.getItem('loja_ativa');
     const operadorAtivo = localStorage.getItem('operador_ativo');
@@ -1226,18 +1249,60 @@ if (document.body.id === 'app-page') {
     }
 }
 
-// ==========================================
-// 7. LÓGICA DA TELA DE GESTÃO
-// ==========================================
+// =============================================================
+// 8. TELA DE GESTÃO — DASHBOARD (admin)
+// Executado apenas em dashboard.html (body#admin-page).
+// Funcionalidades:
+//   - Autenticação obrigatória
+//   - Logout automático por inatividade (30 min)
+//   - Métricas, rankings, gráfico de tendência
+//   - Filtro por data, loja e mês/ano
+//   - Aba Lançados com tabs por mês
+//   - Exportação Excel e PDF
+// =============================================================
 if (document.body.id === 'admin-page') {
     document.body.style.opacity = '1';
 
-    // === 1. Validação de sessão + reconexão ===
+    // ---------------------------------------------------------
+    // SEGURANÇA: Logout automático por inatividade
+    // Timer reinicia a cada interação do usuário.
+    // Tempo: 30 min = 30 * 60 * 1000 ms
+    // Para alterar: mude TIMEOUT_INATIVIDADE_MS
+    // ---------------------------------------------------------
+    const TIMEOUT_INATIVIDADE_MS = 30 * 60 * 1000;
+    let timerInatividade;
+
+    function reiniciarTimerInatividade() {
+        clearTimeout(timerInatividade);
+        timerInatividade = setTimeout(() => {
+            signOut(auth).then(() => {
+                showGlobalModal({
+                    titulo: '⏱️ Sessão encerrada por inatividade',
+                    mensagem: 'Você ficou inativo por 30 minutos. Por segurança, faça login novamente.',
+                    confirmarTexto: 'IR PARA LOGIN',
+                    onConfirm: () => window.location.replace('index.html')
+                });
+            });
+        }, TIMEOUT_INATIVIDADE_MS);
+    }
+
+    // Reinicia o timer a cada interação do usuário
+    ['click', 'keydown', 'touchstart', 'scroll', 'mousemove'].forEach(evento =>
+        document.addEventListener(evento, reiniciarTimerInatividade, { passive: true })
+    );
+    reiniciarTimerInatividade();
+
+    // ---------------------------------------------------------
+    // AUTENTICAÇÃO DO ADMIN
+    // Apenas o e-mail configurado em data.js → adminEmail tem acesso.
+    // Qualquer outro usuário é redirecionado para o login.
+    // ---------------------------------------------------------
     onAuthStateChanged(auth, (user) => {
         if (user && user.email === CONFIG_SISTEMA.adminEmail) {
+            // Admin autenticado: carrega os dados
             carregarDadosFirestore();
         } else if (user === null) {
-            // Sessão expirada
+            // Sessão expirada ou não autenticado
             showGlobalModal({
                 titulo: '⏱️ Sessão expirada',
                 mensagem: 'Sua sessão foi encerrada. Faça login novamente.',
@@ -1271,7 +1336,35 @@ if (document.body.id === 'admin-page') {
         }
     };
 
-    // === Filtros rápidos ===
+    // ---------------------------------------------------------
+    // SELETOR DE MÊS/ANO PARA RELATÓRIOS HISTÓRICOS
+    // Preenche as datas de início e fim automaticamente
+    // com base no mês selecionado no input type="month".
+    // ---------------------------------------------------------
+    window.filtrarPorMesAno = () => {
+        const seletor = el('seletor-mes-relatorio');
+        if (!seletor || !seletor.value) return;
+
+        const [ano, mes] = seletor.value.split('-');
+        const inicio = el('filtroDataInicio');
+        const fim = el('filtroDataFim');
+        if (!inicio || !fim) return;
+
+        // Calcula o último dia do mês (funciona para fevereiro e meses variáveis)
+        const ultimoDia = new Date(parseInt(ano), parseInt(mes), 0).getDate();
+        inicio.value = `${ano}-${mes}-01`;
+        fim.value = `${ano}-${mes}-${String(ultimoDia).padStart(2, '0')}`;
+
+        AppState.filtroRapidoAtivo = null;
+        document.querySelectorAll('.btn-filtro-rapido').forEach(b => b.classList.remove('active'));
+        vibrar();
+        renderDashboard();
+    };
+
+    // ---------------------------------------------------------
+    // FILTROS RÁPIDOS: hoje / 7 dias / 30 dias / limpar
+    // Preenchem as datas de início e fim automaticamente.
+    // ---------------------------------------------------------
     window.filtroRapido = (periodo) => {
         vibrar();
         const inicio = el('filtroDataInicio');
@@ -1389,6 +1482,15 @@ if (document.body.id === 'admin-page') {
         `;
     }
 
+    // ---------------------------------------------------------
+    // CONTROLE DE ABAS: PENDENTES / SOMADOS / LANÇADOS
+    // ---------------------------------------------------------
+
+    /**
+     * Troca a aba ativa do dashboard.
+     * Reseta modo de seleção e itens selecionados.
+     * @param {string} aba - 'pendentes' | 'consolidados' | 'lancados'
+     */
     window.mudarAba = (aba) => {
         window.abaAtual = aba;
         window.modoSelecao = false;
@@ -1403,6 +1505,62 @@ if (document.body.id === 'admin-page') {
 
         renderDashboard();
     };
+
+    /**
+     * Define o mês a exibir na aba Lançados.
+     * @param {string} mes - Formato 'YYYY-MM' (ex: '2026-06')
+     */
+    window.setMesLancados = (mes) => {
+        vibrar();
+        AppState.mesLancados = mes;
+        renderDashboard();
+    };
+
+    /**
+     * Renderiza as tabs de mês na aba Lançados.
+     * Exibe pills horizontais com scroll para cada mês disponível.
+     * Por padrão, abre no mês atual.
+     *
+     * @param {HTMLElement} container - Elemento onde renderizar
+     */
+    function renderTabsMeses(container) {
+        const completed = window.todosOsLotes.filter(b => b.status_lancado);
+        const mesesSet = new Set();
+
+        completed.forEach(lote => {
+            if (!lote.data || typeof lote.data.toDate !== 'function') return;
+            const mes = lote.data.toDate().toISOString().slice(0, 7);
+            mesesSet.add(mes);
+        });
+
+        // Ordena do mais recente ao mais antigo
+        const meses = [...mesesSet].sort((a, b) => b.localeCompare(a));
+
+        if (meses.length === 0) { container.innerHTML = ''; return; }
+
+        // Garante que o mês selecionado ainda existe nos dados
+        if (!meses.includes(AppState.mesLancados)) {
+            AppState.mesLancados = meses[0];
+        }
+
+        // Converte 'YYYY-MM' para 'Jan 2026', 'Fev 2026', etc.
+        const nomeMes = (ym) => {
+            const [y, m] = ym.split('-');
+            const nomes = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+            return `${nomes[parseInt(m)-1]} ${y}`;
+        };
+
+        container.innerHTML = `
+            <div class="tabs-meses-scroll">
+                ${meses.map(m => `
+                    <button class="tab-mes-btn tap-feedback ${AppState.mesLancados === m ? 'active' : ''}"
+                        onclick="window.setMesLancados('${m}')">
+                        ${nomeMes(m)}
+                    </button>
+                `).join('')}
+            </div>
+        `;
+    }
 
     function getLotesDaAbaAtual() {
         const pending = window.todosOsLotes.filter(b => !b.status_lancado && !b.consolidado);
@@ -1788,14 +1946,32 @@ if (document.body.id === 'admin-page') {
         container.innerHTML = '';
 
         if (window.abaAtual === 'consolidados') {
+            // Aba Somados
             renderConsolidados(container);
-        } else {
-            // Aplica filtro de data E de loja na lista de lotes
-            let list = aplicarFiltroData(getLotesDaAbaAtual());
-            if (lojaFiltro !== 'todas') {
-                list = list.filter(b => b.loja === lojaFiltro);
+
+        } else if (window.abaAtual === 'lancados') {
+            // Aba Lançados: tabs de mês + lista filtrada pelo mês selecionado
+            const tabsMesesContainer = el('tabs-meses-container');
+            if (tabsMesesContainer) renderTabsMeses(tabsMesesContainer);
+
+            let list = getLotesDaAbaAtual();
+            if (lojaFiltro !== 'todas') list = list.filter(b => b.loja === lojaFiltro);
+
+            // Filtra pelo mês selecionado nas tabs
+            const mesSel = AppState.mesLancados;
+            if (mesSel) {
+                list = list.filter(lote => {
+                    if (!lote.data || typeof lote.data.toDate !== 'function') return false;
+                    return lote.data.toDate().toISOString().slice(0, 7) === mesSel;
+                });
             }
 
+            renderBatchList(list, container);
+
+        } else {
+            // Aba Pendentes: filtro de data + loja
+            let list = aplicarFiltroData(getLotesDaAbaAtual());
+            if (lojaFiltro !== 'todas') list = list.filter(b => b.loja === lojaFiltro);
             renderBatchList(list, container);
         }
     }
@@ -2421,10 +2597,12 @@ if (document.body.id === 'admin-page') {
     window.renderizarListaAdmin = renderDashboard;
 }
 
-// ==========================================
-// SERVICE WORKER (PWA) — Refresh inteligente
-// Funciona no desktop E no celular em background
-// ==========================================
+// =============================================================
+// 9. SERVICE WORKER (PWA)
+// Registra o SW para cache offline e recebe notificações
+// de atualização no desktop e no celular.
+// Para forçar atualização: mude o CACHE_NAME em sw.js
+// =============================================================
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')

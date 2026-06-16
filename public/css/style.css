@@ -4436,3 +4436,178 @@ body, p, span, label, button, input, select, textarea,
     background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
     box-shadow: 0 8px 24px rgba(59,130,246,0.35) !important;
 }
+
+/* =============================================================
+   LA ROSE v2.0 — NOVAS FUNCIONALIDADES
+   Seletor mês/ano + Tabs de mês + Redesign admin minimalista
+   ============================================================= */
+
+/* --- SELETOR DE MÊS/ANO --- */
+.filtro-mes-linha {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(226,232,240,0.6);
+}
+
+.filtro-mes-linha .input-premium[type="month"] {
+    flex: 1;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    color: #0f172a;
+    cursor: pointer;
+}
+
+.filtro-mes-linha .input-premium[type="month"]:focus {
+    border-color: #10b981;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(16,185,129,0.1);
+}
+
+/* --- TABS DE MÊS NA ABA LANÇADOS --- */
+#tabs-meses-container {
+    width: 92%;
+    margin: 0 auto 12px;
+}
+
+.tabs-meses-scroll {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.tabs-meses-scroll::-webkit-scrollbar { display: none; }
+
+.tab-mes-btn {
+    flex-shrink: 0;
+    padding: 8px 16px;
+    border-radius: 100px;
+    border: 1.5px solid #e2e8f0;
+    background: #ffffff;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    white-space: nowrap;
+    touch-action: manipulation;
+}
+
+.tab-mes-btn:hover {
+    border-color: #10b981;
+    background: #f0fdf4;
+    color: #059669;
+}
+
+.tab-mes-btn.active {
+    background: linear-gradient(135deg, #10b981, #059669);
+    border-color: transparent;
+    color: #ffffff;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(16,185,129,0.3);
+}
+
+/* --- REDESIGN ADMIN MINIMALISTA --- */
+
+/* Card resumo em dark */
+#admin-page .resumo-admin-card {
+    background: #0f172a !important;
+    border: none !important;
+    box-shadow: 0 4px 24px rgba(15,23,42,0.15) !important;
+    border-radius: 20px !important;
+}
+
+#admin-page .resumo-admin-label {
+    color: rgba(255,255,255,0.5) !important;
+    font-size: 10px !important;
+    letter-spacing: 1.5px !important;
+    text-transform: uppercase !important;
+}
+
+#admin-page .resumo-admin-total {
+    font-size: 48px !important;
+    color: #ffffff !important;
+    letter-spacing: -2px !important;
+}
+
+#admin-page .resumo-admin-acoes .btn-entrar {
+    background: rgba(255,255,255,0.1) !important;
+    border: 1px solid rgba(255,255,255,0.15) !important;
+    color: rgba(255,255,255,0.9) !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+}
+
+#admin-page .resumo-admin-acoes .btn-rosa {
+    background: rgba(225,29,72,0.8) !important;
+}
+
+/* Tabs principais — underline ao invés de filled */
+#admin-page .tabs-container {
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    border-radius: 0 !important;
+    padding: 0 16px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+#admin-page .tab-btn {
+    flex: 1 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: #94a3b8 !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    padding: 14px 8px !important;
+    border-bottom: 2px solid transparent !important;
+    box-shadow: none !important;
+    transition: all 0.2s ease !important;
+}
+
+#admin-page .tab-btn.active {
+    background: transparent !important;
+    color: #10b981 !important;
+    border-bottom: 2px solid #10b981 !important;
+    box-shadow: none !important;
+    font-weight: 800 !important;
+}
+
+/* Cards mais limpos */
+#admin-page .card-lote-expandable {
+    border-radius: 14px !important;
+    border: 1px solid #f1f5f9 !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
+    margin-bottom: 8px !important;
+}
+
+/* Métricas mais compactas */
+#admin-page .metrica-card {
+    border: 1px solid #f1f5f9 !important;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04) !important;
+}
+
+/* Rankings mais limpos */
+#admin-page .ranking-card {
+    border: 1px solid #f1f5f9 !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
+    border-radius: 16px !important;
+}
+
+/* Gráfico mais clean */
+#admin-page .grafico-tendencia-card {
+    border: 1px solid #f1f5f9 !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
+    border-radius: 16px !important;
+}

@@ -16,9 +16,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
 
-    <link rel="preload" href="css/style.css?v=1.7" as="style">
-    <link rel="preload" href="js/app.js?v=1.7" as="script">
-    <link rel="stylesheet" href="css/style.css?v=1.7">
+    <link rel="preload" href="css/style.css?v=2.0" as="style">
+    <link rel="preload" href="js/app.js?v=2.0" as="script">
+    <link rel="stylesheet" href="css/style.css?v=2.0">
 
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
@@ -112,12 +112,21 @@
 
             <!-- FILTRO DATA -->
             <div class="filtro-data-box">
+                <!-- Filtro por intervalo de datas -->
                 <div class="filtro-data-linha">
                     <input type="date" id="filtroDataInicio" class="input-premium" title="Data início">
                     <span class="filtro-data-separador">até</span>
                     <input type="date" id="filtroDataFim" class="input-premium" title="Data fim">
                     <button onclick="window.filtrarPorData()" class="btn-entrar btn-filtrar-data tap-feedback">
                         FILTRAR
+                    </button>
+                </div>
+                <!-- Seletor de mês/ano para relatórios históricos -->
+                <div class="filtro-mes-linha">
+                    <span class="filtro-data-separador" style="flex-shrink:0;">📅 Mês</span>
+                    <input type="month" id="seletor-mes-relatorio" class="input-premium" title="Selecionar mês">
+                    <button onclick="window.filtrarPorMesAno()" class="btn-entrar btn-filtrar-data tap-feedback">
+                        VER MÊS
                     </button>
                 </div>
             </div>
@@ -231,10 +240,13 @@
                 <button id="tab-lancados" class="tab-btn tap-feedback" onclick="window.mudarAba('lancados')">✅ LANÇADOS</button>
             </div>
 
-            <!-- FILTRO OPERADOR -->
+            <!-- RANKING DE OPERADORES (preenchido via JS) -->
             <div id="filtro-operador-container" class="filtro-operador-box"></div>
 
-            <!-- SELEÇÃO -->
+            <!-- TABS DE MÊS (visíveis apenas na aba Lançados) -->
+            <div id="tabs-meses-container"></div>
+
+            <!-- BARRA DE SELEÇÃO DE LOTES (preenchida via JS) -->
             <div id="selection-bar" class="selection-bar-admin"></div>
 
             <!-- LISTA -->
@@ -256,7 +268,7 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="js/modal.js?v=1.7"></script>
-    <script type="module" src="js/app.js?v=1.7"></script>
+    <script src="js/modal.js?v=2.0"></script>
+    <script type="module" src="js/app.js?v=2.0"></script>
 </body>
 </html>
