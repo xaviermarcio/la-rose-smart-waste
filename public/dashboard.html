@@ -4,271 +4,335 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Gestão La Rose - Smart Waste</title>
-
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="La Rose Gestão">
     <meta name="theme-color" content="#10b981">
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-
-    <link rel="preload" href="css/style.css?v=2.0" as="style">
-    <link rel="preload" href="js/app.js?v=2.0" as="script">
-    <link rel="stylesheet" href="css/style.css?v=2.0">
-
+    <link rel="stylesheet" href="css/style.css?v=3.0">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
 </head>
-
 <body id="admin-page" class="page-fade">
 
-    <!-- Modal Detalhes -->
-    <div id="modal-detalhes" class="modal-overlay hidden">
-        <div class="modal-estruturado pop-in">
-            <div class="modal-cabecalho">
-                <div>
-                    <h3 class="titulo-modal-lote">Resumo do Lote</h3>
-                    <p id="detalhe-data-op"></p>
-                </div>
-                <div id="detalhe-loja" class="badge-loja">LOJA</div>
-            </div>
-            <div class="modal-corpo">
-                <table class="tabela-detalhes">
-                    <thead>
-                        <tr>
-                            <th>Produto</th>
-                            <th class="text-right">Qtd/Peso</th>
-                        </tr>
-                    </thead>
-                    <tbody id="lista-itens-detalhe"></tbody>
-                </table>
-            </div>
-            <div class="modal-rodape">
-                <button onclick="window.fecharModalDetalhes()" class="btn-outline tap-feedback">FECHAR</button>
-                <button id="btn-acao-lancamento" class="btn-entrar tap-feedback">✅ DAR BAIXA</button>
-            </div>
+<!-- ═══ MODAIS ═══ -->
+<div id="modal-detalhes" class="modal-overlay hidden">
+    <div class="modal-estruturado pop-in">
+        <div class="modal-cabecalho">
+            <div><h3 class="titulo-modal-lote">Resumo do Lote</h3><p id="detalhe-data-op"></p></div>
+            <div id="detalhe-loja" class="badge-loja">LOJA</div>
+        </div>
+        <div class="modal-corpo">
+            <table class="tabela-detalhes">
+                <thead><tr><th>Produto</th><th class="text-right">Qtd/Peso</th></tr></thead>
+                <tbody id="lista-itens-detalhe"></tbody>
+            </table>
+        </div>
+        <div class="modal-rodape">
+            <button onclick="window.fecharModalDetalhes()" class="btn-outline tap-feedback">FECHAR</button>
+            <button id="btn-acao-lancamento" class="btn-entrar tap-feedback">✅ DAR BAIXA</button>
         </div>
     </div>
+</div>
 
-    <!-- Modal Somar -->
-    <div id="modal-somar" class="modal-overlay hidden">
-        <div class="modal-centered pop-in">
-            <div class="modal-icon modal-success">📊</div>
-            <h3>Somar Lotes?</h3>
-            <p class="modal-msg" id="msg-somar"></p>
-            <div class="modal-actions">
-                <button id="btn-confirmar-somar" class="btn-entrar tap-feedback">SOMAR LOTES</button>
-                <button onclick="document.getElementById('modal-somar').classList.add('hidden')" class="cancel-link">Cancelar</button>
-            </div>
+<div id="modal-somar" class="modal-overlay hidden">
+    <div class="modal-centered pop-in">
+        <div class="modal-icon modal-success">📊</div>
+        <h3>Somar Lotes?</h3>
+        <p class="modal-msg" id="msg-somar"></p>
+        <div class="modal-actions">
+            <button id="btn-confirmar-somar" class="btn-entrar tap-feedback">SOMAR LOTES</button>
+            <button onclick="document.getElementById('modal-somar').classList.add('hidden')" class="cancel-link">Cancelar</button>
         </div>
     </div>
+</div>
 
-    <!-- Modal Sair -->
-    <div id="modal-sair-admin" class="modal-overlay hidden">
-        <div class="modal-centered pop-in">
-            <div class="modal-icon">⚠️</div>
-            <h3>Deseja sair?</h3>
-            <p class="modal-msg">Você será desconectado do painel administrativo.</p>
-            <div class="modal-actions">
-                <button id="btn-confirmar-sair-admin" class="btn-entrar btn-rosa tap-feedback">SIM, QUERO SAIR</button>
-                <button onclick="document.getElementById('modal-sair-admin').classList.add('hidden')" class="cancel-link">CANCELAR</button>
-            </div>
+<div id="modal-sair-admin" class="modal-overlay hidden">
+    <div class="modal-centered pop-in">
+        <div class="modal-icon">⚠️</div>
+        <h3>Deseja sair?</h3>
+        <p class="modal-msg">Você será desconectado do painel administrativo.</p>
+        <div class="modal-actions">
+            <button id="btn-confirmar-sair-admin" class="btn-entrar btn-rosa tap-feedback">SIM, QUERO SAIR</button>
+            <button onclick="document.getElementById('modal-sair-admin').classList.add('hidden')" class="cancel-link">CANCELAR</button>
         </div>
     </div>
+</div>
 
-    <div class="app-container">
-        <header class="header-app">
+<div id="modal-global" class="modal-overlay hidden">
+    <div class="modal-centered pop-in">
+        <div class="modal-icon">⚠️</div>
+        <h3 id="modalTitulo">Título</h3>
+        <p class="modal-msg" id="modalMensagem"></p>
+        <div class="modal-actions">
+            <button id="modalConfirmar" class="btn-entrar tap-feedback">OK</button>
+            <button id="modalCancelar" class="cancel-link">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ LAYOUT: 3 COLUNAS ═══ -->
+<div class="adm-layout">
+
+    <!-- ── SIDEBAR ESQUERDA: Navegação ── -->
+    <aside class="adm-sidebar-left">
+
+        <!-- Brand -->
+        <div class="adm-brand">
+            <img src="assets/images/logo.png" alt="La Rose" class="adm-logo">
             <div>
-                <div class="badge-loja">👤 PAINEL ADMIN</div>
-                <h1 class="nome-operador">Painel La Rose</h1>
+                <div class="adm-brand-name">La Rose</div>
+                <div class="adm-brand-sub">Smart Waste</div>
             </div>
-            <div class="header-actions">
+        </div>
+
+        <!-- Navegação -->
+        <nav class="adm-nav">
+            <button class="adm-nav-btn active tap-feedback" data-secao="visao-geral" onclick="window.mudarSecao('visao-geral')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+                    <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+                </svg>
+                Visão Geral
+            </button>
+
+            <button class="adm-nav-btn tap-feedback" data-secao="lotes" onclick="window.mudarSecao('lotes')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                    <polyline points="14,2 14,8 20,8"/>
+                </svg>
+                Lotes
+                <span id="sidebar-badge-pendentes" class="adm-nav-badge hidden">0</span>
+            </button>
+
+            <button class="adm-nav-btn tap-feedback" data-secao="rankings" onclick="window.mudarSecao('rankings')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                    <polyline points="17 6 23 6 23 12"/>
+                </svg>
+                Rankings
+            </button>
+        </nav>
+
+        <!-- Separador -->
+        <div class="adm-nav-sep"></div>
+
+        <!-- Filtro por loja (compacto) -->
+        <div class="adm-nav-label">Loja</div>
+        <div class="adm-loja-btns">
+            <button class="adm-loja-btn active tap-feedback" data-loja="todas" onclick="window.setRankingLoja('todas')">Todas</button>
+            <button class="adm-loja-btn tap-feedback adm-loja-verde" data-loja="entre_lagos" onclick="window.setRankingLoja('entre_lagos')">
+                <span class="adm-dot verde"></span>Entre Lagos
+            </button>
+            <button class="adm-loja-btn tap-feedback adm-loja-azul" data-loja="itapoa_parque" onclick="window.setRankingLoja('itapoa_parque')">
+                <span class="adm-dot azul"></span>Itapoã Parque
+            </button>
+        </div>
+
+        <!-- Sair -->
+        <div class="adm-sidebar-footer">
+            <button id="btn-logout" class="adm-logout-btn tap-feedback">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
+                    <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+                Sair
+            </button>
+        </div>
+    </aside>
+
+    <!-- ── ÁREA CENTRAL: Conteúdo ── -->
+    <main class="adm-main" id="admin-main">
+
+        <!-- Cabeçalho interno -->
+        <div class="adm-main-header">
+            <div>
+                <h1 id="adm-titulo" class="adm-main-titulo">Visão Geral</h1>
+                <span id="adm-sub" class="adm-main-sub">Resumo das quebras</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+                <div id="admin-loja-label" class="adm-loja-badge-header">Todas as lojas</div>
                 <button onclick="window.location.reload()" class="btn-icon tap-feedback" title="Recarregar">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/>
                     </svg>
                 </button>
-                <button id="btn-logout" class="btn-outline btn-sair-header tap-feedback">SAIR</button>
-            </div>
-        </header>
-
-        <main class="fade-in-up admin-main" id="admin-main">
-
-            <!-- RESUMO -->
-            <div class="glass-card overlay resumo-admin-card">
-                <div class="resumo-admin-info">
-                    <small id="titulo-resumo" class="resumo-admin-label">Pendentes</small>
-                    <h2 id="resumo-total" class="resumo-admin-total">0</h2>
-                </div>
-                <div class="resumo-admin-acoes">
-                    <button id="btn-excel" class="btn-entrar tap-feedback">📊 EXCEL</button>
-                    <button onclick="window.gerarRelatorioPDF()" class="btn-entrar btn-rosa tap-feedback">📄 PDF</button>
-                </div>
-            </div>
-
-            <!-- FILTRO DATA -->
-            <div class="filtro-data-box">
-                <!-- Filtro por intervalo de datas -->
-                <div class="filtro-data-linha">
-                    <input type="date" id="filtroDataInicio" class="input-premium" title="Data início">
-                    <span class="filtro-data-separador">até</span>
-                    <input type="date" id="filtroDataFim" class="input-premium" title="Data fim">
-                    <button onclick="window.filtrarPorData()" class="btn-entrar btn-filtrar-data tap-feedback">
-                        FILTRAR
-                    </button>
-                </div>
-                <!-- Seletor de mês/ano para relatórios históricos -->
-                <div class="filtro-mes-linha">
-                    <span class="filtro-data-separador" style="flex-shrink:0;">📅 Mês</span>
-                    <input type="month" id="seletor-mes-relatorio" class="input-premium" title="Selecionar mês">
-                    <button onclick="window.filtrarPorMesAno()" class="btn-entrar btn-filtrar-data tap-feedback">
-                        VER MÊS
-                    </button>
-                </div>
-            </div>
-
-            <!-- TOGGLE RESUMO -->
-            <button id="btn-toggle-resumo" class="btn-toggle-resumo tap-feedback" onclick="window.toggleResumo()">
-                👁️ Ocultar Resumo
-            </button>
-
-            <!-- SEÇÃO RESUMO -->
-            <div id="secao-resumo">
-                <!-- MÉTRICAS -->
-                <div id="metricas-container" class="metricas-container">
-                    <div class="metrica-card">
-                        <div class="metrica-icone">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--verde-vibrante)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
-                            </svg>
-                        </div>
-                        <div id="metrica-kg" class="metrica-valor">0</div>
-                        <div class="metrica-label">Total KG</div>
-                    </div>
-                    <div class="metrica-card">
-                        <div class="metrica-icone">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--azul-consolidar)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/>
-                            </svg>
-                        </div>
-                        <div id="metrica-un" class="metrica-valor">0</div>
-                        <div class="metrica-label">Total UN</div>
-                    </div>
-                    <div class="metrica-card">
-                        <div class="metrica-icone">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--rosa-la-rose)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
-                            </svg>
-                        </div>
-                        <div id="metrica-itens" class="metrica-valor">0</div>
-                        <div class="metrica-label">Total Itens</div>
-                    </div>
-                    <div class="metrica-card">
-                        <div class="metrica-icone">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/>
-                            </svg>
-                        </div>
-                        <div id="metrica-lotes" class="metrica-valor">0</div>
-                        <div class="metrica-label">Total Lotes</div>
-                    </div>
-                </div>
-
-                <!-- FILTROS RÁPIDOS -->
-                <div id="filtros-rapidos" class="filtros-rapidos">
-                    <button class="btn-filtro-rapido tap-feedback" onclick="window.filtroRapido('hoje')">Hoje</button>
-                    <button class="btn-filtro-rapido tap-feedback" onclick="window.filtroRapido('7dias')">7 dias</button>
-                    <button class="btn-filtro-rapido tap-feedback" onclick="window.filtroRapido('30dias')">30 dias</button>
-                    <button class="btn-filtro-rapido btn-limpar tap-feedback" onclick="window.filtroRapido('limpar')">✕ Limpar</button>
-                </div>
-
-                <!-- GRÁFICO DE TENDÊNCIA SEMANAL -->
-                <div class="grafico-tendencia-card">
-                    <div id="grafico-tendencia">
-                        <div class="grafico-header">
-                            <span class="grafico-titulo">📈 Tendência de Perdas KG</span>
-                            <span class="grafico-sub">Últimas 7 semanas</span>
-                        </div>
-                        <div class="grafico-barras">
-                            <div class="grafico-coluna"><div class="grafico-barra-wrap"><div class="grafico-barra skeleton-line" style="height:30%"></div></div></div>
-                            <div class="grafico-coluna"><div class="grafico-barra-wrap"><div class="grafico-barra skeleton-line" style="height:50%"></div></div></div>
-                            <div class="grafico-coluna"><div class="grafico-barra-wrap"><div class="grafico-barra skeleton-line" style="height:40%"></div></div></div>
-                            <div class="grafico-coluna"><div class="grafico-barra-wrap"><div class="grafico-barra skeleton-line" style="height:70%"></div></div></div>
-                            <div class="grafico-coluna"><div class="grafico-barra-wrap"><div class="grafico-barra skeleton-line" style="height:60%"></div></div></div>
-                            <div class="grafico-coluna"><div class="grafico-barra-wrap"><div class="grafico-barra skeleton-line" style="height:45%"></div></div></div>
-                            <div class="grafico-coluna"><div class="grafico-barra-wrap"><div class="grafico-barra grafico-barra-atual skeleton-line" style="height:55%"></div></div></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- RANKINGS -->
-                <div id="ranking-container" class="ranking-container">
-                    <div class="ranking-store-tabs">
-                        <button class="ranking-store-tab active tap-feedback" onclick="window.setRankingLoja('todas')">📊 Todas</button>
-                        <button class="ranking-store-tab tap-feedback" onclick="window.setRankingLoja('entre_lagos')">🏬 Entre Lagos</button>
-                        <button class="ranking-store-tab tap-feedback" onclick="window.setRankingLoja('itapoa_parque')">🏬 Itapoã Parque</button>
-                    </div>
-
-                    <div id="ranking-loja-label" class="ranking-loja-label">Todas as lojas</div>
-
-                    <div class="ranking-card">
-                        <div class="ranking-header">
-                            <span class="ranking-titulo">🏆 Top Perdas KG</span>
-                            <button class="btn-pdf-ranking tap-feedback" onclick="window.gerarPdfRanking('KG')">📄 PDF</button>
-                        </div>
-                        <div id="ranking-kg"></div>
-                    </div>
-
-                    <div class="ranking-card">
-                        <div class="ranking-header">
-                            <span class="ranking-titulo">🏆 Top Perdas UN</span>
-                            <button class="btn-pdf-ranking tap-feedback" onclick="window.gerarPdfRanking('UN')">📄 PDF</button>
-                        </div>
-                        <div id="ranking-un"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TABS -->
-            <div class="tabs-container">
-                <button id="tab-pendentes" class="tab-btn active tap-feedback" onclick="window.mudarAba('pendentes')">⏳ PENDENTES</button>
-                <button id="tab-consolidados" class="tab-btn tap-feedback" onclick="window.mudarAba('consolidados')">📊 SOMADOS</button>
-                <button id="tab-lancados" class="tab-btn tap-feedback" onclick="window.mudarAba('lancados')">✅ LANÇADOS</button>
-            </div>
-
-            <!-- RANKING DE OPERADORES (preenchido via JS) -->
-            <div id="filtro-operador-container" class="filtro-operador-box"></div>
-
-            <!-- TABS DE MÊS (visíveis apenas na aba Lançados) -->
-            <div id="tabs-meses-container"></div>
-
-            <!-- BARRA DE SELEÇÃO DE LOTES (preenchida via JS) -->
-            <div id="selection-bar" class="selection-bar-admin"></div>
-
-            <!-- LISTA -->
-            <div id="lista-admin" class="lista-admin-box"></div>
-        </main>
-    </div>
-
-    <!-- MODAL GLOBAL -->
-    <div id="modal-global" class="modal-overlay hidden">
-        <div class="modal-centered pop-in">
-            <div class="modal-icon">⚠️</div>
-            <h3 id="modalTitulo">Título</h3>
-            <p class="modal-msg" id="modalMensagem"></p>
-            <div class="modal-actions">
-                <button id="modalConfirmar" class="btn-entrar tap-feedback">OK</button>
-                <button id="modalCancelar" class="cancel-link">Cancelar</button>
             </div>
         </div>
-    </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="js/modal.js?v=2.0"></script>
-    <script type="module" src="js/app.js?v=2.0"></script>
+        <!-- ── SEÇÃO: VISÃO GERAL ── -->
+        <section id="secao-visao-geral" class="adm-secao">
+
+            <!-- Métricas -->
+            <div class="adm-metricas">
+                <div class="adm-metrica-card">
+                    <div class="adm-metrica-icon verde">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+                        </svg>
+                    </div>
+                    <div id="metrica-kg" class="adm-metrica-val">0</div>
+                    <div class="adm-metrica-label">Total KG</div>
+                </div>
+                <div class="adm-metrica-card">
+                    <div class="adm-metrica-icon azul">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/>
+                        </svg>
+                    </div>
+                    <div id="metrica-un" class="adm-metrica-val">0</div>
+                    <div class="adm-metrica-label">Total UN</div>
+                </div>
+                <div class="adm-metrica-card">
+                    <div class="adm-metrica-icon rosa">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e11d48" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
+                        </svg>
+                    </div>
+                    <div id="metrica-itens" class="adm-metrica-val">0</div>
+                    <div class="adm-metrica-label">Total Itens</div>
+                </div>
+                <div class="adm-metrica-card adm-metrica-amber">
+                    <div class="adm-metrica-icon amber">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                    </div>
+                    <div id="metrica-lotes" class="adm-metrica-val">0</div>
+                    <div class="adm-metrica-label">Pendentes</div>
+                </div>
+            </div>
+
+            <!-- Tabela comparativa mensal -->
+            <div class="adm-card">
+                <div class="adm-card-header">
+                    <span class="adm-card-titulo">📅 Comparativo Mensal</span>
+                    <span class="adm-card-sub">Últimos 6 meses</span>
+                </div>
+                <div id="tabela-comparativa"></div>
+            </div>
+
+            <!-- Ranking de operadores -->
+            <div id="filtro-operador-container"></div>
+
+        </section>
+
+        <!-- ── SEÇÃO: LOTES ── -->
+        <section id="secao-lotes" class="adm-secao hidden">
+
+            <!-- Sub-tabs -->
+            <div class="adm-lotes-tabs">
+                <button id="tab-pendentes" class="adm-lote-tab active tap-feedback" onclick="window.mudarAba('pendentes')">
+                    ⏳ Pendentes <span id="badge-pendentes" class="adm-lote-badge">0</span>
+                </button>
+                <button id="tab-consolidados" class="adm-lote-tab tap-feedback" onclick="window.mudarAba('consolidados')">📊 Somados</button>
+                <button id="tab-lancados" class="adm-lote-tab tap-feedback" onclick="window.mudarAba('lancados')">✅ Lançados</button>
+            </div>
+
+            <!-- Tabs de mês (só na aba Lançados) -->
+            <div id="tabs-meses-container"></div>
+
+            <!-- Barra de seleção -->
+            <div id="selection-bar" class="selection-bar-admin"></div>
+
+            <!-- Lista -->
+            <div id="lista-admin" class="lista-admin-box"></div>
+
+        </section>
+
+        <!-- ── SEÇÃO: RANKINGS ── -->
+        <section id="secao-rankings" class="adm-secao hidden">
+
+            <div class="adm-ranking-store-tabs">
+                <button class="ranking-store-tab active tap-feedback" onclick="window.setRankingLoja('todas')">📊 Todas</button>
+                <button class="ranking-store-tab tap-feedback" onclick="window.setRankingLoja('entre_lagos')">🏬 Entre Lagos</button>
+                <button class="ranking-store-tab tap-feedback" onclick="window.setRankingLoja('itapoa_parque')">🏬 Itapoã Parque</button>
+            </div>
+            <div id="ranking-loja-label" class="ranking-loja-label">Todas as lojas</div>
+
+            <!-- Grid 2 colunas: ocupa toda a largura central -->
+            <div class="adm-rankings-grid">
+                <div class="ranking-card">
+                    <div class="ranking-header">
+                        <span class="ranking-titulo">🏆 Top Perdas KG</span>
+                        <button class="btn-pdf-ranking tap-feedback" onclick="window.gerarPdfRanking('KG')">📄 PDF</button>
+                    </div>
+                    <div id="ranking-kg"></div>
+                </div>
+                <div class="ranking-card">
+                    <div class="ranking-header">
+                        <span class="ranking-titulo">🏆 Top Perdas UN</span>
+                        <button class="btn-pdf-ranking tap-feedback" onclick="window.gerarPdfRanking('UN')">📄 PDF</button>
+                    </div>
+                    <div id="ranking-un"></div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- ── SIDEBAR DIREITA: Filtros + Ações ── -->
+    <aside class="adm-sidebar-right">
+
+        <!-- Filtros rápidos -->
+        <div class="adm-right-section">
+            <div class="adm-right-label">Período rápido</div>
+            <div class="adm-filtros-rapidos">
+                <button class="adm-filtro-btn tap-feedback" onclick="window.filtroRapido('hoje')">Hoje</button>
+                <button class="adm-filtro-btn tap-feedback" onclick="window.filtroRapido('7dias')">7 dias</button>
+                <button class="adm-filtro-btn tap-feedback" onclick="window.filtroRapido('30dias')">30 dias</button>
+                <button class="adm-filtro-btn adm-filtro-limpar tap-feedback" onclick="window.filtroRapido('limpar')">✕ Limpar</button>
+            </div>
+        </div>
+
+        <!-- Filtro por data -->
+        <div class="adm-right-section">
+            <div class="adm-right-label">Intervalo de datas</div>
+            <div class="adm-date-row">
+                <input type="date" id="filtroDataInicio" class="adm-date-input" title="Início">
+                <span class="adm-date-sep">→</span>
+                <input type="date" id="filtroDataFim" class="adm-date-input" title="Fim">
+            </div>
+            <button onclick="window.filtrarPorData()" class="adm-right-btn tap-feedback">Filtrar datas</button>
+        </div>
+
+        <!-- Seletor mês/ano -->
+        <div class="adm-right-section">
+            <div class="adm-right-label">Mês específico</div>
+            <div class="adm-date-row">
+                <input type="month" id="seletor-mes-relatorio" class="adm-date-input" title="Mês/Ano">
+            </div>
+            <button onclick="window.filtrarPorMesAno()" class="adm-right-btn tap-feedback">Ver mês</button>
+        </div>
+
+        <!-- Exportação -->
+        <div class="adm-right-section">
+            <div class="adm-right-label">Exportar</div>
+            <button id="btn-excel" class="adm-export-btn tap-feedback">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/>
+                </svg>
+                Excel (.xlsx)
+            </button>
+            <button onclick="window.gerarRelatorioPDF()" class="adm-export-btn adm-export-pdf tap-feedback">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/>
+                </svg>
+                Relatório PDF
+            </button>
+        </div>
+
+    </aside>
+
+</div><!-- fim .adm-layout -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="js/modal.js?v=3.0"></script>
+<script type="module" src="js/app.js?v=3.0"></script>
 </body>
 </html>
