@@ -1649,6 +1649,13 @@ if (document.body.id === 'admin-page') {
     // Store filter for rankings
     window.setRankingLoja = (loja) => {
         vibrar(); AppState.rankingLojaFiltro = loja;
+        // Sincroniza barra de loja mobile
+        document.querySelectorAll('.adm-loja-btn-mobile').forEach(b => {
+            const isActive = b.dataset.loja === loja;
+            b.style.background = isActive ? '#10b981' : 'transparent';
+            b.style.color = isActive ? '#fff' : 'rgba(255,255,255,.6)';
+            b.style.borderColor = isActive ? '#10b981' : 'rgba(255,255,255,.15)';
+        });
         document.querySelectorAll('.adm-loja-btn').forEach(b=>b.classList.toggle('active',b.dataset.loja===loja));
         const nL={todas:'Todas as lojas',entre_lagos:'🟢 Entre Lagos',itapoa_parque:'🔵 Itapoã Parque'};
         if (el('admin-loja-label')) el('admin-loja-label').innerText=nL[loja]||'Todas as lojas';
@@ -1899,9 +1906,9 @@ if (document.body.id === 'admin-page') {
         }
 
         container.innerHTML = `
-            <div class="glass-card" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding:15px 20px;">
-                <h3 style="font-size:12px; font-weight:900; text-transform:uppercase; color:var(--verde-dark);">📋 Lotes</h3>
-                <span style="font-size:11px; font-weight:800; color:var(--texto-suave);">${list.length} lote(s)</span>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; padding:10px 14px; background:#fff; border-radius:10px; border:1px solid #e2e8f0;">
+                <span style="font-size:11px; font-weight:800; text-transform:uppercase; color:#64748b; letter-spacing:.5px;">📋 Lotes</span>
+                <span style="font-size:11px; font-weight:700; color:#94a3b8;">${list.length} lote(s)</span>
             </div>
         `;
 
@@ -1918,17 +1925,17 @@ if (document.body.id === 'admin-page') {
             card.className = `card-lote-expandable slide-in-right ${corLoja} ${window.modoSelecao && isSelected ? 'ring-selected' : ''}`;
             card.style.animationDelay = `${idx * 80}ms`;
 
-            // Card compacto — tudo em linha única
+            // Card compacto — linha única, largura máxima de 680px para não ficar excessivamente largo
             let html = `
                 <div style="display:flex; align-items:center; gap:10px; min-width:0;">
                     ${window.modoSelecao ? `<span class="check-icon ${isSelected ? 'checked' : 'unchecked'}" style="flex-shrink:0; color:${isSelected ? 'var(--verde-vibrante)' : 'var(--texto-suave)'};">${isSelected ? '☑️' : '☐'}</span>` : ''}
-                    <div style="flex:1; min-width:0; display:flex; flex-wrap:wrap; align-items:center; gap:6px 12px;">
+                    <div style="flex:1; min-width:0; display:flex; flex-wrap:wrap; align-items:center; gap:4px 10px;">
                         <span class="lote-nome-loja" style="flex-shrink:0;">${lojaDisplay}</span>
                         <span class="lote-operador-nome" style="flex-shrink:0;">👤 ${batch.operador}</span>
                         <span class="lote-data-hora" style="flex-shrink:0;">${dataFormatada} ${horaFormatada}</span>
                     </div>
-                    <span style="font-size:11px; font-weight:800; color:var(--verde-dark); flex-shrink:0; white-space:nowrap;">${batch.itens.length} itens</span>
-                    ${!window.modoSelecao ? `<div class="btn-seta-moderno" style="flex-shrink:0; ${isOpen ? 'transform:rotate(90deg)' : ''}">
+                    <span style="font-size:11px; font-weight:800; color:var(--verde-dark); flex-shrink:0; white-space:nowrap; background:rgba(16,185,129,0.08); padding:3px 10px; border-radius:100px;">${batch.itens.length} itens</span>
+                    ${!window.modoSelecao ? `<div class="btn-seta-moderno" style="flex-shrink:0; transition:transform .2s; ${isOpen ? 'transform:rotate(90deg)' : ''}">
                         <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
                         </svg>
@@ -1938,26 +1945,27 @@ if (document.body.id === 'admin-page') {
 
             if (isOpen) {
                 html += `
-                    <div class="detail-section fade-in-up">
-                        <table class="tabela-detalhes">
+                    <div class="detail-section fade-in-up" style="margin-top:10px; border-top:1px solid #f1f5f9; padding-top:10px;">
+                        <table style="width:100%; border-collapse:collapse; table-layout:fixed; font-size:12px;">
                             <thead>
-                                <tr>
-                                    <th>Produto</th>
-                                    <th style="text-align:right;">Qtd/Peso</th>
+                                <tr style="background:#f8fafc;">
+                                    <th style="width:72%; padding:7px 10px; text-align:left; font-size:10px; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:.5px; border-bottom:1px solid #e2e8f0;">Produto</th>
+                                    <th style="width:28%; padding:7px 10px; text-align:right; font-size:10px; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:.5px; border-bottom:1px solid #e2e8f0;">Qtd/Peso</th>
                                 </tr>
                             </thead>
                             <tbody>
                 `;
 
-                batch.itens.forEach(item => {
+                batch.itens.forEach((item, zebIdx) => {
+                    const bg = zebIdx % 2 === 0 ? '#ffffff' : '#f8fafc';
                     html += `
-                        <tr>
-                            <td>
-                                <strong>${item.nome}</strong><br>
-                                <small class="item-lote-cod">Cód: ${item.cod || 'N/A'}</small>
+                        <tr style="background:${bg};">
+                            <td style="padding:7px 10px; border-bottom:1px solid #f1f5f9;">
+                                <div style="font-size:12px; font-weight:700; color:#0f172a; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${item.nome}</div>
+                                <div style="font-size:10px; color:#94a3b8;">Cód: ${item.cod || 'N/A'}</div>
                             </td>
-                            <td style="text-align:right;">
-                                <span class="item-lote-peso">${formatPeso(item.peso, item.unidade)}</span>
+                            <td style="padding:7px 10px; text-align:right; border-bottom:1px solid #f1f5f9; font-size:12px; font-weight:800; color:#0f172a; background:${bg}; white-space:nowrap;">
+                                ${formatPeso(item.peso, item.unidade)}
                             </td>
                         </tr>
                     `;
@@ -2497,6 +2505,20 @@ if (document.body.id === 'admin-page') {
 // SERVICE WORKER (PWA) — Refresh inteligente
 // Funciona no desktop E no celular em background
 // ==========================================
+// Mostrar/esconder barra de loja mobile conforme tamanho da tela
+function atualizarBarraMobile() {
+    const bar = document.getElementById('mobile-loja-bar');
+    if (!bar) return;
+    bar.style.display = window.innerWidth <= 680 ? 'flex' : 'none';
+}
+window.addEventListener('resize', atualizarBarraMobile);
+// Chama imediatamente ao carregar
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', atualizarBarraMobile);
+} else {
+    atualizarBarraMobile();
+}
+
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
