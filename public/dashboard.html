@@ -13,7 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-    <link rel="stylesheet" href="css/style.css?v=3.1">
+    <link rel="stylesheet" href="css/style.css?v=3.4">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
 
@@ -182,7 +182,7 @@
             padding-bottom: calc(56px + env(safe-area-inset-bottom));
         }
 
-        /* Sidebar vira bottom nav com suporte a safe area */
+        /* Sidebar vira bottom nav com safe area */
         .adm-sidebar-left {
             position:fixed;
             bottom:0; left:0; right:0; top:auto;
@@ -196,38 +196,41 @@
         }
 
         /* Esconde partes que não cabem no bottom nav */
-        .adm-brand, .adm-nav-sep, .adm-nav-label,
-        .adm-loja-btns, .adm-sidebar-footer { display:none !important; }
+        .adm-brand,
+        .adm-nav-sep,
+        .adm-nav-label,
+        .adm-loja-btns,
+        .adm-sidebar-footer { display:none !important; }
 
         /* Nav horizontal com 3 botões */
         .adm-nav {
             flex-direction:row;
-            padding:0; gap:0;
+            padding:0;
+            gap:0;
             flex:1;
-            align-items:flex-start;
-            height:56px;
+            align-items:stretch;
         }
 
         .adm-nav-btn {
             flex-direction:column;
-            gap:3px;
-            padding:10px 4px 6px;
+            gap:2px;
+            padding:8px 4px 6px;
             border-radius:0;
             font-size:10px;
-            justify-content:flex-start;
+            justify-content:center;
             align-items:center;
             flex:1;
             text-align:center;
-            height:56px;
         }
 
+        /* Label do botão ativo */
         .adm-nav-btn.active {
             background:rgba(16,185,129,.12);
             border-top:2px solid #10b981;
             border-radius:0;
         }
 
-        /* Header compacto com suporte a Dynamic Island / notch */
+        /* Área principal — header compacto com suporte a Dynamic Island/notch */
         .adm-main { height:auto; overflow-y:auto; }
         .adm-main-header {
             padding: calc(10px + env(safe-area-inset-top)) 14px 10px;
@@ -240,7 +243,7 @@
         .adm-secao { padding:10px 12px; }
         .adm-metricas { grid-template-columns:repeat(2,1fr); gap:8px; }
         .adm-metrica-val { font-size:18px; }
-        .adm-metrica-card { padding:10px 10px; }
+        .adm-metrica-card { padding:10px; }
         .adm-rankings-grid { grid-template-columns:1fr; }
         .adm-barra-cell, .adm-tabela-comp th:nth-child(5),
         .adm-tabela-comp td:nth-child(5) { display:none; }
@@ -262,7 +265,7 @@
         .adm-main-titulo { font-size:13px; }
     }
 
-    /* iPhone Pro com Dynamic Island (tela alta) */
+    /* iPhone Pro com Dynamic Island — tela alta */
     @media (max-width:430px) and (min-height:900px) {
         .adm-main-header {
             padding-top: max(14px, env(safe-area-inset-top));
@@ -592,7 +595,7 @@
 </div><!-- fim .adm-layout -->
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="js/modal.js?v=3.1"></script>
-<script type="module" src="js/app.js?v=3.1"></script>
+<script src="js/modal.js?v=3.4"></script>
+<script type="module" src="js/app.js?v=3.4"></script>
 </body>
 </html>

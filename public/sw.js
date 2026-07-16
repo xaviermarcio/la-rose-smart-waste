@@ -1,9 +1,9 @@
 // MUDE ESTE NÚMERO para forçar atualização do cache em todos os dispositivos
-const CACHE_NAME = 'larose-v3.1';
+const CACHE_NAME = 'larose-v3.4';
 
 const ASSETS_TO_CACHE = [
     '/','/index.html','/lancamento.html','/dashboard.html','/manifest.json',
-    '/css/style.css?v=3.0','/js/modal.js?v=3.0','/js/app.js?v=3.0',
+    '/css/style.css?v=3.4','/js/modal.js?v=3.4','/js/app.js?v=3.4',
     '/js/data.js','/js/firebase-config.js',
     '/assets/images/logo.png','/assets/icons/icon-192.png','/assets/icons/icon-512.png',
     'https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap',

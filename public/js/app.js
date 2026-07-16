@@ -1633,7 +1633,7 @@ if (document.body.id === 'admin-page') {
             if (lojaFiltro !== 'todas' && lojaLote !== lojaFiltro) return;
 
             lote.itens.forEach(item => {
-                // Normaliza unidade: KG só pega KG, UN só pega UN
+                // KG só pega KG, UN só pega UN — sem ambiguidade
                 const unidadeItem = (item.unidade || 'KG').toUpperCase().trim();
                 if (unidadeItem !== unidade) return;
 
