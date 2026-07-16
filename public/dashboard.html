@@ -179,95 +179,94 @@
             display:flex;
             flex-direction:column;
             min-height:100vh;
-            padding-bottom:60px; /* espaço para o bottom nav */
+            padding-bottom: calc(56px + env(safe-area-inset-bottom));
         }
 
-        /* Sidebar vira bottom nav */
+        /* Sidebar vira bottom nav com suporte a safe area */
         .adm-sidebar-left {
             position:fixed;
             bottom:0; left:0; right:0; top:auto;
-            width:100%; height:56px;
+            width:100%;
+            height: calc(56px + env(safe-area-inset-bottom));
             flex-direction:row;
-            align-items:center;
+            align-items:flex-start;
             z-index:200;
             overflow:hidden;
-            box-shadow: 0 -2px 16px rgba(0,0,0,.15);
+            box-shadow: 0 -1px 0 rgba(255,255,255,.06), 0 -4px 20px rgba(0,0,0,.2);
         }
 
         /* Esconde partes que não cabem no bottom nav */
-        .adm-brand,
-        .adm-nav-sep,
-        .adm-nav-label,
-        .adm-loja-btns,
-        .adm-sidebar-footer { display:none !important; }
+        .adm-brand, .adm-nav-sep, .adm-nav-label,
+        .adm-loja-btns, .adm-sidebar-footer { display:none !important; }
 
         /* Nav horizontal com 3 botões */
         .adm-nav {
             flex-direction:row;
-            padding:0;
-            gap:0;
+            padding:0; gap:0;
             flex:1;
-            align-items:stretch;
+            align-items:flex-start;
+            height:56px;
         }
 
         .adm-nav-btn {
             flex-direction:column;
-            gap:2px;
-            padding:8px 4px 6px;
+            gap:3px;
+            padding:10px 4px 6px;
             border-radius:0;
             font-size:10px;
-            justify-content:center;
+            justify-content:flex-start;
             align-items:center;
             flex:1;
             text-align:center;
+            height:56px;
         }
 
-        /* Label do botão ativo */
         .adm-nav-btn.active {
             background:rgba(16,185,129,.12);
             border-top:2px solid #10b981;
             border-radius:0;
         }
 
-        /* Área principal ocupa tela cheia */
+        /* Header compacto com suporte a Dynamic Island / notch */
         .adm-main { height:auto; overflow-y:auto; }
-        .adm-main-header { padding:12px 14px 10px; }
-        .adm-main-titulo { font-size:15px; }
+        .adm-main-header {
+            padding: calc(10px + env(safe-area-inset-top)) 14px 10px;
+            min-height:auto;
+        }
+        .adm-main-titulo { font-size:14px; }
+        .adm-main-sub { display:none; }
+        .adm-loja-badge-header { font-size:10px; padding:4px 10px; }
 
-        /* Seções com padding menor no mobile */
         .adm-secao { padding:10px 12px; }
-
-        /* Métricas: 2x2 no mobile */
         .adm-metricas { grid-template-columns:repeat(2,1fr); gap:8px; }
         .adm-metrica-val { font-size:18px; }
-
-        /* Rankings: coluna única */
+        .adm-metrica-card { padding:10px 10px; }
         .adm-rankings-grid { grid-template-columns:1fr; }
-
-        /* Tabela comparativa: oculta coluna Volume no mobile */
         .adm-barra-cell, .adm-tabela-comp th:nth-child(5),
         .adm-tabela-comp td:nth-child(5) { display:none; }
-
-        /* Filtros por loja — row no mobile (botões compactos) */
-        .adm-loja-btns-mobile { display:flex; gap:6px; padding:8px 12px; overflow-x:auto; background:#0f172a; }
-        .adm-loja-btn-mobile { padding:5px 12px; border-radius:100px; border:1px solid rgba(255,255,255,.15); color:rgba(255,255,255,.6); font-size:11px; font-weight:600; background:transparent; cursor:pointer; white-space:nowrap; }
+        .adm-loja-btns-mobile { display:flex !important; gap:6px; padding:8px 12px; overflow-x:auto; background:#0f172a; scrollbar-width:none; }
+        .adm-loja-btns-mobile::-webkit-scrollbar { display:none; }
+        .adm-loja-btn-mobile { padding:5px 12px; border-radius:100px; border:1px solid rgba(255,255,255,.15); color:rgba(255,255,255,.6); font-size:11px; font-weight:600; background:transparent; cursor:pointer; white-space:nowrap; font-family:'Inter',sans-serif; }
         .adm-loja-btn-mobile.active { background:#10b981; border-color:#10b981; color:#fff; }
-
-        /* Sub-tabs de lotes scroll horizontal */
         .adm-lotes-tabs { overflow-x:auto; }
         .adm-lote-tab { padding:8px 12px; font-size:11px; }
-
-        /* Cards de lote mais compactos no mobile */
         .card-lote-expandable { padding:9px 12px !important; }
     }
 
     /* iPhone SE / telas muito pequenas */
     @media (max-width:380px) {
         .adm-metricas { grid-template-columns:repeat(2,1fr); gap:6px; }
-        .adm-metrica-val { font-size:16px; }
+        .adm-metrica-val { font-size:15px; }
         .adm-metrica-label { font-size:9px; }
         .adm-nav-btn { font-size:9px; }
-        .adm-main-titulo { font-size:14px; }
+        .adm-main-titulo { font-size:13px; }
+    }
+
+    /* iPhone Pro com Dynamic Island (tela alta) */
+    @media (max-width:430px) and (min-height:900px) {
+        .adm-main-header {
+            padding-top: max(14px, env(safe-area-inset-top));
+        }
     }
     </style>
 </head>
