@@ -18,9 +18,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
 
-    <link rel="preload" href="css/style.css?v=3.4" as="style">
-    <link rel="preload" href="js/app.js?v=3.4" as="script">
-    <link rel="stylesheet" href="css/style.css?v=3.4">
+    <link rel="preload" href="css/style.css?v=3.3" as="style">
+    <link rel="preload" href="js/app.js?v=3.3" as="script">
+    <link rel="stylesheet" href="css/style.css?v=3.3">
 
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
@@ -81,6 +81,40 @@
                         </button>
                     </div>
 
+                    <!-- ══ TELA: LOJA INATIVA ══ -->
+                    <div id="etapa-loja-inativa" class="hidden etapa-transicao" style="text-align:center; padding:10px 0;">
+                        <div style="
+                            width:72px; height:72px; border-radius:50%;
+                            background:linear-gradient(135deg,rgba(239,68,68,.15),rgba(220,38,38,.08));
+                            border:2px solid rgba(239,68,68,.3);
+                            display:flex; align-items:center; justify-content:center;
+                            margin:0 auto 16px; font-size:30px;
+                        ">🔒</div>
+                        <h3 style="font-size:17px; font-weight:800; color:#1e293b; margin-bottom:6px; font-family:'Inter',sans-serif;">
+                            Unidade Inativa
+                        </h3>
+                        <p style="font-size:13px; color:#64748b; line-height:1.5; margin-bottom:6px; font-family:'Inter',sans-serif;">
+                            A unidade <strong style="color:#0f172a;">Itapoã Parque</strong> não está<br>disponível no momento.
+                        </p>
+                        <p style="font-size:11px; color:#94a3b8; margin-bottom:24px; font-family:'Inter',sans-serif;">
+                            Entre em contato com a gestão para mais informações.
+                        </p>
+                        <button
+                            onclick="
+                                document.getElementById('etapa-loja-inativa').classList.add('hidden');
+                                const el = document.getElementById('etapa-loja');
+                                el.classList.remove('hidden');
+                                el.classList.add('etapa-entrando');
+                                setTimeout(() => el.classList.remove('etapa-entrando'), 500);
+                            "
+                            class="btn-entrar tap-feedback"
+                            style="max-width:220px; margin:0 auto; display:block;"
+                        >
+                            ← VOLTAR ÀS UNIDADES
+                        </button>
+                    </div>
+                    <!-- ════════════════════════ -->
+
                     <div id="etapa-operador" class="hidden etapa-transicao">
                         <p class="section-label">👥 Quem está operando?</p>
                         <div id="container-operadores" class="grid-cards operadores-grid"></div>
@@ -109,7 +143,7 @@
         </div>
     </div>
 
-    <script src="js/modal.js?v=3.4"></script>
-    <script type="module" src="js/app.js?v=3.4"></script>
+    <script src="js/modal.js?v=3.3"></script>
+    <script type="module" src="js/app.js?v=3.3"></script>
 </body>
 </html>

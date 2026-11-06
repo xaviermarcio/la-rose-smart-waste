@@ -305,8 +305,39 @@ window.definirPerfil = (tipo) => {
     }, 450);
 };
 
+// ══ LOJAS OFFLINE ══
+// Para colocar uma loja offline, adicione o id aqui.
+// Para reativar, remova o id da lista.
+// Estado inicial vem do localStorage (admin pode alterar em tempo real)
+// Fallback: ['itapoa_parque'] — a loja que foi vendida fica offline por padrão.
+let LOJAS_OFFLINE = (() => {
+    try { return JSON.parse(localStorage.getItem('lojas_offline_admin') || '["itapoa_parque"]'); }
+    catch { return ['itapoa_parque']; }
+})();
+
 // Transição suave entre etapas
 window.selecionarLoja = (lojaId) => {
+
+    // ── Verifica se a loja está offline ──
+    if (LOJAS_OFFLINE.includes(lojaId)) {
+        vibrar();
+        // Mostra tela de loja inativa em vez de avançar
+        const etapaLoja    = el('etapa-loja');
+        const telaInativa  = el('etapa-loja-inativa');
+
+        if (etapaLoja && telaInativa) {
+            etapaLoja.classList.add('etapa-saindo');
+            setTimeout(() => {
+                etapaLoja.classList.add('hidden');
+                etapaLoja.classList.remove('etapa-saindo');
+                telaInativa.classList.remove('hidden');
+                telaInativa.classList.add('etapa-entrando');
+                setTimeout(() => telaInativa.classList.remove('etapa-entrando'), 500);
+            }, 400);
+        }
+        return; // Não prossegue para operadores
+    }
+
     localStorage.setItem('loja_ativa', lojaId);
     vibrar();
     showTransitionLoader();
@@ -1361,7 +1392,7 @@ if (document.body.id === 'admin-page') {
         const contagem = {};
         lotesFiltrados.forEach(lote => {
             if (!lote.operador) return;
-            if (lojaFiltro !== 'todas' && (lote.loja||'').toLowerCase().trim() !== lojaFiltro) return;
+            if (lojaFiltro !== 'todas' && lote.loja !== lojaFiltro) return;
             contagem[lote.operador] = (contagem[lote.operador] || 0) + 1;
         });
 
@@ -1409,7 +1440,7 @@ if (document.body.id === 'admin-page') {
         const pending = window.todosOsLotes.filter(b=>!b.status_lancado&&!b.consolidado);
         const lojaFiltro = AppState.rankingLojaFiltro||'todas';
         const lotesFiltrados = aplicarFiltroData(pending);
-        const lotesPorLoja = lojaFiltro==='todas' ? lotesFiltrados : lotesFiltrados.filter(b=>(b.loja||'').toLowerCase().trim()===lojaFiltro);
+        const lotesPorLoja = lojaFiltro==='todas' ? lotesFiltrados : lotesFiltrados.filter(b=>b.loja===lojaFiltro);
         const m = calcularMetricas(lotesPorLoja);
         if (el('metrica-kg')) el('metrica-kg').innerText = m.totalKG.toFixed(3).replace('.',',');
         if (el('metrica-un')) el('metrica-un').innerText = Math.floor(m.totalUN);
@@ -1434,7 +1465,7 @@ if (document.body.id === 'admin-page') {
         const porMes={};
         window.todosOsLotes.forEach(lote=>{
             if(!lote.data||typeof lote.data.toDate!=='function') return;
-            if(lojaFiltro!=='todas'&&(lote.loja||'').toLowerCase().trim()!==lojaFiltro) return;
+            if(lojaFiltro!=='todas'&&lote.loja!==lojaFiltro) return;
             const mes=lote.data.toDate().toISOString().slice(0,7);
             if(!porMes[mes]) porMes[mes]={kg:0,un:0,lotes:0};
             porMes[mes].lotes++;
@@ -1628,22 +1659,22 @@ if (document.body.id === 'admin-page') {
 
         lotes.forEach(lote => {
             if (!lote.itens) return;
-            // Normaliza loja para evitar variações de case/espaço
-            const lojaLote = (lote.loja || '').toLowerCase().trim();
-            if (lojaFiltro !== 'todas' && lojaLote !== lojaFiltro) return;
+            if (lojaFiltro !== 'todas' && lote.loja !== lojaFiltro) return;
 
             lote.itens.forEach(item => {
-                // KG só pega KG, UN só pega UN — sem ambiguidade
-                const unidadeItem = (item.unidade || 'KG').toUpperCase().trim();
-                if (unidadeItem !== unidade) return;
-
-                const key = item.nome;
-                if (!mapa[key]) mapa[key] = { nome: item.nome, total: 0, unidade };
-                mapa[key].total += item.peso;
+                if (item.unidade === unidade || (unidade === 'KG' && item.unidade !== 'UN')) {
+                    const key = item.nome;
+                    if (!mapa[key]) {
+                        mapa[key] = { nome: item.nome, total: 0, unidade: item.unidade || unidade };
+                    }
+                    mapa[key].total += item.peso;
+                }
             });
         });
 
-        return Object.values(mapa).sort((a, b) => b.total - a.total).slice(0, top);
+        return Object.values(mapa)
+            .sort((a, b) => b.total - a.total)
+            .slice(0, top);
     }
 
     // Store filter for rankings
@@ -1946,15 +1977,11 @@ if (document.body.id === 'admin-page') {
             if (isOpen) {
                 html += `
                     <div class="detail-section fade-in-up" style="margin-top:10px; border-top:1px solid #f1f5f9; padding-top:10px;">
-                        <table style="width:100%; border-collapse:collapse; table-layout:fixed;">
-                            <colgroup>
-                                <col style="width:68%">
-                                <col style="width:32%">
-                            </colgroup>
+                        <table style="width:100%; border-collapse:collapse; table-layout:fixed; font-size:12px;">
                             <thead>
                                 <tr style="background:#f8fafc;">
-                                    <th style="padding:7px 12px; text-align:left; font-size:9px; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:.8px; border-bottom:1.5px solid #e2e8f0;">Produto</th>
-                                    <th style="padding:7px 12px; text-align:right; font-size:9px; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:.8px; border-bottom:1.5px solid #e2e8f0;">Qtd/Peso</th>
+                                    <th style="width:72%; padding:7px 10px; text-align:left; font-size:10px; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:.5px; border-bottom:1px solid #e2e8f0;">Produto</th>
+                                    <th style="width:28%; padding:7px 10px; text-align:right; font-size:10px; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:.5px; border-bottom:1px solid #e2e8f0;">Qtd/Peso</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -1964,11 +1991,13 @@ if (document.body.id === 'admin-page') {
                     const bg = zebIdx % 2 === 0 ? '#ffffff' : '#f8fafc';
                     html += `
                         <tr style="background:${bg};">
-                            <td style="padding:8px 12px; border-bottom:1px solid #f1f5f9; overflow:hidden; background:${bg};">
-                                <div style="font-size:12px; font-weight:700; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.nome}</div>
-                                <div style="font-size:10px; color:#94a3b8; margin-top:1px;">Cód: ${item.cod || 'N/A'}</div>
+                            <td style="padding:7px 10px; border-bottom:1px solid #f1f5f9;">
+                                <div style="font-size:12px; font-weight:700; color:#0f172a; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${item.nome}</div>
+                                <div style="font-size:10px; color:#94a3b8;">Cód: ${item.cod || 'N/A'}</div>
                             </td>
-                            <td style="padding:8px 12px; text-align:right; border-bottom:1px solid #f1f5f9; font-size:13px; font-weight:900; color:#059669; letter-spacing:-.3px; font-family:'Roboto',sans-serif; white-space:nowrap; background:${bg};">${formatPeso(item.peso, item.unidade)}</td>
+                            <td style="padding:7px 10px; text-align:right; border-bottom:1px solid #f1f5f9; font-size:12px; font-weight:800; color:#0f172a; background:${bg}; white-space:nowrap;">
+                                ${formatPeso(item.peso, item.unidade)}
+                            </td>
                         </tr>
                     `;
                 });
@@ -2067,17 +2096,11 @@ if (document.body.id === 'admin-page') {
             if (isOpen) {
                 html += `
                     <div class="detail-section fade-in-up">
-                        <table style="width:100%; border-collapse:collapse; table-layout:fixed;">
-                            <colgroup>
-                                <col style="width:28px">
-                                <col>
-                                <col style="width:110px">
-                            </colgroup>
+                        <table class="tabela-detalhes" style="table-layout:fixed; width:100%;">
                             <thead>
-                                <tr style="background:#f8fafc;">
-                                    <th style="padding:7px 4px 7px 12px; text-align:right; font-size:9px; font-weight:800; color:#94a3b8; border-bottom:1.5px solid #e2e8f0;">#</th>
-                                    <th style="padding:7px 8px; text-align:left; font-size:9px; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:.8px; border-bottom:1.5px solid #e2e8f0;">Produto</th>
-                                    <th style="padding:7px 12px 7px 4px; text-align:right; font-size:9px; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:.8px; border-bottom:1.5px solid #e2e8f0;">Total</th>
+                                <tr>
+                                    <th style="width:75%; padding:6px 10px;">Produto</th>
+                                    <th style="width:25%; text-align:right; padding:6px 10px;">Total</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -2088,12 +2111,16 @@ if (document.body.id === 'admin-page') {
                     const zebra = idx % 2 === 0 ? '#ffffff' : '#f8fafc';
                     html += `
                         <tr style="background:${zebra};">
-                            <td style="padding:8px 4px 8px 12px; text-align:right; color:#cbd5e1; font-size:10px; font-weight:700; border-bottom:1px solid #f1f5f9; vertical-align:middle; background:${zebra};">${idx + 1}.</td>
-                            <td style="padding:8px; border-bottom:1px solid #f1f5f9; overflow:hidden; background:${zebra};">
-                                <div style="font-size:12px; font-weight:700; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.nome}</div>
-                                <div style="font-size:10px; color:#94a3b8; margin-top:1px;">Cód: ${item.cod}</div>
+                            <td style="padding:7px 10px; display:flex; align-items:center; gap:8px;">
+                                <span style="color:#94a3b8; font-size:10px; font-weight:700; width:18px; flex-shrink:0; text-align:right;">${idx + 1}.</span>
+                                <div style="min-width:0;">
+                                    <div style="font-size:12px; font-weight:700; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.nome}</div>
+                                    <div style="font-size:10px; color:#94a3b8;">Cód: ${item.cod}</div>
+                                </div>
                             </td>
-                            <td style="padding:8px 12px 8px 4px; text-align:right; border-bottom:1px solid #f1f5f9; font-size:13px; font-weight:900; color:#059669; letter-spacing:-.3px; font-family:'Roboto',sans-serif; white-space:nowrap; background:${zebra};">${formatPeso(item.pesoTotal, item.unidade)}</td>
+                            <td style="padding:7px 10px; text-align:right; white-space:nowrap; font-size:12px; font-weight:800; color:#0f172a; background:${zebra};">
+                                ${formatPeso(item.pesoTotal, item.unidade)}
+                            </td>
                         </tr>
                     `;
                 });
@@ -2503,6 +2530,78 @@ if (document.body.id === 'admin-page') {
 
     window.fecharModalDetalhes = () => el('modal-detalhes')?.classList.add('hidden');
     window.renderizarListaAdmin = renderDashboard;
+
+    // === Toggle online/offline da Itapoã Parque ===
+    // Persiste em localStorage para sobreviver a reload
+    // (array LOJAS_OFFLINE em memória é re-derivado ao carregar)
+    const OFFLINE_KEY = 'lojas_offline_admin';
+
+    function getLojasOfflineAdmin() {
+        try { return JSON.parse(localStorage.getItem(OFFLINE_KEY) || '["itapoa_parque"]'); }
+        catch { return ['itapoa_parque']; }
+    }
+    function setLojasOfflineAdmin(arr) {
+        localStorage.setItem(OFFLINE_KEY, JSON.stringify(arr));
+    }
+
+    window.toggleLojaOffline = () => {
+        vibrar();
+        const lojas = getLojasOfflineAdmin();
+        const idx = lojas.indexOf('itapoa_parque');
+        const estaOffline = idx !== -1;
+
+        if (estaOffline) {
+            // Reativar
+            lojas.splice(idx, 1);
+        } else {
+            // Colocar offline
+            lojas.push('itapoa_parque');
+        }
+        setLojasOfflineAdmin(lojas);
+        atualizarEstadoOfflineUI(!estaOffline);
+
+        // Atualiza o array global de LOJAS_OFFLINE em memória
+        // para que selecionarLoja reaja imediatamente
+        LOJAS_OFFLINE.length = 0;
+        lojas.forEach(l => LOJAS_OFFLINE.push(l));
+
+        showGlobalModal({
+            titulo: estaOffline ? '✅ Loja reativada' : '🔒 Loja colocada offline',
+            mensagem: estaOffline
+                ? 'Itapoã Parque voltou a aparecer como ativa para os operadores.'
+                : 'Itapoã Parque está offline. Os operadores verão a tela de unidade inativa.',
+            confirmarTexto: 'OK',
+            onConfirm: () => {}
+        });
+    };
+
+    function atualizarEstadoOfflineUI(estaOffline) {
+        const btn = el('btn-toggle-offline');
+        const txt = el('btn-toggle-offline-txt');
+        const badge = el('sidebar-offline-badge');
+
+        if (btn) {
+            btn.className = estaOffline
+                ? 'btn-toggle-loja-offline loja-reativar tap-feedback'
+                : 'btn-toggle-loja-offline tap-feedback';
+        }
+        if (txt) {
+            txt.textContent = estaOffline ? 'Itapoã: Reativar loja' : 'Itapoã: Colocar offline';
+        }
+        if (badge) {
+            badge.style.display = estaOffline ? 'inline-flex' : 'none';
+        }
+    }
+
+    // Inicializa estado ao carregar
+    (function() {
+        const lojas = getLojasOfflineAdmin();
+        const estaOffline = lojas.includes('itapoa_parque');
+        atualizarEstadoOfflineUI(estaOffline);
+        // Sincroniza o array em memória
+        LOJAS_OFFLINE.length = 0;
+        lojas.forEach(l => LOJAS_OFFLINE.push(l));
+    })();
 }
 
 // ==========================================
