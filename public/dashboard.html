@@ -13,7 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-    <link rel="stylesheet" href="css/style.css?v=3.3">
+    <link rel="stylesheet" href="css/style.css?v=3.4">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
 
@@ -149,22 +149,47 @@
     .btn-toggle-loja-offline {
         display: flex; align-items: center; gap: 8px; width: 100%;
         padding: 9px 12px; border-radius: 10px;
-        border: 1px solid rgba(245,158,11,.2);
-        background: rgba(245,158,11,.07);
-        color: rgba(251,191,36,.8); font-size: 11px; font-weight: 700;
+        border: 1px solid rgba(245,158,11,.3);
+        background: rgba(245,158,11,.1);
+        color: #fbbf24; font-size: 11px; font-weight: 700;
         font-family: 'Inter', sans-serif; cursor: pointer; transition: all .15s;
     }
-    .btn-toggle-loja-offline:hover { background: rgba(245,158,11,.14); color: #fbbf24; }
+    .btn-toggle-loja-offline:hover { background: rgba(245,158,11,.18); }
     .btn-toggle-loja-offline.loja-reativar {
-        border-color: rgba(16,185,129,.25); background: rgba(16,185,129,.07); color: rgba(52,211,153,.85);
+        border-color: rgba(16,185,129,.35); background: rgba(16,185,129,.1); color: #34d399;
     }
-    .btn-toggle-loja-offline.loja-reativar:hover { background: rgba(16,185,129,.14); color: #34d399; }
+    .btn-toggle-loja-offline.loja-reativar:hover { background: rgba(16,185,129,.18); }
     .offline-indicator {
         display: inline-flex; align-items: center; gap: 5px;
         font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 100px;
-        background: rgba(239,68,68,.1); color: #f87171; border: 1px solid rgba(239,68,68,.2);
+        background: rgba(239,68,68,.15); color: #f87171; border: 1px solid rgba(239,68,68,.3);
         margin-left: 4px;
     }
+
+    /* ═══ Card Status das Unidades ═══ */
+    .lojas-status-grid { display: flex; flex-direction: column; gap: 10px; }
+    .loja-status-item {
+        display: flex; align-items: center; gap: 12px;
+        padding: 10px 14px; border-radius: 10px;
+        border: 1px solid var(--adm-border); background: var(--adm-bg);
+        transition: all .2s;
+    }
+    .loja-status-dot {
+        width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+    }
+    .loja-status-ativa .loja-status-dot { background: #10b981; box-shadow: 0 0 0 3px rgba(16,185,129,.2); }
+    .loja-status-offline .loja-status-dot { background: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,.2); }
+    .loja-status-info { flex: 1; min-width: 0; }
+    .loja-status-info strong { display: block; font-size: 13px; font-weight: 700; color: var(--adm-txt); }
+    .loja-status-info span { font-size: 11px; color: var(--adm-muted); }
+    .loja-status-offline .loja-status-info span { color: #f87171; }
+    .loja-status-badge {
+        font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 100px;
+        white-space: nowrap; flex-shrink: 0;
+    }
+    .loja-badge-ativa { background: rgba(16,185,129,.12); color: #10b981; border: 1px solid rgba(16,185,129,.25); }
+    .loja-badge-offline { background: rgba(239,68,68,.12); color: #ef4444; border: 1px solid rgba(239,68,68,.25); }
+    .loja-status-offline { border-color: rgba(239,68,68,.2); background: rgba(239,68,68,.04); }
 
     /* ═══════════════════════════════════════
        ÁREA CENTRAL
@@ -804,6 +829,35 @@
                     </div>
                 </div>
 
+                <!-- Card de Status das Unidades -->
+                <div class="adm-card adm-card-lojas-status">
+                    <div class="adm-card-header">
+                        <span class="adm-card-titulo">🏪 Status das Unidades</span>
+                        <span class="adm-card-sub">Visibilidade para operadores</span>
+                    </div>
+                    <div class="lojas-status-grid">
+                        <div class="loja-status-item loja-status-ativa">
+                            <div class="loja-status-dot"></div>
+                            <div class="loja-status-info">
+                                <strong>Entre Lagos</strong>
+                                <span>Ativa — operadores podem lançar</span>
+                            </div>
+                            <span class="loja-status-badge loja-badge-ativa">✓ Online</span>
+                        </div>
+                        <div id="loja-status-itapoa" class="loja-status-item loja-status-ativa">
+                            <div class="loja-status-dot"></div>
+                            <div class="loja-status-info">
+                                <strong>Itapoã Parque</strong>
+                                <span id="loja-status-itapoa-txt">Ativa — operadores podem lançar</span>
+                            </div>
+                            <span id="loja-status-itapoa-badge" class="loja-status-badge loja-badge-ativa">✓ Online</span>
+                        </div>
+                    </div>
+                    <p style="font-size:11px; color:var(--adm-muted); margin-top:12px; padding-top:10px; border-top:1px solid var(--adm-border);">
+                        Para alterar o status, use o botão <strong>Itapoã: Colocar offline</strong> na barra lateral.
+                    </p>
+                </div>
+
                 <div class="adm-card">
                     <div class="adm-card-header">
                         <span class="adm-card-titulo">📅 Comparativo Mensal</span>
@@ -861,7 +915,7 @@
 </div><!-- fim .adm-layout -->
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="js/modal.js?v=3.3"></script>
+<script src="js/modal.js?v=3.4"></script>
 <script>
 // Drawer de filtros
 window.abrirDrawerFiltros = () => {
@@ -875,6 +929,6 @@ window.fecharDrawerFiltros = () => {
 // Fecha drawer com ESC
 document.addEventListener('keydown', e => { if (e.key === 'Escape') window.fecharDrawerFiltros(); });
 </script>
-<script type="module" src="js/app.js?v=3.3"></script>
+<script type="module" src="js/app.js?v=3.4"></script>
 </body>
 </html>

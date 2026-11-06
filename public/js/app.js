@@ -311,8 +311,8 @@ window.definirPerfil = (tipo) => {
 // Estado inicial vem do localStorage (admin pode alterar em tempo real)
 // Fallback: ['itapoa_parque'] — a loja que foi vendida fica offline por padrão.
 let LOJAS_OFFLINE = (() => {
-    try { return JSON.parse(localStorage.getItem('lojas_offline_admin') || '["itapoa_parque"]'); }
-    catch { return ['itapoa_parque']; }
+    try { return JSON.parse(localStorage.getItem('lojas_offline_admin') || '[]'); }
+    catch { return []; }
 })();
 
 // Transição suave entre etapas
@@ -2537,8 +2537,8 @@ if (document.body.id === 'admin-page') {
     const OFFLINE_KEY = 'lojas_offline_admin';
 
     function getLojasOfflineAdmin() {
-        try { return JSON.parse(localStorage.getItem(OFFLINE_KEY) || '["itapoa_parque"]'); }
-        catch { return ['itapoa_parque']; }
+        try { return JSON.parse(localStorage.getItem(OFFLINE_KEY) || '[]'); }
+        catch { return []; }
     }
     function setLojasOfflineAdmin(arr) {
         localStorage.setItem(OFFLINE_KEY, JSON.stringify(arr));
@@ -2590,6 +2590,27 @@ if (document.body.id === 'admin-page') {
         }
         if (badge) {
             badge.style.display = estaOffline ? 'inline-flex' : 'none';
+        }
+
+        // Atualiza card de Status das Unidades
+        const cardItapoa = el('loja-status-itapoa');
+        const cardTxt = el('loja-status-itapoa-txt');
+        const cardBadge = el('loja-status-itapoa-badge');
+        if (cardItapoa) {
+            cardItapoa.className = estaOffline
+                ? 'loja-status-item loja-status-offline'
+                : 'loja-status-item loja-status-ativa';
+        }
+        if (cardTxt) {
+            cardTxt.textContent = estaOffline
+                ? 'Offline — operadores veem tela de unidade inativa'
+                : 'Ativa — operadores podem lançar';
+        }
+        if (cardBadge) {
+            cardBadge.className = estaOffline
+                ? 'loja-status-badge loja-badge-offline'
+                : 'loja-status-badge loja-badge-ativa';
+            cardBadge.textContent = estaOffline ? '✗ Offline' : '✓ Online';
         }
     }
 
