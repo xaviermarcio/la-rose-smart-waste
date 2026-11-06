@@ -315,6 +315,16 @@ let LOJAS_OFFLINE = (() => {
     catch { return []; }
 })();
 
+// Sincroniza LOJAS_OFFLINE em tempo real quando o admin altera em outra aba
+window.addEventListener('storage', (e) => {
+    if (e.key !== 'lojas_offline_admin') return;
+    try {
+        const novasLojas = JSON.parse(e.newValue || '[]');
+        LOJAS_OFFLINE.length = 0;
+        novasLojas.forEach(l => LOJAS_OFFLINE.push(l));
+    } catch { /* ignora parse error */ }
+});
+
 // Transição suave entre etapas
 window.selecionarLoja = (lojaId) => {
 
@@ -552,9 +562,32 @@ if (document.body.id === 'app-page') {
     if (!lojaAtiva || !operadorAtivo) {
         window.location.replace('index.html');
     } else {
+        // Se já estava offline ao entrar, redireciona de volta
+        if (LOJAS_OFFLINE.includes(lojaAtiva)) {
+            window.location.replace('index.html');
+        }
+
         el('display-loja').innerText = lojaAtiva.toUpperCase().replace('_', ' ');
         el('display-operador').innerText = operadorAtivo;
         document.body.style.opacity = '1';
+
+        // Detecta se a loja é colocada offline enquanto o operador está lançando
+        window.addEventListener('storage', (e) => {
+            if (e.key !== 'lojas_offline_admin') return;
+            try {
+                const lojasOffline = JSON.parse(e.newValue || '[]');
+                if (lojasOffline.includes(lojaAtiva)) {
+                    showGlobalModal({
+                        titulo: '🔒 Unidade desativada',
+                        mensagem: `A unidade <b>${lojaAtiva.replace('_',' ')}</b> foi colocada offline pelo gestor. Você será redirecionado.`,
+                        confirmarTexto: 'ENTENDIDO',
+                        onConfirm: () => window.location.replace('index.html')
+                    });
+                    // Fecha modal automaticamente após 5s
+                    setTimeout(() => window.location.replace('index.html'), 5000);
+                }
+            } catch { /* ignora */ }
+        });
 
         // Sincroniza produtos extras do Firebase ao abrir
         carregarProdutosFirebase();
