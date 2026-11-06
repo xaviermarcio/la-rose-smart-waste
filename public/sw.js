@@ -1,5 +1,5 @@
 // MUDE ESTE NÚMERO para forçar atualização do cache em todos os dispositivos
-const CACHE_NAME = 'larose-v3.4';
+const CACHE_NAME = 'larose-v3.5';
 
 const ASSETS_TO_CACHE = [
     '/','/index.html','/lancamento.html','/dashboard.html','/manifest.json',
