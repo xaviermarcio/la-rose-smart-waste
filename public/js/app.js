@@ -7,6 +7,9 @@ import {
     collection,
     addDoc,
     getDocs,
+    getDoc,
+    setDoc,
+    onSnapshot,
     query,
     orderBy,
     serverTimestamp,
@@ -305,24 +308,66 @@ window.definirPerfil = (tipo) => {
     }, 450);
 };
 
-// ══ LOJAS OFFLINE ══
-// Para colocar uma loja offline, adicione o id aqui.
-// Para reativar, remova o id da lista.
-// Estado inicial vem do localStorage (admin pode alterar em tempo real)
-// Fallback: ['itapoa_parque'] — a loja que foi vendida fica offline por padrão.
-let LOJAS_OFFLINE = (() => {
-    try { return JSON.parse(localStorage.getItem('lojas_offline_admin') || '[]'); }
-    catch { return []; }
-})();
+// ==========================================
+// STATUS OFFLINE DAS LOJAS — Firestore como fonte da verdade
+// Documento: config/lojas_status  →  { offline: ["itapoa_parque"] }
+// onSnapshot propaga a mudança em tempo real para qualquer
+// dispositivo, aba ou PWA instalado no celular.
+// ==========================================
+let LOJAS_OFFLINE = [];
+let _offlineSnapshotInicial = true; // ignora o primeiro disparo (carga inicial)
 
-// Sincroniza LOJAS_OFFLINE em tempo real quando o admin altera em outra aba
-window.addEventListener('storage', (e) => {
-    if (e.key !== 'lojas_offline_admin') return;
-    try {
-        const novasLojas = JSON.parse(e.newValue || '[]');
-        LOJAS_OFFLINE.length = 0;
-        novasLojas.forEach(l => LOJAS_OFFLINE.push(l));
-    } catch { /* ignora parse error */ }
+const _statusDocRef = doc(db, 'config', 'lojas_status');
+
+// Escuta em tempo real — atualiza LOJAS_OFFLINE automaticamente em qualquer dispositivo/PWA
+onSnapshot(_statusDocRef, (snap) => {
+    const data = snap.exists() ? snap.data() : {};
+    const novas = Array.isArray(data.offline) ? data.offline : [];
+    LOJAS_OFFLINE.length = 0;
+    novas.forEach(l => LOJAS_OFFLINE.push(l));
+
+    if (_offlineSnapshotInicial) {
+        // Primeira leitura: apenas inicializa o array, não redireciona
+        _offlineSnapshotInicial = false;
+
+        // Na tela de lançamento: se a loja já estava offline ao entrar, redireciona silenciosamente
+        if (document.body.id === 'app-page') {
+            const lojaAtiva = localStorage.getItem('loja_ativa');
+            if (lojaAtiva && LOJAS_OFFLINE.includes(lojaAtiva)) {
+                window.location.replace('index.html');
+            }
+        }
+
+        // Na tela admin: atualiza botão e card com estado atual
+        if (document.body.id === 'admin-page' && typeof atualizarEstadoOfflineUI === 'function') {
+            atualizarEstadoOfflineUI(LOJAS_OFFLINE.includes('itapoa_parque'));
+        }
+        return;
+    }
+
+    // Disparos seguintes = mudanças reais feitas pelo admin
+
+    // Se o operador está lançando e sua loja acabou de ficar offline → avisa e redireciona
+    if (document.body.id === 'app-page') {
+        const lojaAtiva = localStorage.getItem('loja_ativa');
+        if (lojaAtiva && LOJAS_OFFLINE.includes(lojaAtiva)) {
+            showGlobalModal({
+                titulo: '🔒 Unidade desativada',
+                mensagem: `A unidade <b>${lojaAtiva.replace(/_/g,' ')}</b> foi colocada offline pelo gestor. Você será redirecionado.`,
+                confirmarTexto: 'ENTENDIDO',
+                onConfirm: () => window.location.replace('index.html')
+            });
+            setTimeout(() => window.location.replace('index.html'), 5000);
+        }
+    }
+
+    // Atualiza UI do admin em tempo real
+    if (document.body.id === 'admin-page' && typeof atualizarEstadoOfflineUI === 'function') {
+        atualizarEstadoOfflineUI(LOJAS_OFFLINE.includes('itapoa_parque'));
+    }
+}, () => {
+    // Sem conexão: mantém último estado conhecido
+    _offlineSnapshotInicial = false;
 });
 
 // Transição suave entre etapas
@@ -562,32 +607,15 @@ if (document.body.id === 'app-page') {
     if (!lojaAtiva || !operadorAtivo) {
         window.location.replace('index.html');
     } else {
-        // Se já estava offline ao entrar, redireciona de volta
-        if (LOJAS_OFFLINE.includes(lojaAtiva)) {
-            window.location.replace('index.html');
-        }
+        // Verificação de offline é feita pelo onSnapshot (topo do arquivo),
+        // que redireciona silenciosamente se a loja já estiver offline ao carregar.
 
         el('display-loja').innerText = lojaAtiva.toUpperCase().replace('_', ' ');
         el('display-operador').innerText = operadorAtivo;
         document.body.style.opacity = '1';
 
-        // Detecta se a loja é colocada offline enquanto o operador está lançando
-        window.addEventListener('storage', (e) => {
-            if (e.key !== 'lojas_offline_admin') return;
-            try {
-                const lojasOffline = JSON.parse(e.newValue || '[]');
-                if (lojasOffline.includes(lojaAtiva)) {
-                    showGlobalModal({
-                        titulo: '🔒 Unidade desativada',
-                        mensagem: `A unidade <b>${lojaAtiva.replace('_',' ')}</b> foi colocada offline pelo gestor. Você será redirecionado.`,
-                        confirmarTexto: 'ENTENDIDO',
-                        onConfirm: () => window.location.replace('index.html')
-                    });
-                    // Fecha modal automaticamente após 5s
-                    setTimeout(() => window.location.replace('index.html'), 5000);
-                }
-            } catch { /* ignora */ }
-        });
+        // Detecção de offline em tempo real é feita pelo onSnapshot global
+        // (topo do arquivo) — funciona em PWA, qualquer dispositivo e aba.
 
         // Sincroniza produtos extras do Firebase ao abrir
         carregarProdutosFirebase();
@@ -2565,47 +2593,36 @@ if (document.body.id === 'admin-page') {
     window.renderizarListaAdmin = renderDashboard;
 
     // === Toggle online/offline da Itapoã Parque ===
-    // Persiste em localStorage para sobreviver a reload
-    // (array LOJAS_OFFLINE em memória é re-derivado ao carregar)
-    const OFFLINE_KEY = 'lojas_offline_admin';
+    // Salva no Firestore (config/lojas_status) para funcionar
+    // em tempo real em qualquer dispositivo, aba ou PWA instalado.
+    // O onSnapshot global (topo do arquivo) propaga a mudança automaticamente.
 
-    function getLojasOfflineAdmin() {
-        try { return JSON.parse(localStorage.getItem(OFFLINE_KEY) || '[]'); }
-        catch { return []; }
-    }
-    function setLojasOfflineAdmin(arr) {
-        localStorage.setItem(OFFLINE_KEY, JSON.stringify(arr));
-    }
-
-    window.toggleLojaOffline = () => {
+    window.toggleLojaOffline = async () => {
         vibrar();
-        const lojas = getLojasOfflineAdmin();
-        const idx = lojas.indexOf('itapoa_parque');
-        const estaOffline = idx !== -1;
+        const estaOffline = LOJAS_OFFLINE.includes('itapoa_parque');
+        const novasLojas = estaOffline
+            ? LOJAS_OFFLINE.filter(l => l !== 'itapoa_parque')
+            : [...LOJAS_OFFLINE, 'itapoa_parque'];
 
-        if (estaOffline) {
-            // Reativar
-            lojas.splice(idx, 1);
-        } else {
-            // Colocar offline
-            lojas.push('itapoa_parque');
+        try {
+            await setDoc(_statusDocRef, { offline: novasLojas });
+            // onSnapshot vai atualizar LOJAS_OFFLINE e a UI automaticamente
+            showGlobalModal({
+                titulo: estaOffline ? '✅ Loja reativada' : '🔒 Loja colocada offline',
+                mensagem: estaOffline
+                    ? 'Itapoã Parque voltou a aparecer como ativa para todos os operadores.'
+                    : 'Itapoã Parque está offline. Todos os operadores verão a tela de unidade inativa.',
+                confirmarTexto: 'OK',
+                onConfirm: () => {}
+            });
+        } catch (err) {
+            showGlobalModal({
+                titulo: '⚠️ Erro',
+                mensagem: 'Não foi possível alterar o status da loja. Verifique a conexão e tente novamente.',
+                confirmarTexto: 'OK',
+                onConfirm: () => {}
+            });
         }
-        setLojasOfflineAdmin(lojas);
-        atualizarEstadoOfflineUI(!estaOffline);
-
-        // Atualiza o array global de LOJAS_OFFLINE em memória
-        // para que selecionarLoja reaja imediatamente
-        LOJAS_OFFLINE.length = 0;
-        lojas.forEach(l => LOJAS_OFFLINE.push(l));
-
-        showGlobalModal({
-            titulo: estaOffline ? '✅ Loja reativada' : '🔒 Loja colocada offline',
-            mensagem: estaOffline
-                ? 'Itapoã Parque voltou a aparecer como ativa para os operadores.'
-                : 'Itapoã Parque está offline. Os operadores verão a tela de unidade inativa.',
-            confirmarTexto: 'OK',
-            onConfirm: () => {}
-        });
     };
 
     function atualizarEstadoOfflineUI(estaOffline) {
@@ -2647,15 +2664,8 @@ if (document.body.id === 'admin-page') {
         }
     }
 
-    // Inicializa estado ao carregar
-    (function() {
-        const lojas = getLojasOfflineAdmin();
-        const estaOffline = lojas.includes('itapoa_parque');
-        atualizarEstadoOfflineUI(estaOffline);
-        // Sincroniza o array em memória
-        LOJAS_OFFLINE.length = 0;
-        lojas.forEach(l => LOJAS_OFFLINE.push(l));
-    })();
+    // Inicialização da UI é feita pelo onSnapshot global (topo do arquivo)
+    // que dispara imediatamente ao conectar e a cada mudança no Firestore.
 }
 
 // ==========================================
