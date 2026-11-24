@@ -1,13 +1,24 @@
 // MUDE ESTE NÚMERO para forçar atualização do cache em todos os dispositivos
-const CACHE_NAME = 'larose-v3.6';
+const CACHE_NAME = 'larose-v3.4';
 
 const ASSETS_TO_CACHE = [
     '/','/index.html','/lancamento.html','/dashboard.html','/manifest.json',
     '/css/style.css?v=3.4','/js/modal.js?v=3.4','/js/app.js?v=3.4',
     '/js/data.js','/js/firebase-config.js',
-    '/assets/images/logo.png','/assets/icons/icon-192.png','/assets/icons/icon-512.png',
-    'https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap',
-    'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'
+    '/assets/images/logo.png','/assets/icons/icon-192.png','/assets/icons/icon-512.png'
+];
+
+// Origens externas que NUNCA devem ser interceptadas pelo SW
+// (Firebase, Google Fonts, CDNs — usam streams que não podem ser clonados)
+const SKIP_ORIGINS = [
+    'firestore.googleapis.com',
+    'firebase.googleapis.com',
+    'identitytoolkit.googleapis.com',
+    'securetoken.googleapis.com',
+    'fonts.googleapis.com',
+    'fonts.gstatic.com',
+    'cdnjs.cloudflare.com',
+    'www.gstatic.com'
 ];
 
 self.addEventListener('install', e => {
@@ -28,12 +39,37 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
     const r = e.request;
     if (r.method !== 'GET') return;
+
+    // Ignora requisições externas (Firebase, Fonts, CDNs)
+    const url = new URL(r.url);
+    if (SKIP_ORIGINS.some(origin => url.hostname.includes(origin))) return;
+
+    // Páginas HTML: network-first (tenta buscar fresco, cai no cache se offline)
     if (r.headers.get('accept')?.includes('text/html')) {
-        e.respondWith(fetch(r).then(res => { caches.open(CACHE_NAME).then(c => c.put(r, res.clone())); return res; })
-            .catch(() => caches.match(r).then(c => c || caches.match('/index.html'))));
+        e.respondWith(
+            fetch(r)
+                .then(res => {
+                    const clone = res.clone();
+                    caches.open(CACHE_NAME).then(c => c.put(r, clone));
+                    return res;
+                })
+                .catch(() => caches.match(r).then(c => c || caches.match('/index.html')))
+        );
         return;
     }
-    e.respondWith(caches.match(r).then(c => c || fetch(r).then(res => {
-        caches.open(CACHE_NAME).then(ca => ca.put(r, res.clone())); return res;
-    })));
+
+    // Demais recursos da própria origem: cache-first
+    e.respondWith(
+        caches.match(r).then(cached => {
+            if (cached) return cached;
+            return fetch(r).then(res => {
+                // Só cacheia respostas válidas da mesma origem
+                if (res.ok && res.type === 'basic') {
+                    const clone = res.clone();
+                    caches.open(CACHE_NAME).then(c => c.put(r, clone));
+                }
+                return res;
+            });
+        })
+    );
 });
