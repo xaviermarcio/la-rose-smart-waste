@@ -2605,7 +2605,7 @@ if (document.body.id === 'admin-page') {
             : [...LOJAS_OFFLINE, 'itapoa_parque'];
 
         try {
-            await setDoc(_statusDocRef, { offline: novasLojas });
+            await setDoc(_statusDocRef, { offline: novasLojas }, { merge: true });
             // onSnapshot vai atualizar LOJAS_OFFLINE e a UI automaticamente
             showGlobalModal({
                 titulo: estaOffline ? '✅ Loja reativada' : '🔒 Loja colocada offline',
@@ -2616,16 +2616,17 @@ if (document.body.id === 'admin-page') {
                 onConfirm: () => {}
             });
         } catch (err) {
+            console.error('[LaRose] Erro ao salvar status offline:', err?.code, err?.message);
             showGlobalModal({
                 titulo: '⚠️ Erro',
-                mensagem: 'Não foi possível alterar o status da loja. Verifique a conexão e tente novamente.',
+                mensagem: `Não foi possível alterar o status da loja.<br><small style="color:#94a3b8">${err?.code || 'Verifique a conexão'}</small>`,
                 confirmarTexto: 'OK',
                 onConfirm: () => {}
             });
         }
     };
 
-    function atualizarEstadoOfflineUI(estaOffline) {
+    window.atualizarEstadoOfflineUI = function atualizarEstadoOfflineUI(estaOffline) {
         const btn = el('btn-toggle-offline');
         const txt = el('btn-toggle-offline-txt');
         const badge = el('sidebar-offline-badge');
@@ -2664,8 +2665,8 @@ if (document.body.id === 'admin-page') {
         }
     }
 
-    // Inicialização da UI é feita pelo onSnapshot global (topo do arquivo)
-    // que dispara imediatamente ao conectar e a cada mudança no Firestore.
+    // Aplica estado atual assim que o bloco admin inicializa
+    atualizarEstadoOfflineUI(LOJAS_OFFLINE.includes('itapoa_parque'));
 }
 
 // ==========================================
